@@ -220,14 +220,6 @@ public class RecyclingManager {
 		}
 		/* coarse dirt */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:dirt:2:1", new String[] { "minecraft:dirt:1:0", "minecraft:gravel:1:0" }));
-		/* podzol */
-		if (ConfigurationHandler.craftPodzol) {
-			jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:dirt:2:2", new String[] { "minecraft:dirt:1:0", "minecraft:sand:1:0" }));			
-		}
-		/* clay ball */
-		if (ConfigurationHandler.craftClay) {
-			jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:clay_ball:2:0", new String[] { "minecraft:stone:1:1", "minecraft:sand:1:0" }));			
-		}
 		/* clay */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:clay:1:0", new String[] { "minecraft:clay_ball:4:0", }));					
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:hardened_clay:1:0", new String[] { "minecraft:clay:1:0", }));								
@@ -410,10 +402,6 @@ public class RecyclingManager {
 				"minecraft:redstone:1:0",
 				"minecraft:planks:3:0",
 		}));
-		/** cobweb */
-		if (ConfigurationHandler.craftWeb) {
-			jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:web:1:0", new String[] { "minecraft:string:5:0", }));			
-		}
 		/** wool */
 		for (int i = 0; i < 16; i++) {
 			jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:wool:1:"+i, new String[] { 
@@ -894,24 +882,6 @@ public class RecyclingManager {
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_leggings:1:0", new String[] {
 				"minecraft:diamond:7:0",
 		}, true));
-		if (ConfigurationHandler.craftChainmail) {
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:chainmail_boots:1:0", new String[] {
-				"minecraft:iron_ingot:2:0",
-				"minecraft:iron_bars:2:0",
-		}, true));
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:chainmail_helmet:1:0", new String[] {
-				"minecraft:iron_ingot:3:0",
-				"minecraft:iron_bars:2:0",
-		}, true));
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:chainmail_chestplate:1:0", new String[] {
-				"minecraft:iron_ingot:6:0",
-				"minecraft:iron_bars:2:0",
-		}, true));
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:chainmail_leggings:1:0", new String[] {
-				"minecraft:iron_ingot:3:0",
-				"minecraft:iron_bars:4:0",
-		}, true));
-		}
 		/** recycler */
 		if (ConfigurationHandler.recyclerRecycled) {
 			jsonRecipesList.add(new JsonRecyclingRecipe(Main.MOD_ID+":recycler:1:0", new String[] {
