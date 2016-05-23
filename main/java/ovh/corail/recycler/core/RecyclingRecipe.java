@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 public class RecyclingRecipe {
 	private ItemStack itemRecipe;
 	private boolean canBeRepaired=false;
+	private boolean isUnbalanced=false;
 	private List<ItemStack> itemsList=new ArrayList<ItemStack>();
 	public RecyclingRecipe(Item item, int count, int meta) {
 		this.itemRecipe=new ItemStack(item, count, meta);
@@ -37,27 +38,43 @@ public class RecyclingRecipe {
 	public void setCanBeRepaired(boolean state) {
 		canBeRepaired=state;
 	}
+	
 	public boolean canBeRepaired() {
 		return canBeRepaired;
 	}
+	
+	public void setUnbalanced(boolean state) {
+		isUnbalanced=state;
+	}
+	
+	public boolean isUnbalanced() {
+		return isUnbalanced;
+	}
+	
 	public int getMeta() {
 		return itemRecipe.getItemDamage();
 	}
+	
 	public Integer getCount() {
 		return itemsList.size();
 	}
+	
 	public void addStack(Item item, int count, int meta) {
 		itemsList.add(new ItemStack(item, count, meta));
 	}
+	
 	public void addStack(Block block, int count, int meta) {
 		addStack(Item.getItemFromBlock(block), count, meta);
 	}
+	
 	public void addStack(ItemStack stack) {
 		itemsList.add(stack);
 	}
+	
 	public ItemStack getStack(int index) {
 		return itemsList.get(index);
 	}
+	
 	public void setStack(int index, ItemStack stack) {
 		itemsList.set(index, stack);
 	}

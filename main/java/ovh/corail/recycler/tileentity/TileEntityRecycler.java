@@ -24,7 +24,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 	public InventoryBasic visual;
 	private RecyclingManager recyclingManager;
 	private int countTicks = 0;
-	private final int maxTicks = 200;
+	private final int maxTicks = 100;
 	private boolean isWorking = false;
 	private int progress = 0;
 	private int cantRecycleTicks = 0;
