@@ -6,9 +6,10 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.handler.ConfigurationHandler;
 
 public class GuiButtonRecycler extends GuiButton {
-	protected static final ResourceLocation newButtonTextures = new ResourceLocation(Main.MOD_ID + ":textures/gui/recycler.png");
+	//protected static final ResourceLocation newButtonTextures = new ResourceLocation(Main.MOD_ID + ":textures/gui/recycler.png");
 
 	public GuiButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
 		super(buttonId, x, y, buttonText);
@@ -22,7 +23,7 @@ public class GuiButtonRecycler extends GuiButton {
 			int buttonWidth = 74;
 			
 			FontRenderer fontrenderer = mc.fontRendererObj;
-			mc.getTextureManager().bindTexture(newButtonTextures);
+			mc.getTextureManager().bindTexture(new ResourceLocation(Main.MOD_ID + ":textures/gui/" + (ConfigurationHandler.fancyGui ?  "fancy_recycler.png" : "vanilla_recycler.png")));
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width	&& mouseY < this.yPosition + this.height;
 			int i = this.getHoverState(this.hovered);

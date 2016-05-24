@@ -85,6 +85,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		if (num_recipe < 0) {
 			Helper.addChatMessage("tile.recycler.message.noRecipe", currentPlayer, true);
 			transferSlotInput();
+			emptyVisual();
 			return false;
 		}
 		RecyclingRecipe currentRecipe = recyclingManager.getRecipe(num_recipe);
@@ -227,7 +228,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		emptyVisual();
 		List<ItemStack> itemsList = recyclingManager.getResultStack(stack, 1);
 		if (itemsList.isEmpty() && getStackInSlot(0) != null) {
-			itemsList.add(new ItemStack(getStackInSlot(0).getItem(), 1));
+			itemsList.add(getStackInSlot(0));
 		}
 		fillVisual(itemsList);
 	}
