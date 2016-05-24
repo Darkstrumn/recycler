@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -38,16 +39,23 @@ public class CommonProxy {
 		Helper.getNewRecipes();
 		/** packet handler */
 		PacketHandler.init();
-		/** load json recycling recipes */
-		File recyclingRecipesFile = new File(event.getModConfigurationDirectory(), "recyclingRecipes.json");
-		if (!recyclingRecipesFile.exists()) {
-			recyclingRecipesFile.createNewFile();
-			FileWriter fw = new FileWriter(recyclingRecipesFile);
-			List<JsonRecyclingRecipe> jsonRecipesList = RecyclingManager.getJsonRecyclingRecipes();
+		/** load default recycling recipes */
+		List<JsonRecyclingRecipe> recipesList = RecyclingManager.getJsonRecyclingRecipes();
+		RecyclingManager.loadJsonRecipes(recipesList);
+		/** load json user defined recycling recipes */
+		File userRecyclingRecipesFile = new File(event.getModConfigurationDirectory(), "userRecyclingRecipes.json");
+		if (!userRecyclingRecipesFile.exists()) {
+			userRecyclingRecipesFile.createNewFile();
+			FileWriter fw = new FileWriter(userRecyclingRecipesFile);
+			List<JsonRecyclingRecipe> jsonRecipesList = new ArrayList<JsonRecyclingRecipe>();
+			jsonRecipesList.add(new JsonRecyclingRecipe(Main.MOD_ID+":recycler:1:0", new String[] {
+					"minecraft:cobblestone:6:0",
+					"minecraft:iron_ingot:3:0",
+			}));
 			fw.write(new GsonBuilder().setPrettyPrinting().create().toJson(jsonRecipesList));
 			fw.close();
 		}
-		List<JsonRecyclingRecipe> jsonRecipesList = new Gson().fromJson(new BufferedReader(new FileReader(recyclingRecipesFile)),
+		List<JsonRecyclingRecipe> jsonRecipesList = new Gson().fromJson(new BufferedReader(new FileReader(userRecyclingRecipesFile)),
 			new TypeToken<List<JsonRecyclingRecipe>>() {}.getType());
 		RecyclingManager.loadJsonRecipes(jsonRecipesList);
 	}

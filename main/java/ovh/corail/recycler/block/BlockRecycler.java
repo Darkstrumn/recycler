@@ -32,7 +32,6 @@ import ovh.corail.recycler.tileentity.TileEntityRecycler;
 public class BlockRecycler extends Block implements ITileEntityProvider {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
 	public static final PropertyBool ENABLED = PropertyBool.create("enabled");
-	private static boolean isGrind = false;
 	private static String name = "recycler";
 
 	public BlockRecycler() {
@@ -76,10 +75,6 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState().withProperty(FACING, EnumFacing.getFront(meta & 7)).withProperty(ENABLED, (meta & 8) != 0);
     }
-
-	public boolean isGrind() {
-		return isGrind;
-	}
 	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {

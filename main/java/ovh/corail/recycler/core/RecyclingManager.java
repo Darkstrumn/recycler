@@ -63,12 +63,11 @@ public class RecyclingManager {
 			if (recipes.get(recipe_num).canBeRepaired()) {
 				testStack.setItemDamage(0);
 			}
-			if (testStack==recipes.get(recipe_num).getItemRecipe()) {
+			if (testStack.isItemEqual(recipes.get(recipe_num).getItemRecipe())) {
 				if (!ConfigurationHandler.unbalancedRecipes && recipes.get(recipe_num).isUnbalanced()) {
 					return -1;
-				} else {
-					return recipe_num;
 				}
+				return recipe_num;
 			}
 		}
 		return -1;
@@ -135,11 +134,6 @@ public class RecyclingManager {
 				itemsList.add(fullStack);
 			}
 
-		}
-		if (isGrind) { // TODO améliorer
-			itemsList = this.getResultList(itemsList);
-			itemsList = this.getResultList(itemsList);
-			itemsList = this.getResultList(itemsList);
 		}
 		return itemsList;
 	}
@@ -884,13 +878,6 @@ public class RecyclingManager {
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_leggings:1:0", new String[] {
 				"minecraft:diamond:7:0",
 		}, true));
-		/** recycler */
-		if (ConfigurationHandler.recyclerRecycled) {
-			jsonRecipesList.add(new JsonRecyclingRecipe(Main.MOD_ID+":recycler:1:0", new String[] {
-					"minecraft:cobblestone:6:0",
-					"minecraft:iron_ingot:3:0",
-			}));
-		}
 		return jsonRecipesList;
 	}
 	private RecyclingManager() {
@@ -900,7 +887,19 @@ public class RecyclingManager {
 		for (int i = 0; i < jsonRecipes.size(); i++) {
 			RecyclingRecipe recipe = convertJsonRecipe(jsonRecipes.get(i));
 			if (recipe != null && recipe.getCount() > 0) {
-				instance.recipes.add(recipe);
+				/** check for same existing recipe */
+				int foundRecipe = -1;
+				for (int numRecipe=0 ; numRecipe < instance.recipes.size() ; numRecipe++) {
+					if (instance.recipes.get(numRecipe).getItemRecipe() == recipe.getItemRecipe()) {
+						foundRecipe = numRecipe;
+						break;
+					}
+				}
+				if (foundRecipe == -1) {
+					instance.recipes.add(recipe);
+				} else {
+					instance.recipes.set(foundRecipe, recipe);
+				}
 			} else {
 				//println("Erreur.... Recette : "+i+"  Item : "+jsonRecipes.get(i).inputItem);
 			}
