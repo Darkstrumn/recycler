@@ -226,6 +226,9 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 	public void refreshVisual(ItemStack stack) {
 		emptyVisual();
 		List<ItemStack> itemsList = recyclingManager.getResultStack(stack, 1);
+		if (itemsList.isEmpty() && getStackInSlot(0) != null) {
+			itemsList.add(new ItemStack(getStackInSlot(0).getItem(), 1));
+		}
 		fillVisual(itemsList);
 	}
 

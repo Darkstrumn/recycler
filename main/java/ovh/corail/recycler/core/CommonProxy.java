@@ -28,7 +28,7 @@ import ovh.corail.recycler.tileentity.TileEntityRecycler;
 public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent event) throws IOException {
 		/** config */
-		ConfigurationHandler.config = new Configuration(event.getSuggestedConfigurationFile());
+		ConfigurationHandler.config = new Configuration(event.getSuggestedConfigurationFile(), Main.MOD_VER);
 		ConfigurationHandler.config.load();
 		ConfigurationHandler.refreshConfig();
 		/** register items and blocks */

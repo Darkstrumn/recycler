@@ -17,6 +17,7 @@ import ovh.corail.recycler.container.ContainerRecycler;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
+import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.packet.RecycleMessage;
 import ovh.corail.recycler.packet.ServerProgressMessage;
@@ -29,7 +30,7 @@ public class GuiRecycler extends GuiContainer {
 	public int k = 0;
 	public TileEntityRecycler inventory;
 	public EntityPlayer currentPlayer;
-	private static ResourceLocation textureBg = new ResourceLocation(Main.MOD_ID + ":textures/gui/recycler.png");
+	//private static ResourceLocation textureBg = new ResourceLocation(Main.MOD_ID + ":textures/gui/" + (ConfigurationHandler.fancyGui ?  "fancy_recycler.png" : "vanilla_recycler.png"));
 	
 	public GuiRecycler(EntityPlayer player, World world, int x, int y, int z, TileEntityRecycler inventory) {
 		super(new ContainerRecycler(player, world, x, y, z, inventory));
@@ -39,14 +40,14 @@ public class GuiRecycler extends GuiContainer {
 		this.j = y;
 		this.k = z;
 		this.xSize = 176;
-		this.ySize = 176;
+		this.ySize = ConfigurationHandler.fancyGui? 176 : 179;
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GL11.glScalef(1F, 1F, 1F);
-		mc.renderEngine.bindTexture(textureBg);
+		mc.renderEngine.bindTexture(new ResourceLocation(Main.MOD_ID + ":textures/gui/" + (ConfigurationHandler.fancyGui ?  "fancy_recycler.png" : "vanilla_recycler.png")));
 		int posX = ((this.width - this.xSize) / 2);
 		int posY = ((this.height - this.ySize) / 2);
 		this.drawTexturedModalRect(posX, posY, 0, 0, this.xSize, this.ySize);
@@ -81,7 +82,7 @@ public class GuiRecycler extends GuiContainer {
 				boolean enoughStackSize = inventory.getStackInSlot(0).stackSize >= inputCount;
 				// TODO Current Changes
 				if (inventory.isWorking() && enoughStackSize) {
-					mc.renderEngine.bindTexture(textureBg);
+					mc.renderEngine.bindTexture(new ResourceLocation(Main.MOD_ID + ":textures/gui/" + (ConfigurationHandler.fancyGui ?  "fancy_recycler.png" : "vanilla_recycler.png")));
 					drawTexturedModalRect(78, 41, 0, 212, 19, 4);
 					int widthWorking=(int) Math.floor((double) inventory.getPercentWorking()*17.0/100);
 					drawTexturedModalRect(79, 42, 1, 216, widthWorking, 2);

@@ -8,6 +8,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.packet.ServerProgressMessage;
 import ovh.corail.recycler.packet.VisualMessage;
@@ -34,7 +35,7 @@ public class ContainerRecycler extends Container {
 		}
 		for (int i = 0 ; i < 3 ; i++) {
 			for (int j = 0 ; j < 3 ; j++) {
-				this.addSlotToContainer(new SlotVisual(inventory, inventory.visual, (i*3) + j, (j * 16) + 118, i*16 + 2));
+				this.addSlotToContainer(new SlotVisual(inventory, inventory.visual, (i*3) + j, (j * 16) + 118, i*16 + (ConfigurationHandler.fancyGui?2:3)));
 			}
 		}
 		PacketHandler.INSTANCE.sendToServer(new VisualMessage(inventory.getPos()));
