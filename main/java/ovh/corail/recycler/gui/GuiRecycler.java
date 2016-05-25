@@ -82,9 +82,9 @@ public class GuiRecycler extends GuiContainer {
 				// TODO Current Changes
 				if (inventory.isWorking() && enoughStackSize) {
 					mc.renderEngine.bindTexture(ConfigurationHandler.fancyGui ? Main.textureFancyRecycler : Main.textureVanillaRecycler);
-					drawTexturedModalRect(78, 41, 0, 212, 19, 4);
+					drawTexturedModalRect(78, 41, 0, 225, 19, 4);
 					int widthWorking=(int) Math.floor((double) inventory.getPercentWorking()*17.0/100);
-					drawTexturedModalRect(79, 42, 1, 216, widthWorking, 2);
+					drawTexturedModalRect(79, 42, 1, 229, widthWorking, 2);
 					//this.fontRendererObj.drawString(Integer.toString(inventory.getPercentWorking())+" %", (74), (11), 0xffffff);
 				}
 				this.fontRendererObj.drawString("X " + Integer.toString(inventory.getStackInSlot(0).stackSize/inputCount), (70), (13), (enoughStackSize?0x00ff00:0xff0000));
@@ -112,9 +112,9 @@ public class GuiRecycler extends GuiContainer {
 		this.guiTop = (this.height - ySize) / 2;
 		Keyboard.enableRepeatEvents(true);
 		this.buttonList.clear();
-		this.buttonList.add(new GuiButtonRecycler(0, this.guiLeft + 8, this.guiTop + 90, 53, 14, Helper.getTranslation("button.recycle")));
-		this.buttonList.add(new GuiButtonRecycler(1, this.guiLeft + 62, this.guiTop + 90, 53, 14, Helper.getTranslation("button.auto")));
-		this.buttonList.add(new GuiButtonRecycler(2, this.guiLeft + 116, this.guiTop + 90, 53, 14, Helper.getTranslation("button.takeAll")));
+		this.buttonList.add(new GuiButtonRecycler(0, this.guiLeft + 8, this.guiTop + 90, 53, 14, Helper.getTranslation("button.recycle"), inventory));
+		this.buttonList.add(new GuiButtonRecycler(1, this.guiLeft + 62, this.guiTop + 90, 53, 14, Helper.getTranslation("button.auto"), inventory));
+		this.buttonList.add(new GuiButtonRecycler(2, this.guiLeft + 116, this.guiTop + 90, 53, 14, Helper.getTranslation("button.takeAll"), inventory));
 	}
 
 	@Override

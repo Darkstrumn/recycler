@@ -7,10 +7,14 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.handler.ConfigurationHandler;
+import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class GuiButtonRecycler extends GuiButton {
-	public GuiButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
+	private TileEntityRecycler invent;
+
+	public GuiButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, TileEntityRecycler invent) {
 		super(buttonId, x, y, buttonText);
+		this.invent = invent;
 		this.width = widthIn;
 		this.height = heightIn;
 	}
@@ -19,17 +23,38 @@ public class GuiButtonRecycler extends GuiButton {
 		if (this.visible) {
 			int buttonHeight = 14;
 			int buttonWidth = 74;
-			
 			FontRenderer fontrenderer = mc.fontRendererObj;
 			mc.getTextureManager().bindTexture(ConfigurationHandler.fancyGui ? Main.textureFancyRecycler : Main.textureVanillaRecycler);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width	&& mouseY < this.yPosition + this.height;
-			int i = this.getHoverState(this.hovered);
+			int isHovered = this.getHoverState(this.hovered);
 			GlStateManager.enableBlend();
 			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,	GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-			this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 183+(i==2?14:0)/*46 + i * buttonHeight*/, this.width / 2, this.height);
-			this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, buttonWidth - this.width / 2, 183+(i==2?14:0)/*46 + i * buttonHeight*/, this.width / 2, this.height);
+			
+			boolean valid = false;
+			/** button take all */
+			if (id == 2) {
+				for (int i=invent.firstOutput;i<invent.getSizeInventory();i++) {
+					if (invent.getStackInSlot(i) != null) {
+						valid = true;
+						break;
+					}
+				}
+			/** input slot empty */
+			} else if (invent.getStackInSlot(0) != null && invent.getStackInSlot(1) != null) {
+				valid = true;
+				/** button recycle */
+				if (id == 0 && invent.isWorking()) {
+					valid = false;
+				}
+			}
+			this.enabled=valid;
+
+			/** texture height to read the button */
+			int readButton = (!valid?28:(isHovered==2?14:0));
+			this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 183 + readButton, this.width / 2, this.height);
+			this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, buttonWidth - this.width / 2, 183 + readButton, this.width / 2, this.height);
 			this.mouseDragged(mc, mouseX, mouseY);
 			int j = 14737632;
 
