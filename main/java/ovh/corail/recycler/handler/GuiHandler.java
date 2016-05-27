@@ -11,7 +11,7 @@ import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class GuiHandler implements IGuiHandler {
 	private static final int MOD_TILE_ENTITY_GUI =0;
-	public static int getGuiID() {
+	private static int getGuiID() {
 		return MOD_TILE_ENTITY_GUI;
 	}
 	

@@ -4,7 +4,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -15,18 +14,10 @@ import ovh.corail.recycler.packet.VisualMessage;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class ContainerRecycler extends Container {
-	public int i = 0;
-	public int j = 0;
-	public int k = 0;
-	public TileEntityRecycler inventory;
-	public IInventory visual;
+	private TileEntityRecycler inventory;
 
 	public ContainerRecycler(EntityPlayer player, World world, int x, int y, int z, TileEntityRecycler inventory) {
 		this.inventory = inventory;
-		this.visual = inventory.visual;
-		this.i = x;
-		this.j = y;
-		this.k = z;
 		this.addSlotToContainer(new SlotRecycler(inventory, 0, 27, 9));
 		this.addSlotToContainer(new SlotRecycler(inventory, 1, 27, 27));
 		for (int i = inventory.firstOutput; i <= 10; i++) {
@@ -35,7 +26,7 @@ public class ContainerRecycler extends Container {
 		}
 		for (int i = 0 ; i < 3 ; i++) {
 			for (int j = 0 ; j < 3 ; j++) {
-				this.addSlotToContainer(new SlotVisual(inventory, inventory.visual, (i*3) + j, (j * 16) + 118, i*16 + (ConfigurationHandler.fancyGui?2:3)));
+				this.addSlotToContainer(new SlotVisual(inventory.visual, (i*3) + j, (j * 16) + 118, i*16 + (ConfigurationHandler.fancyGui?2:3)));
 			}
 		}
 		PacketHandler.INSTANCE.sendToServer(new VisualMessage(inventory.getPos()));
@@ -50,13 +41,14 @@ public class ContainerRecycler extends Container {
 			PacketHandler.INSTANCE.sendToServer(new VisualMessage(inventory.getPos()));
 			inventory.refreshVisual(inventory.getStackInSlot(0));
 		}
+		/** reset progress */
 		if ((slotId == 0 || slotId == 1) && inventory.isWorking()) {
-			PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(inventory.getPos(), 0, inventory.isWorking(), true));
+			PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(inventory.getPos(), 0));
 		}
 		return stack;
 	}
 
-	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer) {
+	private void bindPlayerInventory(InventoryPlayer inventoryPlayer) {
 		int i;
 		int j;
 		for (i = 0; i < 3; i++) {

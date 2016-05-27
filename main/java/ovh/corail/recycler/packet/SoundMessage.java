@@ -1,26 +1,23 @@
 package ovh.corail.recycler.packet;
 
-import java.util.List;
 import java.util.Random;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import ovh.corail.recycler.handler.SoundHandler;
 
 public class SoundMessage implements IMessage {
-	BlockPos currentPos;
+	private BlockPos currentPos;
 	/** numSound 0=recycle, 1=working */
-	int numSound;
+	private int numSound;
 
 	public SoundMessage() {	
 	}

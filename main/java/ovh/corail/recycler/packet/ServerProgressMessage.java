@@ -1,7 +1,6 @@
 package ovh.corail.recycler.packet;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.util.math.BlockPos;
@@ -14,34 +13,27 @@ import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class ServerProgressMessage implements IMessage {
-	BlockPos currentPos; 
-	int progress;
-	boolean isWorking, isReset;
+	private BlockPos currentPos; 
+	private int progress;
 
 	public ServerProgressMessage() {
 	}
 
-	public ServerProgressMessage(BlockPos currentPos, int progress, boolean isWorking, boolean isReset) {
+	public ServerProgressMessage(BlockPos currentPos, int progress) {
 		this.currentPos = currentPos;
 		this.progress = progress;
-		this.isWorking = isWorking;
-		this.isReset = isReset;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		this.currentPos = BlockPos.fromLong(buf.readLong());
 		this.progress = buf.readInt();
-		this.isWorking = buf.readBoolean();
-		this.isReset = buf.readBoolean();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
 		buf.writeLong(this.currentPos.toLong());
 		buf.writeInt(this.progress);
-		buf.writeBoolean(this.isWorking);
-		buf.writeBoolean(this.isReset);
 	}
 	
 	public static class Handler implements IMessageHandler<ServerProgressMessage, IMessage> {
@@ -55,12 +47,12 @@ public class ServerProgressMessage implements IMessage {
 					TileEntity tile = worldIn.getTileEntity(message.currentPos);
 					if (tile == null || !(tile instanceof TileEntityRecycler)) { return ; }
 					TileEntityRecycler recycler = (TileEntityRecycler) worldIn.getTileEntity(message.currentPos);
-   					recycler.setProgress(message.progress, message.isWorking, message.isReset);
+   					recycler.setProgress(message.progress);
    					/*if (message.isReset) {
    						IBlockState state = worldIn.getBlockState(message.currentPos);
    						worldIn.setBlockState(message.currentPos, state.withProperty(BlockRecycler.ENABLED, message.isWorking), 3);
    					}*/
-   					PacketHandler.INSTANCE.sendToAllAround(new ClientProgressMessage(message.currentPos, message.progress, message.isWorking, message.isReset),
+   					PacketHandler.INSTANCE.sendToAllAround(new ClientProgressMessage(message.currentPos, message.progress),
    							new TargetPoint(worldIn.provider.getDimension(), (double) message.currentPos.getX(), (double) message.currentPos.getY(), (double) message.currentPos.getZ(), 12.0d));
 				}
 			});

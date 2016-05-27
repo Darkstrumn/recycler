@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class VisualMessage implements IMessage {
-	BlockPos currentPos;
+	private BlockPos currentPos;
 
 	public VisualMessage() {
 	}

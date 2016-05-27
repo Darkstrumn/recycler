@@ -11,8 +11,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class RecycleMessage implements IMessage {
-	int id;
-	BlockPos currentPos;
+	private int id;
+	private BlockPos currentPos;
 
 	public RecycleMessage() {
 	}

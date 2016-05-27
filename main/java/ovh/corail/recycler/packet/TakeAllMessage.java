@@ -14,7 +14,7 @@ import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class TakeAllMessage implements IMessage {
-	BlockPos currentPos;
+	private BlockPos currentPos;
 
 	public TakeAllMessage() {
 		}

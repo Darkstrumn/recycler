@@ -11,7 +11,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import ovh.corail.recycler.container.ContainerRecycler;
 import ovh.corail.recycler.core.Helper;
@@ -20,24 +19,18 @@ import ovh.corail.recycler.core.RecyclingManager;
 import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.packet.RecycleMessage;
-import ovh.corail.recycler.packet.ServerProgressMessage;
 import ovh.corail.recycler.packet.TakeAllMessage;
+import ovh.corail.recycler.packet.WorkingMessage;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class GuiRecycler extends GuiContainer {
-	public int i = 0;
-	public int j = 0;
-	public int k = 0;
-	public TileEntityRecycler inventory;
-	public EntityPlayer currentPlayer;
+	private TileEntityRecycler inventory;
+	private EntityPlayer currentPlayer;
 	
 	public GuiRecycler(EntityPlayer player, World world, int x, int y, int z, TileEntityRecycler inventory) {
 		super(new ContainerRecycler(player, world, x, y, z, inventory));
 		this.inventory = inventory;
 		this.currentPlayer = player;
-		this.i = x;
-		this.j = y;
-		this.k = z;
 		this.xSize = 176;
 		this.ySize = ConfigurationHandler.fancyGui? 176 : 179;
 	}
@@ -126,17 +119,17 @@ public class GuiRecycler extends GuiContainer {
 	protected void actionPerformed(GuiButton button) throws IOException {
 		super.actionPerformed(button);
 		switch (button.id) {
-		case 0: // Recycle
+		case 0: /** Recycle */
 			PacketHandler.INSTANCE.sendToServer(new RecycleMessage(button.id, inventory.getPos()));
 			if (inventory.recycle(currentPlayer)) {
 				currentPlayer.addStat(Main.achievementFirstRecycle, 1);
 			}
 			break;
-		case 1: // Switch Working
-			PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(inventory.getPos(), 0, !inventory.isWorking(), true));
-			
+		case 1: /** Switch Working */
+			inventory.setWorking(!this.inventory.isWorking());
+			PacketHandler.INSTANCE.sendToServer(new WorkingMessage(inventory.getPos(), inventory.isWorking()));
 			break;
-		case 2: // Take All
+		case 2: /** Take All */
 			PacketHandler.INSTANCE.sendToServer(new TakeAllMessage(inventory.getPos()));
 			break;
 		default:

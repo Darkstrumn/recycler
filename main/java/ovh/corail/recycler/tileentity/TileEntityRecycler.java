@@ -1,6 +1,5 @@
 package ovh.corail.recycler.tileentity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,16 +8,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
-import ovh.corail.recycler.block.BlockRecycler;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
 import ovh.corail.recycler.core.RecyclingRecipe;
 import ovh.corail.recycler.handler.PacketHandler;
-import ovh.corail.recycler.handler.SoundHandler;
-import ovh.corail.recycler.packet.ClientProgressMessage;
 import ovh.corail.recycler.packet.ServerProgressMessage;
 import ovh.corail.recycler.packet.SoundMessage;
+import ovh.corail.recycler.packet.WorkingMessage;
 
 public class TileEntityRecycler extends TileEntityInventory implements ITickable {
 	public InventoryBasic visual;
@@ -35,7 +32,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		recyclingManager = RecyclingManager.getInstance();
 	}
 
-	public boolean canRecycle(EntityPlayer currentPlayer) {
+	private boolean canRecycle(EntityPlayer currentPlayer) {
 		/** item input slot empty */
 		if (getStackInSlot(0) == null) {
 			Helper.addChatMessage("tile.recycler.message.emptySlot", currentPlayer, true);
@@ -66,7 +63,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		return true;
 	}
 
-	public boolean transferSlotInput() {
+	private boolean transferSlotInput() {
 		int emptySlot = this.getEmptySlot();
 		if (emptySlot == -1 || getStackInSlot(0) == null) { return false; }
 		ItemStack stack = getStackInSlot(0).copy();
@@ -209,7 +206,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		return true;
 	}
 
-	public void fillVisual(List<ItemStack> itemsList) {
+	private void fillVisual(List<ItemStack> itemsList) {
 		int num_slot = 0;
 		for (int i = 0; i < itemsList.size(); i++) {
 			if (num_slot < visual.getSizeInventory()) {
@@ -218,7 +215,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		}
 	}
 
-	public void emptyVisual() {
+	private void emptyVisual() {
 		for (int i = 0; i < visual.getSizeInventory(); i++) {
 			visual.setInventorySlotContents(i, null);
 		}
@@ -237,7 +234,6 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 	public void update() {
 		if (worldObj.isRemote || !isWorking) { return; }
 		countTicks--;
-		boolean hasChanged = false;
 		
 		/** each tick */
 		if (!canRecycle((EntityPlayer) null)) {
@@ -265,12 +261,10 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			/** no input item or no disk */
 			if (getStackInSlot(0) == null || getStackInSlot(1) == null) {
 				isWorking = false;
-				hasChanged = true;
 			}
 			/** no output slot */
 			if (!transferSlotInput()) {
 				isWorking = false;
-				hasChanged = true;
 			}
 			cantRecycleTicks = 0;
 			countTicks = maxTicks;
@@ -289,7 +283,10 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		}
 
 		progress = (int) Math.floor(((double) (maxTicks-countTicks) / (double) maxTicks) * 100.0);
-		PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(getPos(), progress, isWorking, hasChanged));
+		PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(getPos(), progress));
+		if (!isWorking) {
+			PacketHandler.INSTANCE.sendToServer(new WorkingMessage(getPos(), false));
+		}
 	}
 
 	public int getPercentWorking() {
@@ -304,10 +301,15 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		return countTicks;
 	}
 	
-	public void setProgress(int progress, boolean isWorking, boolean isReset) {
-		this.progress = progress;
+	public void setWorking(boolean isWorking) {
+		this.setProgress(0);
 		this.isWorking = isWorking;
-		if (isReset) {
+
+	}
+	
+	public void setProgress(int progress) {
+		this.progress = progress;
+		if (progress == 0) {
 			countTicks = maxTicks;
 		}
 	}

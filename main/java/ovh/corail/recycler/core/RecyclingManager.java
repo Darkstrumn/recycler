@@ -10,8 +10,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import ovh.corail.recycler.handler.ConfigurationHandler;
 
 public class RecyclingManager {
@@ -78,7 +76,7 @@ public class RecyclingManager {
 		return getResultStack(stack, nb_input, false);
 	}
 
-	public List<ItemStack> getResultStack(ItemStack stack, int nb_input, boolean isGrind) {
+	private List<ItemStack> getResultStack(ItemStack stack, int nb_input, boolean isGrind) {
 		List<ItemStack> itemsList = new ArrayList<ItemStack>();
 		int num_recipe = hasRecipe(stack);
 		if (num_recipe < 0) {
@@ -907,7 +905,7 @@ public class RecyclingManager {
 		}
 	}
 
-	public static RecyclingRecipe convertJsonRecipe(JsonRecyclingRecipe jRecipe) {
+	private static RecyclingRecipe convertJsonRecipe(JsonRecyclingRecipe jRecipe) {
 		ItemStack inputItem = StringToItemStack(jRecipe.inputItem);
 		if (inputItem == null) { return null; }
 		RecyclingRecipe recipe = new RecyclingRecipe(inputItem);
@@ -922,7 +920,7 @@ public class RecyclingManager {
 		return recipe;
 	}
 
-	public static ItemStack StringToItemStack(String value) {
+	private static ItemStack StringToItemStack(String value) {
 		String[] parts = value.split(":");
 		if (parts.length == 4) {
 			//Item item = (Item) GameRegistry.findItem(parts[0], parts[1]);
