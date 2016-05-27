@@ -22,7 +22,7 @@ import ovh.corail.recycler.packet.SoundMessage;
 
 public class TileEntityRecycler extends TileEntityInventory implements ITickable {
 	public InventoryBasic visual;
-	private RecyclingManager recyclingManager;
+	public RecyclingManager recyclingManager;
 	private int countTicks = 0;
 	private final int maxTicks = 100;
 	private boolean isWorking = false;

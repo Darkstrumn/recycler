@@ -56,12 +56,12 @@ public class ServerProgressMessage implements IMessage {
 					if (tile == null || !(tile instanceof TileEntityRecycler)) { return ; }
 					TileEntityRecycler recycler = (TileEntityRecycler) worldIn.getTileEntity(message.currentPos);
    					recycler.setProgress(message.progress, message.isWorking, message.isReset);
-   					if (message.isReset) {
+   					/*if (message.isReset) {
    						IBlockState state = worldIn.getBlockState(message.currentPos);
-   						//worldIn.setBlockState(message.currentPos, state.withProperty(BlockRecycler.ENABLED, message.isWorking), 3);
-   					}
+   						worldIn.setBlockState(message.currentPos, state.withProperty(BlockRecycler.ENABLED, message.isWorking), 3);
+   					}*/
    					PacketHandler.INSTANCE.sendToAllAround(new ClientProgressMessage(message.currentPos, message.progress, message.isWorking, message.isReset),
-   							new TargetPoint(worldIn.provider.getDimension(), message.currentPos.getX(), message.currentPos.getY(), message.currentPos.getZ(), 12));
+   							new TargetPoint(worldIn.provider.getDimension(), (double) message.currentPos.getX(), (double) message.currentPos.getY(), (double) message.currentPos.getZ(), 12.0d));
 				}
 			});
 			return null;

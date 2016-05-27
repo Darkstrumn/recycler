@@ -43,10 +43,18 @@ public class GuiButtonRecycler extends GuiButton {
 				}
 			/** input slot empty */
 			} else if (invent.getStackInSlot(0) != null && invent.getStackInSlot(1) != null) {
-				valid = true;
-				/** button recycle */
-				if (id == 0 && invent.isWorking()) {
-					valid = false;
+				valid = false;
+				/** input stacksize */
+				if ((id == 0 || id == 1) && invent.getStackInSlot(0) != null) {
+					int numRecipe = invent.recyclingManager.hasRecipe(invent.getStackInSlot(0));
+					if (numRecipe >= 0 && invent.getStackInSlot(0).stackSize >= invent.recyclingManager.getRecipe(numRecipe).getItemRecipe().stackSize) {
+						if (id == 1) {
+							valid= true;
+						/** button recycle */
+						} else if (!invent.isWorking()) {
+							valid = true;
+						}				
+					}
 				}
 			}
 			this.enabled=valid;

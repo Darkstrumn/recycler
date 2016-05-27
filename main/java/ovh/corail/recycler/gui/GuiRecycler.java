@@ -134,6 +134,7 @@ public class GuiRecycler extends GuiContainer {
 			break;
 		case 1: // Switch Working
 			PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(inventory.getPos(), 0, !inventory.isWorking(), true));
+			
 			break;
 		case 2: // Take All
 			PacketHandler.INSTANCE.sendToServer(new TakeAllMessage(inventory.getPos()));

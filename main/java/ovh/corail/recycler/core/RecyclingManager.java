@@ -9,6 +9,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import ovh.corail.recycler.handler.ConfigurationHandler;
@@ -924,7 +925,8 @@ public class RecyclingManager {
 	public static ItemStack StringToItemStack(String value) {
 		String[] parts = value.split(":");
 		if (parts.length == 4) {
-			Item item = (Item) GameRegistry.findItem(parts[0], parts[1]);
+			//Item item = (Item) GameRegistry.findItem(parts[0], parts[1]);
+			Item item = Item.itemRegistry.getObject(new ResourceLocation(parts[0], parts[1]));
 			if (item != null) {
 				return new ItemStack(item, Integer.valueOf(parts[2]), Integer.valueOf(parts[3]));
 			}
