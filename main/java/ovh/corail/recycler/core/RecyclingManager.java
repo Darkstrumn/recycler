@@ -63,7 +63,12 @@ public class RecyclingManager {
 				testStack.setItemDamage(0);
 			}
 			if (testStack.isItemEqual(recipes.get(recipe_num).getItemRecipe())) {
+				/** unbalanced recipes */
 				if (!ConfigurationHandler.unbalancedRecipes && recipes.get(recipe_num).isUnbalanced()) {
+					return -1;
+				}
+				/** only user defined recipes */
+				if (ConfigurationHandler.onlyUserRecipes && !recipes.get(recipe_num).isUserDefined()) {
 					return -1;
 				}
 				return recipe_num;
@@ -882,17 +887,20 @@ public class RecyclingManager {
 	private RecyclingManager() {
 	}
 
-	public static void loadJsonRecipes(List<JsonRecyclingRecipe> jsonRecipes) {
+	public static void loadJsonRecipes(List<JsonRecyclingRecipe> jsonRecipes, boolean userDefined) {
 		for (int i = 0; i < jsonRecipes.size(); i++) {
 			RecyclingRecipe recipe = convertJsonRecipe(jsonRecipes.get(i));
 			if (recipe != null && recipe.getCount() > 0) {
 				/** check for same existing recipe */
 				int foundRecipe = -1;
-				for (int numRecipe=0 ; numRecipe < instance.recipes.size() ; numRecipe++) {
-					if (instance.recipes.get(numRecipe).getItemRecipe() == recipe.getItemRecipe()) {
-						foundRecipe = numRecipe;
-						break;
+				if (userDefined) {
+					for (int numRecipe=0 ; numRecipe < instance.recipes.size() ; numRecipe++) {
+						if (instance.recipes.get(numRecipe).getItemRecipe() == recipe.getItemRecipe()) {
+							foundRecipe = numRecipe;
+							break;
+						}
 					}
+					recipe.setUserDefined(true);
 				}
 				if (foundRecipe == -1) {
 					instance.recipes.add(recipe);

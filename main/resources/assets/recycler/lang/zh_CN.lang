@@ -14,6 +14,7 @@ button.recycle=回收
 button.takeAll=全部拾取
 button.auto=自动
 config.unbalancedRecipes=Add unbalanced recycling recipes
+config.onlyUserRecipes=Only use your custom recycling recipes
 config.fancyGui=Use the fancy GUI
 achievement.PlaceRecycler=开始回收
 achievement.PlaceRecycler.desc=你合成了一个回收站 !

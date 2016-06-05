@@ -11,6 +11,7 @@ public class RecyclingRecipe {
 	private ItemStack itemRecipe;
 	private boolean canBeRepaired=false;
 	private boolean isUnbalanced=false;
+	private boolean isUserDefined=false;
 	private List<ItemStack> itemsList=new ArrayList<ItemStack>();
 	public RecyclingRecipe(Item item, int count, int meta) {
 		this.itemRecipe=new ItemStack(item, count, meta);
@@ -49,6 +50,14 @@ public class RecyclingRecipe {
 	
 	public boolean isUnbalanced() {
 		return isUnbalanced;
+	}
+	
+	public void setUserDefined(boolean state) {
+		isUserDefined=state;
+	}
+	
+	public boolean isUserDefined() {
+		return isUserDefined;
 	}
 	
 	public int getMeta() {

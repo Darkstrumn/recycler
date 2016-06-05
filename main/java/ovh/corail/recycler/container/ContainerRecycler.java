@@ -18,12 +18,16 @@ public class ContainerRecycler extends Container {
 
 	public ContainerRecycler(EntityPlayer player, World world, int x, int y, int z, TileEntityRecycler inventory) {
 		this.inventory = inventory;
+		/** input slot 0 */
 		this.addSlotToContainer(new SlotRecycler(inventory, 0, 27, 9));
+		/** disk slot 1 */
 		this.addSlotToContainer(new SlotRecycler(inventory, 1, 27, 27));
+		/** output slots 2-19 */
 		for (int i = inventory.firstOutput; i <= 10; i++) {
 			this.addSlotToContainer(new SlotRecycler(inventory, i, ((i - inventory.firstOutput) * 18) + 8, 54));
 			this.addSlotToContainer(new SlotRecycler(inventory, i + 9, ((i - inventory.firstOutput) * 18) + 8, 72));
 		}
+		/** visual slots 20-28 */
 		for (int i = 0 ; i < 3 ; i++) {
 			for (int j = 0 ; j < 3 ; j++) {
 				this.addSlotToContainer(new SlotVisual(inventory.visual, (i*3) + j, (j * 16) + 118, i*16 + (ConfigurationHandler.fancyGui?2:3)));
@@ -31,6 +35,7 @@ public class ContainerRecycler extends Container {
 		}
 		PacketHandler.INSTANCE.sendToServer(new VisualMessage(inventory.getPos()));
 		inventory.refreshVisual(inventory.getStackInSlot(0));
+		/** player slots 29-64 */
 		bindPlayerInventory(player.inventory);
 	}
 
@@ -75,11 +80,11 @@ public class ContainerRecycler extends Container {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 			
-			if (index < 9) {
-				if (!this.mergeItemStack(itemstack1, 10, 45, true)) {
+			if (index < 19) {
+				if (!this.mergeItemStack(itemstack1, 29, 64, true)) {
 					return null;
 				}
-			} else if (!this.mergeItemStack(itemstack1, 0, 9, false)) {
+			} else if (!this.mergeItemStack(itemstack1, 0, 19, false)) {
 				return null;
 			}
 
