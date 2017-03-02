@@ -53,15 +53,14 @@ public class RecyclingManager {
 	}
 
 	public int hasRecipe(ItemStack stack) {
-		if (stack == null || stack.stackSize <= 0) {
+		if (stack == null || stack.getCount() <= 0) {
 			return -1;
 		}
 		ItemStack testStack = stack.copy(); // For damaged items
-
+		if (testStack.getItem().isRepairable()) {
+			testStack.setItemDamage(0);
+		}
 		for (int recipe_num = 0; recipe_num < getRecipesCount(); recipe_num++) {
-			if (recipes.get(recipe_num).canBeRepaired()) {
-				testStack.setItemDamage(0);
-			}
 			if (testStack.isItemEqual(recipes.get(recipe_num).getItemRecipe())) {
 				/** unbalanced recipes */
 				if (!ConfigurationHandler.unbalancedRecipes && recipes.get(recipe_num).isUnbalanced()) {
@@ -93,30 +92,30 @@ public class RecyclingManager {
 		for (int i = 0; i < currentRecipe.getCount(); i++) {
 			/* Pour chaque stack résultat de la recette */
 			ItemStack currentStack = currentRecipe.getStack(i);
-			int newStackCount = currentStack.stackSize * nb_input;
+			int newStackCount = currentStack.getCount() * nb_input;
 			/* Objets abimés */
 			if (currentRecipe.canBeRepaired() && stack.getItemDamage() > 0) {
-				int currentSize = currentStack.stackSize;
+				int currentSize = currentStack.getCount();
 				/* Unités plus petites */
-				if (currentStack.getItem()==Items.iron_ingot) {
+				if (currentStack.getItem()==Items.IRON_INGOT) {
 					currentStack = new ItemStack(Main.iron_nugget, currentSize * 9, 0);
-					newStackCount = currentStack.stackSize * nb_input;
+					newStackCount = currentStack.getCount() * nb_input;
 				}
-				if (currentStack.getItem()==Items.gold_ingot) {
-					currentStack = new ItemStack(Items.gold_nugget, currentSize * 9, 0);
-					newStackCount = currentStack.stackSize * nb_input;
+				if (currentStack.getItem()==Items.GOLD_INGOT) {
+					currentStack = new ItemStack(Items.GOLD_NUGGET, currentSize * 9, 0);
+					newStackCount = currentStack.getCount() * nb_input;
 				}
-				if (currentStack.getItem()==Items.diamond) {
+				if (currentStack.getItem()==Items.DIAMOND) {
 					currentStack = new ItemStack(Main.diamond_nugget, currentSize * 9, 0);
-					newStackCount = currentStack.stackSize * nb_input;
+					newStackCount = currentStack.getCount() * nb_input;
 				}
-				if (currentStack.getItem()==Items.leather) {
-					currentStack = new ItemStack(Items.rabbit_hide, currentSize * 4, 0);
-					newStackCount = currentStack.stackSize * nb_input;
+				if (currentStack.getItem()==Items.LEATHER) {
+					currentStack = new ItemStack(Items.RABBIT_HIDE, currentSize * 4, 0);
+					newStackCount = currentStack.getCount() * nb_input;
 				}
-				if (currentStack.getItem()==Item.getItemFromBlock(Blocks.planks)) {
-					currentStack = new ItemStack(Items.stick, currentSize * 2, 0);
-					newStackCount = currentStack.stackSize * nb_input;
+				if (currentStack.getItem()==Item.getItemFromBlock(Blocks.PLANKS)) {
+					currentStack = new ItemStack(Items.STICK, currentSize * 2, 0);
+					newStackCount = currentStack.getCount() * nb_input;
 				}
 				int maxDamage = currentRecipe.getItemRecipe().getMaxDamage();
 				float pourcent = (float) (maxDamage - (stack.getItemDamage())) / maxDamage;
@@ -127,14 +126,14 @@ public class RecyclingManager {
 			/* Ajout des full stacks */
 			for (int j = 0; j < slotCount; j++) {
 				fullStack = currentStack.copy();
-				fullStack.stackSize = fullStack.getMaxStackSize();
+				fullStack.setCount(fullStack.getMaxStackSize());
 				itemsList.add(fullStack);
 			}
 			/* Reste de stack */
 			int resteStackCount = newStackCount - (slotCount * currentStack.getMaxStackSize());
 			if (resteStackCount > 0) {
 				fullStack = currentStack.copy();
-				fullStack.stackSize = resteStackCount;
+				fullStack.setCount(resteStackCount);
 				itemsList.add(fullStack);
 			}
 
@@ -153,12 +152,12 @@ public class RecyclingManager {
 			}
 			/* Calcul du résultat */
 			RecyclingRecipe currentRecipe = recipes.get(numRecipe);
-			if (currentStack.stackSize < currentRecipe.getItemRecipe().stackSize) {
+			if (currentStack.getCount() < currentRecipe.getItemRecipe().getCount()) {
 				newItemsList.add(currentStack.copy());
 				continue;
 			}
 			// TODO CODE en trop
-			int nb_input = (int) Math.floor(currentStack.stackSize / currentRecipe.getItemRecipe().stackSize);
+			int nb_input = (int) Math.floor(currentStack.getCount() / currentRecipe.getItemRecipe().getCount());
 			List<ItemStack> itemsList2 = getResultStack(currentStack, nb_input);
 			for (int j = 0; j < itemsList2.size(); j++) {
 				if (itemsList2.get(j) != null) {
@@ -932,7 +931,7 @@ public class RecyclingManager {
 		String[] parts = value.split(":");
 		if (parts.length == 4) {
 			//Item item = (Item) GameRegistry.findItem(parts[0], parts[1]);
-			Item item = Item.itemRegistry.getObject(new ResourceLocation(parts[0], parts[1]));
+			Item item = Item.REGISTRY.getObject(new ResourceLocation(parts[0], parts[1]));
 			if (item != null) {
 				return new ItemStack(item, Integer.valueOf(parts[2]), Integer.valueOf(parts[3]));
 			}

@@ -40,8 +40,8 @@ public class ContainerRecycler extends Container {
 	}
 
 	@Override
-	public ItemStack func_184996_a(int slotId, int dragType, ClickType clickType, EntityPlayer player) {
-		ItemStack stack = super.func_184996_a(slotId, dragType, clickType, player);
+	public ItemStack slotClick(int slotId, int dragType, ClickType clickType, EntityPlayer player) {
+		ItemStack stack = super.slotClick(slotId, dragType, clickType, player);
 		if (slotId == 0) {
 			PacketHandler.INSTANCE.sendToServer(new VisualMessage(inventory.getPos()));
 			inventory.refreshVisual(inventory.getStackInSlot(0));
@@ -73,7 +73,7 @@ public class ContainerRecycler extends Container {
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int index) {
-		ItemStack itemstack = null;
+		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = (Slot) this.inventorySlots.get(index);
 
 		if (slot != null && slot.getHasStack()) {
@@ -82,26 +82,27 @@ public class ContainerRecycler extends Container {
 			
 			if (index < 19) {
 				if (!this.mergeItemStack(itemstack1, 29, 64, true)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 			} else if (!this.mergeItemStack(itemstack1, 0, 19, false)) {
-				return null;
+				return ItemStack.EMPTY;
 			}
 
-			if (itemstack1.stackSize == 0) {
-				slot.putStack((ItemStack) null);
+			if (itemstack1.isEmpty()) {
+				slot.putStack(ItemStack.EMPTY);
 			} else {
 				slot.onSlotChanged();
 			}
 
-			if (itemstack1.stackSize == itemstack.stackSize) {
-				return null;
+			if (itemstack1.getCount() == itemstack.getCount()) {
+				return ItemStack.EMPTY;
 			}
-
-			slot.onPickupFromSlot(player, itemstack1);
 		}
 
 		return itemstack;
+		/*if (index < 0 || index > 19) { return null; }
+		Slot slot = (Slot)this.inventorySlots.get(index);
+        return slot != null ? slot.getStack() : null;*/
 	}
 
 	public void onContainerClosed(EntityPlayer player) {

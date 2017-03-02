@@ -59,12 +59,12 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 	public ItemStack decrStackSize(int index, int count) {
 		ItemStack stack = getStackInSlot(index);
 		if (stack != null) {
-			if (stack.stackSize <= count) {
+			if (stack.getCount() <= count) {
 				setInventorySlotContents(index, null);
 				this.markDirty();
 			} else {
 				stack = stack.splitStack(count);
-				if (stack.stackSize == 0) {
+				if (stack.getCount() == 0) {
 					setInventorySlotContents(index, null);
 					this.markDirty();
 				}
@@ -105,9 +105,9 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(EntityPlayer player) {
 		pos = this.getPos();
-		return worldObj.getTileEntity(pos) == this && player.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64;
+		return world.getTileEntity(pos) == this && player.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64;
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 	}
 	
 	@Override
-	public void writeToNBT(NBTTagCompound compound) {
+	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagList itemList = new NBTTagList();
 		for (int i = 0; i < inventory.length; i++) {
 			ItemStack stack = inventory[i];
@@ -196,7 +196,7 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 			}
 		}
 		compound.setTag("inventory", itemList);
-		super.writeToNBT(compound);
+		return super.writeToNBT(compound);
 	}
 
 	@Override
@@ -207,8 +207,20 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 			NBTTagCompound tag = (NBTTagCompound) tagList.getCompoundTagAt(i);
 			byte slot = tag.getByte("Slot");
 			if (slot >= 0 && slot < inventory.length) {
-				inventory[slot] = ItemStack.loadItemStackFromNBT(tag);
+				inventory[slot] = new ItemStack(tag);
 			}
 		}
 	}
+
+	@Override
+	public boolean isEmpty() {
+		for (ItemStack itemstack : this.inventory) {
+            if (!itemstack.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+	}
+
+
 }

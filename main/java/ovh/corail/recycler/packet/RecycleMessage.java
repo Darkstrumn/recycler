@@ -37,11 +37,11 @@ public class RecycleMessage implements IMessage {
 	public static class Handler implements IMessageHandler<RecycleMessage, IMessage> {
 		@Override
 		public IMessage onMessage(final RecycleMessage message, final MessageContext ctx) {
-			IThreadListener mainThread = (IThreadListener) ctx.getServerHandler().playerEntity.worldObj;
+			IThreadListener mainThread = (IThreadListener) ctx.getServerHandler().playerEntity.world;
 			mainThread.addScheduledTask(new Runnable() {
 				@Override
 				public void run() {
-					World worldIn = ctx.getServerHandler().playerEntity.worldObj;
+					World worldIn = ctx.getServerHandler().playerEntity.world;
 					TileEntity tile = worldIn.getTileEntity(message.currentPos);
 					if (tile == null || !(tile instanceof TileEntityRecycler)) { return ; }
 					TileEntityRecycler recycler = (TileEntityRecycler) worldIn.getTileEntity(message.currentPos);

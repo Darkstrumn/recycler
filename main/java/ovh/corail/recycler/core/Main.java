@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -33,8 +34,8 @@ public class Main {
 	
 	public static CreativeTabs tabRecycler = new CreativeTabs(Main.MOD_ID) {
 		@Override
-		public Item getTabIconItem() {
-			return Item.getItemFromBlock(Main.recycler);
+		public ItemStack getTabIconItem() {
+			return new ItemStack(Item.getItemFromBlock(Main.recycler),1);
 		}
 
 		@Override

@@ -46,7 +46,7 @@ public class GuiButtonRecycler extends GuiButton {
 				/** input stacksize */
 				if ((id == 0 || id == 1) && invent.getStackInSlot(0) != null) {
 					int numRecipe = invent.recyclingManager.hasRecipe(invent.getStackInSlot(0));
-					if (numRecipe >= 0 && invent.getStackInSlot(0).stackSize >= invent.recyclingManager.getRecipe(numRecipe).getItemRecipe().stackSize) {
+					if (numRecipe >= 0 && invent.getStackInSlot(0).getCount() >= invent.recyclingManager.getRecipe(numRecipe).getItemRecipe().getCount()) {
 						if (id == 1) {
 							valid= true;
 						/** button recycle */

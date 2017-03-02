@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class Helper {
 	public static ItemStack addToInventoryWithLeftover(ItemStack stack, IInventory inventory, boolean simulate) {
-		int left = stack.stackSize;
+		int left = stack.getCount();
 		int minus = inventory instanceof InventoryPlayer ? 4 : 0;
 		int max = Math.min(inventory.getInventoryStackLimit(), stack.getMaxStackSize());
 		for (int i = 0; i < inventory.getSizeInventory() - minus; i++) {
@@ -25,11 +25,11 @@ public class Helper {
 			// if (!inventory.isItemValidForSlot(i, stack))
 			// continue;
 			if (in != null && stack.isItemEqual(in) && ItemStack.areItemStackTagsEqual(stack, in)) {
-				int space = max - in.stackSize;
-				int add = Math.min(space, stack.stackSize);
+				int space = max - in.getCount();
+				int add = Math.min(space, stack.getCount());
 				if (add > 0) {
 					if (!simulate)
-						in.stackSize += add;
+						in.grow(add);
 					left -= add;
 					if (left <= 0)
 						return null;
@@ -56,7 +56,7 @@ public class Helper {
 		if (stack == null || size == 0)
 			return null;
 		ItemStack tmp = stack.copy();
-		tmp.stackSize = Math.min(size, stack.getMaxStackSize());
+		tmp.setCount(Math.min(size, stack.getMaxStackSize()));
 		return tmp;
 	}
 	
@@ -65,7 +65,7 @@ public class Helper {
 			if (translate) {
 				message = getTranslation(message);
 			}
-			currentPlayer.addChatMessage(new TextComponentString(message));
+			currentPlayer.sendMessage(new TextComponentString(message));
 		}
 	}
 	
@@ -121,22 +121,22 @@ public class Helper {
 
 	public static void getNewRecipes() {
 		/** nugget => ingot */
-		GameRegistry.addRecipe(new ItemStack(Items.iron_ingot, 1),
+		GameRegistry.addRecipe(new ItemStack(Items.IRON_INGOT, 1),
 				new Object[] { "000", "000", "000", Character.valueOf('0'), 
 						new ItemStack(Main.iron_nugget, 1), });
-		GameRegistry.addRecipe(new ItemStack(Items.diamond, 1),
+		GameRegistry.addRecipe(new ItemStack(Items.DIAMOND, 1),
 				new Object[] { "000", "000", "000", Character.valueOf('0'), new ItemStack(Main.diamond_nugget, 1), });
 		/** ingot => nugget */
 		GameRegistry.addRecipe(new ItemStack(Main.iron_nugget, 9),
-				new Object[] { "0", Character.valueOf('0'), new ItemStack(Items.iron_ingot, 1), });
+				new Object[] { "0", Character.valueOf('0'), new ItemStack(Items.IRON_INGOT, 1), });
 		GameRegistry.addRecipe(new ItemStack(Main.diamond_nugget, 9),
-				new Object[] { "0", Character.valueOf('0'), new ItemStack(Items.diamond, 1), });
+				new Object[] { "0", Character.valueOf('0'), new ItemStack(Items.DIAMOND, 1), });
 		/** recycler recipe */
 		GameRegistry.addRecipe(new ItemStack(Main.recycler, 1), new Object[] { "000", "111", "000", Character.valueOf('0'),
-				new ItemStack(Blocks.cobblestone, 1), Character.valueOf('1'), new ItemStack(Items.iron_ingot, 1), });
+				new ItemStack(Blocks.COBBLESTONE, 1), Character.valueOf('1'), new ItemStack(Items.IRON_INGOT, 1), });
 		/** diamond disk recipe */
 		GameRegistry.addRecipe(new ItemStack(Main.diamond_disk, 1),
 				new Object[] { " 0 ", "010", " 0 ", Character.valueOf('0'), new ItemStack(Main.diamond_nugget, 1),
-						Character.valueOf('1'), new ItemStack(Items.iron_ingot, 1), });
+						Character.valueOf('1'), new ItemStack(Items.IRON_INGOT, 1), });
 	}
 }

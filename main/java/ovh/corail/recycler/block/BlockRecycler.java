@@ -28,7 +28,7 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 	private static String name = "recycler";
 
 	public BlockRecycler() {
-		super(Material.rock);
+		super(Material.ROCK);
 		setRegistryName(name);
 		setUnlocalizedName(name);
 		setCreativeTab(Main.tabRecycler);
@@ -36,7 +36,7 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 		setHardness(2.0f);
 		setResistance(10.0f);
 		this.setCreativeTab(Main.tabRecycler);
-		this.stepSound = SoundType.STONE;
+		this.blockSoundType = SoundType.STONE;
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 	}
 	
@@ -47,6 +47,8 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 	@Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
 		world.setBlockState(pos, state.withProperty(FACING, getFacingFromEntity(pos, placer)), 2);
+		EntityPlayer player = (EntityPlayer) placer;
+		player.addStat(Main.achievementPlaceRecycler, 1);
     }
 	
 	@Override
@@ -65,8 +67,8 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
     }
 	
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-		super.onBlockActivated(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+		super.onBlockActivated(world, pos, state, player, hand, side, hitX, hitY, hitZ);
 		if (!world.isRemote) {
 			if (player instanceof EntityPlayer) {
 				player.openGui(Main.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
@@ -99,16 +101,9 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 	
 	/** block container implement */
 	@Override
-    public boolean onBlockEventReceived(World worldIn, BlockPos pos, IBlockState state, int eventID, int eventParam) {
-        super.onBlockEventReceived(worldIn, pos, state, eventID, eventParam);
+    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+        super.eventReceived(state, worldIn, pos, id, param);
         TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
+        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
     }
-	
-	@Override
-	public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		EntityPlayer player = (EntityPlayer) placer;
-		player.addStat(Main.achievementPlaceRecycler, 1);
-		return super.onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
-	}
 }

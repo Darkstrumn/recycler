@@ -49,20 +49,14 @@ public class GuiRecycler extends GuiContainer {
 		Slot slot;
 		for (i = 0; i < slots.size(); i++) {
 			slot = slots.get(i);
-			this.drawTexturedModalRect(posX + slot.xDisplayPosition, posY + slot.yDisplayPosition, 240, 0, dimCase, dimCase);
+			this.drawTexturedModalRect(posX + slot.xPos, posY + slot.yPos, 240, 0, dimCase, dimCase);
 		}
 		zLevel = 100.0F;
 		
 	}
 
-	protected void keyTyped(char par1, int par2) {
-
-		if (par2 != 28 && par2 != 156) {
-			if (par2 == 1) {
-				this.mc.thePlayer.closeScreen();
-			}
-		}
-
+	protected void keyTyped(char par1, int par2) throws IOException {
+		super.keyTyped(par1, par2);
 	}
 
 	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
@@ -70,8 +64,8 @@ public class GuiRecycler extends GuiContainer {
 			RecyclingManager rm = RecyclingManager.getInstance();
 			int num_recipe=rm.hasRecipe(inventory.getStackInSlot(0));
 			if (num_recipe>=0) {
-				int inputCount=rm.getRecipe(num_recipe).getItemRecipe().stackSize;
-				boolean enoughStackSize = inventory.getStackInSlot(0).stackSize >= inputCount;
+				int inputCount=rm.getRecipe(num_recipe).getItemRecipe().getCount();
+				boolean enoughStackSize = inventory.getStackInSlot(0).getCount() >= inputCount;
 				// TODO Current Changes
 				if (inventory.isWorking() && enoughStackSize) {
 					mc.renderEngine.bindTexture(ConfigurationHandler.fancyGui ? Main.textureFancyRecycler : Main.textureVanillaRecycler);
@@ -80,7 +74,7 @@ public class GuiRecycler extends GuiContainer {
 					drawTexturedModalRect(79, 42, 1, 229, widthWorking, 2);
 					//this.fontRendererObj.drawString(Integer.toString(inventory.getPercentWorking())+" %", (74), (11), 0xffffff);
 				}
-				this.fontRendererObj.drawString("X " + Integer.toString(inventory.getStackInSlot(0).stackSize/inputCount), (70), (13), (enoughStackSize?0x00ff00:0xff0000));
+				this.fontRendererObj.drawString("X " + Integer.toString(inventory.getStackInSlot(0).getCount()/inputCount), (70), (13), (enoughStackSize?0x00ff00:0xff0000));
 			}
 		}
 		ItemStack disk = inventory.getStackInSlot(1);

@@ -46,7 +46,7 @@ public class SoundMessage implements IMessage {
 			mainThread.addScheduledTask(new Runnable() {
 				@Override
 				public void run() {
-					WorldClient worldIn = Minecraft.getMinecraft().theWorld;
+					WorldClient worldIn = Minecraft.getMinecraft().world;
 					worldIn.playSound(message.currentPos, (message.numSound==0?SoundHandler.recycler:SoundHandler.recycler_working), SoundCategory.NEUTRAL, 1.0f, 1.0f, true);
 					Random rand = new Random();
 					for (double i=0.0d;i<4.0d;i+=1.0d) {		

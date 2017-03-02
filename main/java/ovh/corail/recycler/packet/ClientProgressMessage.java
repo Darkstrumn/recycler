@@ -42,7 +42,7 @@ public class ClientProgressMessage implements IMessage {
 			mainThread.addScheduledTask(new Runnable() {
 				@Override
 				public void run() {
-					WorldClient worldIn = Minecraft.getMinecraft().theWorld;
+					WorldClient worldIn = Minecraft.getMinecraft().world;
 					TileEntity tile = worldIn.getTileEntity(message.currentPos);
 					if (tile == null || !(tile instanceof TileEntityRecycler)) { return ; }
 					TileEntityRecycler recycler = (TileEntityRecycler) worldIn.getTileEntity(message.currentPos);
