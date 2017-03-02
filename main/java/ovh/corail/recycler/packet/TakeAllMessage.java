@@ -46,7 +46,7 @@ public class TakeAllMessage implements IMessage {
 					if (tile == null || !(tile instanceof TileEntityRecycler)) { return ; }
 					TileEntityRecycler recycler = (TileEntityRecycler) worldIn.getTileEntity(message.currentPos);
 					for (int i = recycler.firstOutput; i < recycler.getSizeInventory(); i++) {
-						if (recycler.getStackInSlot(i) != null) {
+						if (!recycler.getStackInSlot(i).isEmpty()) {
 							ItemStack stack = recycler.getStackInSlot(i);
 							recycler.setInventorySlotContents(i, Helper.addToInventoryWithLeftover(stack, player.inventory, false));
 						}

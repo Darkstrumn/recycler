@@ -53,7 +53,7 @@ public class RecyclingManager {
 	}
 
 	public int hasRecipe(ItemStack stack) {
-		if (stack == null || stack.getCount() <= 0) {
+		if (stack.isEmpty() || stack.getCount() <= 0) {
 			return -1;
 		}
 		ItemStack testStack = stack.copy(); // For damaged items
@@ -160,7 +160,7 @@ public class RecyclingManager {
 			int nb_input = (int) Math.floor(currentStack.getCount() / currentRecipe.getItemRecipe().getCount());
 			List<ItemStack> itemsList2 = getResultStack(currentStack, nb_input);
 			for (int j = 0; j < itemsList2.size(); j++) {
-				if (itemsList2.get(j) != null) {
+				if (!itemsList2.get(j).isEmpty()) {
 					newItemsList.add(itemsList2.get(j).copy());
 				}
 			}
@@ -914,11 +914,11 @@ public class RecyclingManager {
 
 	private static RecyclingRecipe convertJsonRecipe(JsonRecyclingRecipe jRecipe) {
 		ItemStack inputItem = StringToItemStack(jRecipe.inputItem);
-		if (inputItem == null) { return null; }
+		if (inputItem.isEmpty()) { return null; }
 		RecyclingRecipe recipe = new RecyclingRecipe(inputItem);
 		for (int i = 0; i < jRecipe.outputItems.length; i++) {
 			ItemStack outputItem = StringToItemStack(jRecipe.outputItems[i]);
-			if (outputItem != null) {
+			if (!outputItem.isEmpty()) {
 				recipe.addStack(outputItem);
 			}
 		}
@@ -936,7 +936,7 @@ public class RecyclingManager {
 				return new ItemStack(item, Integer.valueOf(parts[2]), Integer.valueOf(parts[3]));
 			}
 		}
-		return null;
+		return ItemStack.EMPTY;
 
 	}
 }

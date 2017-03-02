@@ -35,16 +35,16 @@ public class GuiButtonRecycler extends GuiButton {
 			/** button take all */
 			if (id == 2) {
 				for (int i=invent.firstOutput;i<invent.getSizeInventory();i++) {
-					if (invent.getStackInSlot(i) != null) {
+					if (!invent.getStackInSlot(i).isEmpty()) {
 						valid = true;
 						break;
 					}
 				}
 			/** input slot empty */
-			} else if (invent.getStackInSlot(0) != null && invent.getStackInSlot(1) != null) {
+			} else if (!invent.getStackInSlot(0).isEmpty() && !invent.getStackInSlot(1).isEmpty()) {
 				valid = false;
 				/** input stacksize */
-				if ((id == 0 || id == 1) && invent.getStackInSlot(0) != null) {
+				if ((id == 0 || id == 1) && !invent.getStackInSlot(0).isEmpty()) {
 					int numRecipe = invent.recyclingManager.hasRecipe(invent.getStackInSlot(0));
 					if (numRecipe >= 0 && invent.getStackInSlot(0).getCount() >= invent.recyclingManager.getRecipe(numRecipe).getItemRecipe().getCount()) {
 						if (id == 1) {

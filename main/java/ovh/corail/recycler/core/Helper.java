@@ -24,7 +24,7 @@ public class Helper {
 			ItemStack in = inventory.getStackInSlot(i);
 			// if (!inventory.isItemValidForSlot(i, stack))
 			// continue;
-			if (in != null && stack.isItemEqual(in) && ItemStack.areItemStackTagsEqual(stack, in)) {
+			if (!in.isEmpty() && stack.isItemEqual(in) && ItemStack.areItemStackTagsEqual(stack, in)) {
 				int space = max - in.getCount();
 				int add = Math.min(space, stack.getCount());
 				if (add > 0) {
@@ -32,7 +32,7 @@ public class Helper {
 						in.grow(add);
 					left -= add;
 					if (left <= 0)
-						return null;
+						return ItemStack.EMPTY;
 				}
 			}
 		}
@@ -40,21 +40,21 @@ public class Helper {
 			ItemStack in = inventory.getStackInSlot(i);
 			// if (!inventory.isItemValidForSlot(i, stack))
 			// continue;
-			if (in == null) {
+			if (in.isEmpty()) {
 				int add = Math.min(max, left);
 				if (!simulate)
 					inventory.setInventorySlotContents(i, copyStack(stack, add));
 				left -= add;
 				if (left <= 0)
-					return null;
+					return ItemStack.EMPTY;
 			}
 		}
 		return copyStack(stack, left);
 	}
 	
 	private static ItemStack copyStack(ItemStack stack, int size) {
-		if (stack == null || size == 0)
-			return null;
+		if (stack.isEmpty() || size == 0)
+			return ItemStack.EMPTY;
 		ItemStack tmp = stack.copy();
 		tmp.setCount(Math.min(size, stack.getMaxStackSize()));
 		return tmp;

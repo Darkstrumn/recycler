@@ -60,7 +60,7 @@ public class GuiRecycler extends GuiContainer {
 	}
 
 	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
-		if (inventory.getStackInSlot(0)!=null) {
+		if (!inventory.getStackInSlot(0).isEmpty()) {
 			RecyclingManager rm = RecyclingManager.getInstance();
 			int num_recipe=rm.hasRecipe(inventory.getStackInSlot(0));
 			if (num_recipe>=0) {
@@ -79,7 +79,7 @@ public class GuiRecycler extends GuiContainer {
 		}
 		ItemStack disk = inventory.getStackInSlot(1);
 		int diskMaxUse;
-		if (disk == null) {
+		if (disk.isEmpty()) {
 			diskMaxUse = 0;
 		} else {
 			diskMaxUse = (disk.getMaxDamage()-disk.getItemDamage())/10;
