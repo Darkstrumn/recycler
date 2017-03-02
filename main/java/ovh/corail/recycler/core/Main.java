@@ -3,6 +3,7 @@ package ovh.corail.recycler.core;
 import java.io.IOException;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
@@ -20,7 +21,6 @@ import ovh.corail.recycler.handler.SoundHandler;
 import ovh.corail.recycler.item.ItemAchievement001;
 import ovh.corail.recycler.item.ItemDiamondDisk;
 import ovh.corail.recycler.item.ItemDiamondNugget;
-import ovh.corail.recycler.item.ItemIronNugget;
 
 @Mod(modid = Main.MOD_ID, name = Main.MOD_NAME, version = Main.MOD_VER, guiFactory = "ovh.corail.recycler.gui.GuiFactoryRecycler")
 public class Main {
@@ -43,7 +43,6 @@ public class Main {
 			return "tab" + Main.MOD_NAME;
 		}
 	};
-	public static ItemIronNugget iron_nugget = new ItemIronNugget();
 	public static ItemDiamondNugget diamond_nugget = new ItemDiamondNugget();
 	public static ItemDiamondDisk diamond_disk = new ItemDiamondDisk();
 	public static BlockRecycler recycler = new BlockRecycler();
@@ -51,7 +50,7 @@ public class Main {
 	public static ItemAchievement001 itemAchievement001 = new ItemAchievement001();
 	public static Achievement achievementPlaceRecycler = new Achievement("achievement.PlaceRecycler", "PlaceRecycler", 0, 0, Main.itemAchievement001, (Achievement) null);
 	public static Achievement achievementBuildDisk = new Achievement("achievement.BuildDisk", "BuildDisk", 1, 1, Main.diamond_disk, achievementPlaceRecycler);
-	public static Achievement achievementFirstRecycle = new Achievement("achievement.FirstRecycle", "FirstRecycle", 2, 2, Main.iron_nugget, achievementBuildDisk);
+	public static Achievement achievementFirstRecycle = new Achievement("achievement.FirstRecycle", "FirstRecycle", 2, 2, Items.field_191525_da, achievementBuildDisk);
 	
 	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
 	public static ResourceLocation textureFancyRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/fancy_recycler.png");

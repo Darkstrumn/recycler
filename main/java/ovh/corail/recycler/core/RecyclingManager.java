@@ -98,7 +98,7 @@ public class RecyclingManager {
 				int currentSize = currentStack.getCount();
 				/* Unités plus petites */
 				if (currentStack.getItem()==Items.IRON_INGOT) {
-					currentStack = new ItemStack(Main.iron_nugget, currentSize * 9, 0);
+					currentStack = new ItemStack(Items.field_191525_da, currentSize * 9, 0); // Iron Nugget
 					newStackCount = currentStack.getCount() * nb_input;
 				}
 				if (currentStack.getItem()==Items.GOLD_INGOT) {
@@ -546,7 +546,7 @@ public class RecyclingManager {
 		}));
 		/** iron bar */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_bars:1:0", new String[] { 
-				Main.MOD_ID+":iron_nugget:3:0", 
+				"minecraft:iron_nugget:3:0", 
 		}));
 		/** redstone lamp */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:redstone_lamp:1:0", new String[] { 

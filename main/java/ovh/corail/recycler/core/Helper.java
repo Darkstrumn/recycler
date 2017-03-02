@@ -77,7 +77,6 @@ public class Helper {
 		/** blocks */
 		render(Main.recycler);
 		/** items */
-		render(Main.iron_nugget);
 		render(Main.diamond_nugget);
 		render(Main.diamond_disk);
 		render(Main.itemAchievement001);
@@ -104,7 +103,6 @@ public class Helper {
 		/** blocks */
 		register(Main.recycler);
 		/** items */
-		register(Main.iron_nugget);
 		register(Main.diamond_nugget);
 		register(Main.diamond_disk);
 		register(Main.itemAchievement001);
@@ -121,14 +119,9 @@ public class Helper {
 
 	public static void getNewRecipes() {
 		/** nugget => ingot */
-		GameRegistry.addRecipe(new ItemStack(Items.IRON_INGOT, 1),
-				new Object[] { "000", "000", "000", Character.valueOf('0'), 
-						new ItemStack(Main.iron_nugget, 1), });
 		GameRegistry.addRecipe(new ItemStack(Items.DIAMOND, 1),
 				new Object[] { "000", "000", "000", Character.valueOf('0'), new ItemStack(Main.diamond_nugget, 1), });
 		/** ingot => nugget */
-		GameRegistry.addRecipe(new ItemStack(Main.iron_nugget, 9),
-				new Object[] { "0", Character.valueOf('0'), new ItemStack(Items.IRON_INGOT, 1), });
 		GameRegistry.addRecipe(new ItemStack(Main.diamond_nugget, 9),
 				new Object[] { "0", Character.valueOf('0'), new ItemStack(Items.DIAMOND, 1), });
 		/** recycler recipe */
