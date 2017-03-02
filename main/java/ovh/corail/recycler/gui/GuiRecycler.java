@@ -74,7 +74,7 @@ public class GuiRecycler extends GuiContainer {
 					drawTexturedModalRect(79, 42, 1, 229, widthWorking, 2);
 					//this.fontRendererObj.drawString(Integer.toString(inventory.getPercentWorking())+" %", (74), (11), 0xffffff);
 				}
-				this.fontRendererObj.drawString("X " + Integer.toString(inventory.getStackInSlot(0).getCount()/inputCount), (70), (13), (enoughStackSize?0x00ff00:0xff0000));
+				this.fontRenderer.drawString("X " + Integer.toString(inventory.getStackInSlot(0).getCount()/inputCount), (70), (13), (enoughStackSize?0x00ff00:0xff0000));
 			}
 		}
 		ItemStack disk = inventory.getStackInSlot(1);
@@ -84,7 +84,7 @@ public class GuiRecycler extends GuiContainer {
 		} else {
 			diskMaxUse = (disk.getMaxDamage()-disk.getItemDamage())/10;
 		}
-		this.fontRendererObj.drawString("X "+Integer.toString(diskMaxUse), (70), (31), (diskMaxUse>0?0x00ff00:0xff0000));
+		this.fontRenderer.drawString("X "+Integer.toString(diskMaxUse), (70), (31), (diskMaxUse>0?0x00ff00:0xff0000));
 
 	}
 

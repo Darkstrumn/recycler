@@ -36,12 +36,12 @@ public class TakeAllMessage implements IMessage {
 	public static class Handler implements IMessageHandler<TakeAllMessage, IMessage> {
 		@Override
 		public IMessage onMessage(final TakeAllMessage message, final MessageContext ctx) {
-			IThreadListener mainThread = (IThreadListener) ctx.getServerHandler().playerEntity.world;
+			IThreadListener mainThread = (IThreadListener) ctx.getServerHandler().player.world;
 			mainThread.addScheduledTask(new Runnable() {
 				@Override
 				public void run() {
-					EntityPlayer player = ctx.getServerHandler().playerEntity;
-					World worldIn = ctx.getServerHandler().playerEntity.world;
+					EntityPlayer player = ctx.getServerHandler().player;
+					World worldIn = ctx.getServerHandler().player.world;
 					TileEntity tile = worldIn.getTileEntity(message.currentPos);
 					if (tile == null || !(tile instanceof TileEntityRecycler)) { return ; }
 					TileEntityRecycler recycler = (TileEntityRecycler) worldIn.getTileEntity(message.currentPos);

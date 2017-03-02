@@ -187,10 +187,10 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		compound = super.writeToNBT(compound);
+		super.writeToNBT(compound);
 		NBTTagList itemList = new NBTTagList();
 		for (int i = 0; i < inventory.length; i++) {
-			ItemStack stack = (inventory[i]==null?ItemStack.EMPTY:inventory[i]);
+			ItemStack stack = inventory[i];
 			if (!stack.isEmpty()) {
 				NBTTagCompound tag = new NBTTagCompound();
 				tag.setByte("Slot", (byte) i);

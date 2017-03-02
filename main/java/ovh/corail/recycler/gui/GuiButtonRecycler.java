@@ -22,7 +22,7 @@ public class GuiButtonRecycler extends GuiButton {
 		if (this.visible) {
 			int buttonHeight = 14;
 			int buttonWidth = 74;
-			FontRenderer fontrenderer = mc.fontRendererObj;
+			FontRenderer fontrenderer = mc.fontRenderer;
 			mc.getTextureManager().bindTexture(ConfigurationHandler.fancyGui ? Main.textureFancyRecycler : Main.textureVanillaRecycler);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width	&& mouseY < this.yPosition + this.height;
