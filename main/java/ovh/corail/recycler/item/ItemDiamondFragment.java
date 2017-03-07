@@ -3,10 +3,10 @@ package ovh.corail.recycler.item;
 import net.minecraft.item.Item;
 import ovh.corail.recycler.core.Main;
 
-public class ItemDiamondNugget extends Item {
-	private static final String name = "diamond_nugget";
+public class ItemDiamondFragment extends Item {
+	private static final String name = "diamond_fragment";
 	
-	public ItemDiamondNugget() {
+	public ItemDiamondFragment() {
 		super();
 		setRegistryName(name);
 		setUnlocalizedName(name);

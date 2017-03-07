@@ -77,7 +77,7 @@ public class Helper {
 		/** blocks */
 		render(Main.recycler);
 		/** items */
-		render(Main.diamond_nugget);
+		render(Main.diamond_fragment);
 		render(Main.diamond_disk);
 		render(Main.itemAchievement001);
 	}
@@ -103,7 +103,7 @@ public class Helper {
 		/** blocks */
 		register(Main.recycler);
 		/** items */
-		register(Main.diamond_nugget);
+		register(Main.diamond_fragment);
 		register(Main.diamond_disk);
 		register(Main.itemAchievement001);
 	}
@@ -120,16 +120,16 @@ public class Helper {
 	public static void getNewRecipes() {
 		/** nugget => ingot */
 		GameRegistry.addRecipe(new ItemStack(Items.DIAMOND, 1),
-				new Object[] { "000", "000", "000", Character.valueOf('0'), new ItemStack(Main.diamond_nugget, 1), });
+				new Object[] { "000", "000", "000", Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1), });
 		/** ingot => nugget */
-		GameRegistry.addRecipe(new ItemStack(Main.diamond_nugget, 9),
+		GameRegistry.addRecipe(new ItemStack(Main.diamond_fragment, 9),
 				new Object[] { "0", Character.valueOf('0'), new ItemStack(Items.DIAMOND, 1), });
 		/** recycler recipe */
 		GameRegistry.addRecipe(new ItemStack(Main.recycler, 1), new Object[] { "000", "111", "000", Character.valueOf('0'),
 				new ItemStack(Blocks.COBBLESTONE, 1), Character.valueOf('1'), new ItemStack(Items.IRON_INGOT, 1), });
 		/** diamond disk recipe */
 		GameRegistry.addRecipe(new ItemStack(Main.diamond_disk, 1),
-				new Object[] { " 0 ", "010", " 0 ", Character.valueOf('0'), new ItemStack(Main.diamond_nugget, 1),
+				new Object[] { " 0 ", "010", " 0 ", Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1),
 						Character.valueOf('1'), new ItemStack(Items.IRON_INGOT, 1), });
 	}
 }

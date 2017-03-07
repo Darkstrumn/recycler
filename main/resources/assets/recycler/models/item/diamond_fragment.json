@@ -1,7 +1,7 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "recycler:items/diamond_nugget"
+        "layer0": "recycler:items/diamond_fragment"
     },
     "display": {
         "thirdperson": {

@@ -21,7 +21,7 @@ import ovh.corail.recycler.handler.EventHandler;
 import ovh.corail.recycler.handler.SoundHandler;
 import ovh.corail.recycler.item.ItemAchievement001;
 import ovh.corail.recycler.item.ItemDiamondDisk;
-import ovh.corail.recycler.item.ItemDiamondNugget;
+import ovh.corail.recycler.item.ItemDiamondFragment;
 
 @Mod(modid = Main.MOD_ID, name = Main.MOD_NAME, version = Main.MOD_VER, guiFactory = "ovh.corail.recycler.gui.GuiFactoryRecycler")
 public class Main {
@@ -44,7 +44,7 @@ public class Main {
 			return Main.MOD_NAME;
 		}
 	};
-	public static ItemDiamondNugget diamond_nugget = new ItemDiamondNugget();
+	public static ItemDiamondFragment diamond_fragment = new ItemDiamondFragment();
 	public static ItemDiamondDisk diamond_disk = new ItemDiamondDisk();
 	public static BlockRecycler recycler = new BlockRecycler();
 	

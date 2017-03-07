@@ -151,7 +151,7 @@ public class RecyclingManager {
 					newStackCount = currentStack.getCount() * nb_input;
 				}
 				if (currentStack.getItem()==Items.DIAMOND) {
-					currentStack = new ItemStack(Main.diamond_nugget, currentSize * 9, 0);
+					currentStack = new ItemStack(Main.diamond_fragment, currentSize * 9, 0);
 					newStackCount = currentStack.getCount() * nb_input;
 				}
 				if (currentStack.getItem()==Items.LEATHER) {
