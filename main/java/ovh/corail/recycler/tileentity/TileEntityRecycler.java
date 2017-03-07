@@ -27,6 +27,8 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 	private boolean isWorking = false;
 	private int progress = 0;
 	private int cantRecycleTicks = 0;
+    public int numPlayersUsing; // TODO only one access
+    private int ticksSinceSync;
 
 	public TileEntityRecycler() {
 		super();
@@ -106,7 +108,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		}
 		/** calculation of the result */
 		List<ItemStack> itemsList = recyclingManager.getResultStack(getStackInSlot(0), nb_input);
-		// TODO calcul des stacksizes pour les slots libres Ã  mettre plus bas
+		// TODO calcul des stacksizes pour les slots libres à  mettre plus bas
 		int emptyCount = hasEmptySlot();
 		if (emptyCount >= itemsList.size()) {
 			/** fill the identical slots not fullstack */
@@ -117,15 +119,15 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 					/** for each slot */
 					for (int j = firstOutput; j < this.count; j++) {
 						/** same item */
-						if (!itemsList.get(i).isEmpty() && itemsList.get(i).isItemEqual(inventory[j])) {
-							int sommeStackSize = inventory[j].getCount() + itemsList.get(i).getCount();
-							if (sommeStackSize > inventory[j].getMaxStackSize()) {
-								inventory[j].setCount(inventory[j].getMaxStackSize());
+						if (!itemsList.get(i).isEmpty() && itemsList.get(i).isItemEqual(inventory.get(j))) {
+							int sommeStackSize = inventory.get(j).getCount() + itemsList.get(i).getCount();
+							if (sommeStackSize > inventory.get(j).getMaxStackSize()) {
+								inventory.get(j).setCount(inventory.get(j).getMaxStackSize());
 								ItemStack resteStack = itemsList.get(i).copy();
-								resteStack.setCount(sommeStackSize - inventory[j].getMaxStackSize());
+								resteStack.setCount(sommeStackSize - inventory.get(j).getMaxStackSize());
 								itemsList.set(i, resteStack);
 							} else {
-								inventory[j].setCount(sommeStackSize);
+								inventory.get(j).setCount(sommeStackSize);
 								itemsList.set(i, ItemStack.EMPTY);
 								// break;
 							}
@@ -319,4 +321,9 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			countTicks = maxTicks;
 		}
 	}
+	
+	public String getName() {
+        return this.hasCustomName() ? this.customName : "container.recycler";
+    }
+	
 }

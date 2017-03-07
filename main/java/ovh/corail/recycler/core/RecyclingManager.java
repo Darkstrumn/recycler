@@ -1,9 +1,17 @@
 package ovh.corail.recycler.core;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -15,9 +23,42 @@ import ovh.corail.recycler.handler.ConfigurationHandler;
 public class RecyclingManager {
 	private static final RecyclingManager instance = new RecyclingManager();
 	private List<RecyclingRecipe> recipes = Lists.<RecyclingRecipe> newArrayList();
+	private List<ItemStack> blacklist = new ArrayList<ItemStack>();
 
 	public static RecyclingManager getInstance() {
 		return instance;
+	}
+	
+	public static void loadBlacklist() throws IOException {
+		File blacklistFile = new File(ConfigurationHandler.configDir, "blacklistItem.json");
+		if (!blacklistFile.exists()) {
+			blacklistFile.createNewFile();
+			FileWriter fw = new FileWriter(blacklistFile);
+			List<String> stringlist = new ArrayList<String>();
+			stringlist.add("recycler:recycler:1:0");
+			fw.write(new GsonBuilder().setPrettyPrinting().create().toJson(stringlist));
+			fw.close();
+		}
+		List<String> stringlist = new Gson().fromJson(new BufferedReader(new FileReader(blacklistFile)),
+				new TypeToken<List<String>>() {}.getType());
+		
+		ItemStack currentStack;
+		for (String currentString : stringlist) {
+			currentStack = instance.StringToItemStack(currentString);
+			if (currentStack != null && !currentStack.isEmpty()) {
+				instance.blacklist.add(currentStack);
+			}
+		}
+		
+	}
+	
+	public boolean isBlacklist(ItemStack stack) {
+		for (ItemStack blackstack : blacklist) {
+			if (blackstack.isItemEqual(stack)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public int getRecipesCount() {
@@ -68,6 +109,10 @@ public class RecyclingManager {
 				}
 				/** only user defined recipes */
 				if (ConfigurationHandler.onlyUserRecipes && !recipes.get(recipe_num).isUserDefined()) {
+					return -1;
+				}
+				/** only allowed recipes */
+				if (!recipes.get(recipe_num).isAllowed()) {
 					return -1;
 				}
 				return recipe_num;
@@ -167,7 +212,8 @@ public class RecyclingManager {
 		}
 		return newItemsList;
 	}
-	public static List<JsonRecyclingRecipe> getJsonRecyclingRecipes() {
+	
+	private static List<JsonRecyclingRecipe> getJsonRecyclingRecipes() {
 		List<JsonRecyclingRecipe> jsonRecipesList = new ArrayList<JsonRecyclingRecipe>();
 		/** unbalanced recipe */
 		/* granite */
@@ -886,9 +932,32 @@ public class RecyclingManager {
 	private RecyclingManager() {
 	}
 
-	public static void loadJsonRecipes(List<JsonRecyclingRecipe> jsonRecipes, boolean userDefined) {
-		for (int i = 0; i < jsonRecipes.size(); i++) {
-			RecyclingRecipe recipe = convertJsonRecipe(jsonRecipes.get(i));
+	public static void loadJsonRecipes(boolean userDefined) throws IOException {
+		List<JsonRecyclingRecipe> jsonRecipesList;
+		if (!userDefined) {
+			jsonRecipesList = getJsonRecyclingRecipes();
+		} else {
+			File userRecyclingRecipesFile = new File(ConfigurationHandler.configDir, "userRecyclingRecipes.json");
+			if (!userRecyclingRecipesFile.exists()) {
+				userRecyclingRecipesFile.createNewFile();
+				FileWriter fw = new FileWriter(userRecyclingRecipesFile);
+				jsonRecipesList = new ArrayList<JsonRecyclingRecipe>();
+				jsonRecipesList.add(new JsonRecyclingRecipe(Main.MOD_ID+":recycler:1:0", new String[] {
+						"minecraft:cobblestone:6:0",
+						"minecraft:iron_ingot:3:0",
+				}));
+				fw.write(new GsonBuilder().setPrettyPrinting().create().toJson(jsonRecipesList));
+				fw.close();
+			}
+			jsonRecipesList = new Gson().fromJson(new BufferedReader(new FileReader(userRecyclingRecipesFile)),
+				new TypeToken<List<JsonRecyclingRecipe>>() {}.getType());
+		}
+		
+		
+		
+		
+		for (int i = 0; i < jsonRecipesList.size(); i++) {
+			RecyclingRecipe recipe = convertJsonRecipe(jsonRecipesList.get(i));
 			if (recipe != null && recipe.getCount() > 0) {
 				/** check for same existing recipe */
 				int foundRecipe = -1;
@@ -901,13 +970,14 @@ public class RecyclingManager {
 					}
 					recipe.setUserDefined(true);
 				}
+				recipe.setAllowed(!instance.isBlacklist(recipe.getItemRecipe()));
 				if (foundRecipe == -1) {
 					instance.recipes.add(recipe);
 				} else {
 					instance.recipes.set(foundRecipe, recipe);
 				}
 			} else {
-				//println("Erreur.... Recette : "+i+"  Item : "+jsonRecipes.get(i).inputItem);
+				System.out.println("Erreur.... Recette : "+i+"  Item : "+jsonRecipesList.get(i).inputItem);
 			}
 		}
 	}
@@ -939,4 +1009,5 @@ public class RecyclingManager {
 		return ItemStack.EMPTY;
 
 	}
+	
 }

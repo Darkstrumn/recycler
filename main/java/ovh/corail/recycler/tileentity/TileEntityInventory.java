@@ -2,11 +2,17 @@ package ovh.corail.recycler.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.datafix.DataFixer;
+import net.minecraft.util.datafix.FixTypes;
+import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
 import ovh.corail.recycler.core.Main;
@@ -14,14 +20,11 @@ import ovh.corail.recycler.core.Main;
 public class TileEntityInventory extends TileEntity implements ISidedInventory {
 	public final int count = 20;
 	public int firstOutput = 2;
-	protected ItemStack[] inventory;
+	protected String customName;
+	protected NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(count, ItemStack.EMPTY);
 
 	public TileEntityInventory() {
 		super();
-		this.inventory = new ItemStack[count];
-		for (int i = 0; i < count ;i++) {
-			this.inventory[i] = ItemStack.EMPTY;
-		}
 	}
 	
 	public int getEmptySlot() {
@@ -50,50 +53,30 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 
 	@Override
 	public ItemStack getStackInSlot(int index) {
-		if (index < 0 || index >= this.getSizeInventory()) {
-			return ItemStack.EMPTY;
-		} else {
-			return this.inventory[index];
-		}
+		return (ItemStack) this.inventory.get(index);
 	}
 
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		ItemStack stack = getStackInSlot(index);
-		if (!stack.isEmpty()) {
-			if (stack.getCount() <= count) {
-				setInventorySlotContents(index, ItemStack.EMPTY);
-				this.markDirty();
-			} else {
-				stack = stack.splitStack(count);
-				if (stack.getCount() == 0) {
-					setInventorySlotContents(index, ItemStack.EMPTY);
-					this.markDirty();
-				}
-			}
-		}
-		return stack;
+		return ItemStackHelper.getAndSplit(this.inventory, index, count);
 	}
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
-		ItemStack stack;
-		if (index >= 0 && index < count) {
-			stack = inventory[index];
-		} else {
-			stack = ItemStack.EMPTY;
-		}
-		return stack;
+		return ItemStackHelper.getAndRemove(this.inventory, index);
 	}
 
 	@Override
 	public void setInventorySlotContents(int index, ItemStack stack) {
-		if (index >= 0 && index < count) {
-			inventory[index] = stack;
-		} else {
-			inventory[index] = ItemStack.EMPTY;
-		}
-		markDirty();
+		ItemStack currentStack = (ItemStack) this.inventory.get(index);
+        boolean flag = !stack.isEmpty() && stack.isItemEqual(currentStack) && ItemStack.areItemStackTagsEqual(stack, currentStack);
+        this.inventory.set(index, stack);
+        if (stack.getCount() > this.getInventoryStackLimit()) {
+            stack.setCount(this.getInventoryStackLimit());
+        }
+        if (index == 0 && !flag) {
+            this.markDirty();
+        }
 	}
 
 	@Override
@@ -108,8 +91,7 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 
 	@Override
 	public boolean isUsableByPlayer(EntityPlayer player) {
-		pos = this.getPos();
-		return world.getTileEntity(pos) == this && player.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64;
+		return world.getTileEntity(this.pos) != this ? false : player.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
 	}
 
 	@Override
@@ -153,7 +135,7 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 
 	@Override
 	public boolean hasCustomName() {
-		return false;
+		return this.customName != null && !this.customName.isEmpty();
 	}
 
 	@Override
@@ -188,44 +170,31 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		super.writeToNBT(compound);
-		NBTTagList itemList = new NBTTagList();
-		for (int i = 0; i < inventory.length; i++) {
-			ItemStack stack = inventory[i];
-			if (!stack.isEmpty()) {
-				NBTTagCompound tag = new NBTTagCompound();
-				tag.setByte("Slot", (byte) i);
-				stack.writeToNBT(tag);
-				itemList.appendTag(tag);
-			}
-		}
-		if (!itemList.hasNoTags()) {
-			compound.setTag("inventory", itemList);
-		}
+		ItemStackHelper.saveAllItems(compound, this.inventory);
+		if (this.hasCustomName()) {
+            compound.setString("CustomName", this.customName);
+        }
 		return compound;
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
-		NBTTagList tagList = compound.getTagList("inventory", Constants.NBT.TAG_COMPOUND);
-		for (int i = 0; i < tagList.tagCount(); i++) {
-			NBTTagCompound tag = (NBTTagCompound) tagList.getCompoundTagAt(i);
-			int j = tag.getByte("Slot") & 255;
-			if (j >= 0 && j < inventory.length) {
-				inventory[j] = new ItemStack(tag);
-			}
-		}
+		this.inventory = NonNullList.<ItemStack>withSize(this.getSizeInventory(), ItemStack.EMPTY);
+		ItemStackHelper.loadAllItems(compound, this.inventory);
+		if (compound.hasKey("CustomName", 8)) {
+            this.customName = compound.getString("CustomName");
+        }
 	}
 
 	@Override
 	public boolean isEmpty() {
-		for (ItemStack itemstack : this.inventory) {
-            if (!itemstack.isEmpty()) {
+		for (ItemStack stack : this.inventory) {
+            if (!stack.isEmpty()) {
                 return false;
             }
         }
         return true;
 	}
-
-
+	
 }

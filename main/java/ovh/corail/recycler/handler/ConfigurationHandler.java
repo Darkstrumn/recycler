@@ -1,10 +1,13 @@
 package ovh.corail.recycler.handler;
 
+import java.io.File;
+
 import net.minecraftforge.common.config.Configuration;
 import ovh.corail.recycler.core.Helper;
 
 public class ConfigurationHandler {
 	public static Configuration config;
+	public static File configDir;
 
 	public static boolean unbalancedRecipes, onlyUserRecipes, fancyGui;
 

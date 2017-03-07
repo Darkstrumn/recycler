@@ -1,5 +1,6 @@
 package ovh.corail.recycler.core;
 
+import java.io.File;
 import java.io.IOException;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -40,7 +41,7 @@ public class Main {
 
 		@Override
 		public String getTranslatedTabLabel() {
-			return "tab" + Main.MOD_NAME;
+			return Main.MOD_NAME;
 		}
 	};
 	public static ItemDiamondNugget diamond_nugget = new ItemDiamondNugget();

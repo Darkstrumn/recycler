@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import net.minecraft.item.Item;
 import net.minecraft.stats.Achievement;
 import net.minecraftforge.common.AchievementPage;
 import net.minecraftforge.common.config.Configuration;
@@ -31,6 +32,7 @@ public class CommonProxy {
 		ConfigurationHandler.config = new Configuration(event.getSuggestedConfigurationFile(), Main.MOD_VER);
 		ConfigurationHandler.config.load();
 		ConfigurationHandler.refreshConfig();
+		ConfigurationHandler.configDir = event.getModConfigurationDirectory();
 		/** register items and blocks */
 		Helper.register();
 		/** register tileentities */
@@ -39,25 +41,12 @@ public class CommonProxy {
 		Helper.getNewRecipes();
 		/** packet handler */
 		PacketHandler.init();
+		/** load blacklist recipes */
+		RecyclingManager.getInstance().loadBlacklist();
 		/** load default recycling recipes */
-		List<JsonRecyclingRecipe> recipesList = RecyclingManager.getJsonRecyclingRecipes();
-		RecyclingManager.loadJsonRecipes(recipesList, false);
+		RecyclingManager.loadJsonRecipes(false);
 		/** load json user defined recycling recipes */
-		File userRecyclingRecipesFile = new File(event.getModConfigurationDirectory(), "userRecyclingRecipes.json");
-		if (!userRecyclingRecipesFile.exists()) {
-			userRecyclingRecipesFile.createNewFile();
-			FileWriter fw = new FileWriter(userRecyclingRecipesFile);
-			List<JsonRecyclingRecipe> jsonRecipesList = new ArrayList<JsonRecyclingRecipe>();
-			jsonRecipesList.add(new JsonRecyclingRecipe(Main.MOD_ID+":recycler:1:0", new String[] {
-					"minecraft:cobblestone:6:0",
-					"minecraft:iron_ingot:3:0",
-			}));
-			fw.write(new GsonBuilder().setPrettyPrinting().create().toJson(jsonRecipesList));
-			fw.close();
-		}
-		List<JsonRecyclingRecipe> jsonRecipesList = new Gson().fromJson(new BufferedReader(new FileReader(userRecyclingRecipesFile)),
-			new TypeToken<List<JsonRecyclingRecipe>>() {}.getType());
-		RecyclingManager.loadJsonRecipes(jsonRecipesList, true);
+		RecyclingManager.loadJsonRecipes(true);
 	}
 
 	public void init(FMLInitializationEvent event) {

@@ -13,6 +13,7 @@
         "sounds": [
             {
                 "name": "recycler:recycler_working",
+				"volume": 0.5,
                 "stream": true
             }
         ]
