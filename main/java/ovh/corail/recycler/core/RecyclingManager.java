@@ -34,7 +34,29 @@ public class RecyclingManager {
 		return instance;
 	}
 	
-	public static void loadBlacklist() throws IOException {
+	private boolean saveBlacklist() throws IOException {
+		File blacklistFile = new File(ConfigurationHandler.configDir, "blacklistItem.json");
+		
+		if (blacklistFile.delete()) {
+			List<String> blacklistItems = new ArrayList<String>();
+			for (int i = 0 ; i < recipes.size() ; i++) {
+				if (!recipes.get(i).isAllowed()) {
+					blacklistItems.add(ItemStackToString(recipes.get(i).getItemRecipe()));				
+				}
+			}	
+			blacklistFile.createNewFile();
+			FileWriter fw = new FileWriter(blacklistFile);
+			fw.write(new GsonBuilder().setPrettyPrinting().create().toJson(blacklistItems));
+			fw.close();
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+
+	
+	public void loadBlacklist() throws IOException {
 		File blacklistFile = new File(ConfigurationHandler.configDir, "blacklistItem.json");
 		if (!blacklistFile.exists()) {
 			blacklistFile.createNewFile();
@@ -96,6 +118,30 @@ public class RecyclingManager {
 
 	public void addRecipe(ItemStack stackIn, ItemStack stackOut) {
 		addRecipe(stackIn, false, stackOut);
+	}
+	
+	public boolean addCraftingRecipe(ItemStack stack) {
+		//TODO
+		
+		return false;
+	}
+	
+	public boolean removeRecipe(ItemStack stack) throws IOException {
+		if (stack.isEmpty()) { return false; }
+		for (int i = 0 ; i < recipes.size() ; i++) {
+			if (stack.isItemEqual(recipes.get(i).getItemRecipe())) {
+				if (recipes.get(i).isUserDefined()) {
+					recipes.remove(i);
+					saveUserDefinedRecipes();
+					return true;
+				} else {
+					recipes.get(i).setAllowed(false);
+					saveBlacklist();
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public int hasRecipe(ItemStack stack) {
@@ -248,7 +294,7 @@ public class RecyclingManager {
 		return newItemsList;
 	}
 	
-	private static List<JsonRecyclingRecipe> getJsonRecyclingRecipes() {
+	private List<JsonRecyclingRecipe> getJsonRecyclingRecipes() {
 		List<JsonRecyclingRecipe> jsonRecipesList = new ArrayList<JsonRecyclingRecipe>();
 		/** unbalanced recipe */
 		/* granite */
@@ -966,8 +1012,27 @@ public class RecyclingManager {
 	}
 	private RecyclingManager() {
 	}
-
-	public static void loadJsonRecipes(boolean userDefined) throws IOException {
+	
+	private boolean saveUserDefinedRecipes() throws IOException {
+		File userRecyclingRecipesFile = new File(ConfigurationHandler.configDir, "userRecyclingRecipes.json");
+		if (userRecyclingRecipesFile.delete()) {
+			List<JsonRecyclingRecipe> jRecipes = new ArrayList<JsonRecyclingRecipe>();
+			for (int i = 0 ; i < recipes.size() ; i++) {
+				if (recipes.get(i).isUserDefined()) {
+					jRecipes.add(convertRecipeToJson(recipes.get(i)));				
+				}
+			}	
+			userRecyclingRecipesFile.createNewFile();
+			FileWriter fw = new FileWriter(userRecyclingRecipesFile);
+			fw.write(new GsonBuilder().setPrettyPrinting().create().toJson(jRecipes));
+			fw.close();
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public void loadJsonRecipes(boolean userDefined) throws IOException {
 		List<JsonRecyclingRecipe> jsonRecipesList;
 		if (!userDefined) {
 			jsonRecipesList = getJsonRecyclingRecipes();
@@ -1017,7 +1082,7 @@ public class RecyclingManager {
 		}
 	}
 
-	private static RecyclingRecipe convertJsonRecipe(JsonRecyclingRecipe jRecipe) {
+	private RecyclingRecipe convertJsonRecipe(JsonRecyclingRecipe jRecipe) {
 		ItemStack inputItem = StringToItemStack(jRecipe.inputItem);
 		if (inputItem.isEmpty()) { return null; }
 		RecyclingRecipe recipe = new RecyclingRecipe(inputItem);
@@ -1031,8 +1096,25 @@ public class RecyclingManager {
 		recipe.setUnbalanced(jRecipe.isUnbalanced);
 		return recipe;
 	}
+	
+	private JsonRecyclingRecipe convertRecipeToJson(RecyclingRecipe recipe) {
+		String inputItem = ItemStackToString(recipe.getItemRecipe());
+		if (inputItem.isEmpty()) { return null; }
+		String outputItems[] = new String[recipe.getCount()];
+		for (int i = 0 ; i < recipe.getCount() ; i++) {
+			String outputItem = ItemStackToString(recipe.getStack(i));
+			outputItems[i] = outputItem;
+		}
+		JsonRecyclingRecipe jRecipe = new JsonRecyclingRecipe(inputItem, outputItems, recipe.canBeRepaired(), recipe.isUnbalanced());
+		
+		return null;
+	}
 
-	private static ItemStack StringToItemStack(String value) {
+	private String ItemStackToString(ItemStack stack) {
+		return stack.getItem().getRegistryName().toString() + ":" + stack.getCount() + ":" + stack.getMetadata();
+	}
+	
+	private ItemStack StringToItemStack(String value) {
 		String[] parts = value.split(":");
 		if (parts.length == 4) {
 			//Item item = (Item) GameRegistry.findItem(parts[0], parts[1]);

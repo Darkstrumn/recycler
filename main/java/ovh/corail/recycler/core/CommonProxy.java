@@ -44,9 +44,9 @@ public class CommonProxy {
 		/** load blacklist recipes */
 		RecyclingManager.getInstance().loadBlacklist();
 		/** load default recycling recipes */
-		RecyclingManager.loadJsonRecipes(false);
+		RecyclingManager.getInstance().loadJsonRecipes(false);
 		/** load json user defined recycling recipes */
-		RecyclingManager.loadJsonRecipes(true);
+		RecyclingManager.getInstance().loadJsonRecipes(true);
 	}
 
 	public void init(FMLInitializationEvent event) {

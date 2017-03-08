@@ -1,12 +1,13 @@
 package ovh.corail.recycler.handler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -21,7 +22,9 @@ public class CommandHandler implements ICommand {
 	public CommandHandler() {
 		aliases.add("recycler");
 		aliases.add("corail");
-		commands.add("viewRecipes");
+		commands.add("viewRecipe");
+		commands.add("addRecipe");
+		commands.add("removeRecipe");
 	}
 	
 	@Override
@@ -37,7 +40,10 @@ public class CommandHandler implements ICommand {
 	@Override
 	public String getUsage(ICommandSender sender) {
 		// TODO translate
-		return "recycler viewRecipes\nShow the list of all items that are allowed to recycle in the console";
+		return "recycler viewRecipe|addRecipe|removeRecipe\n" + 
+		"viewRecipe   - show the list of all items that are allowed to recycle in the console\n" + 
+		"addRecipe    - add the recycling recipe of the crafting result of the item hold in main hand\n" + 
+		"removeRecipe - remove the recycling recipe of the item hold in main hand";
 	}
 
 	@Override
@@ -46,7 +52,7 @@ public class CommandHandler implements ICommand {
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) {
 		World world = sender.getEntityWorld();
 		//TODO translate
 		if (world.isRemote) {
@@ -58,11 +64,15 @@ public class CommandHandler implements ICommand {
 			return;
 		}
 		if (args[0].equals("viewRecipes")) {
-			processViewRecipes(world, sender);
-		/*} else if (args[0].equals("command2")) {
-			processGraveDigger(world, sender);
-			/*} else if (args[0].equals("command3")) {
-			processDeleteGraves(world, sender);*/
+			processViewRecipe(world, sender);
+		} else if (args[0].equals("addRecipe")) {
+			processAddRecipe(world, sender);
+		} else if (args[0].equals("removeRecipe")) {
+			try {
+				processRemoveRecipe(world, sender);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 			Helper.sendMessage("Invalid argument", (EntityPlayer) sender, false);
 			return;
@@ -89,14 +99,29 @@ public class CommandHandler implements ICommand {
 		return false;
 	}
 	
-	private void processViewRecipes(World world, ICommandSender sender) {
+	private void processViewRecipe(World world, ICommandSender sender) {
 		RecyclingManager rm = RecyclingManager.getInstance();
 		RecyclingRecipe cr;
 		for (int i = 0 ; i < rm.getRecipesCount() ; i++) {
 			cr = rm.getRecipe(i);
 			if (!cr.isAllowed() || (cr.isUnbalanced() && !ConfigurationHandler.unbalancedRecipes)) { continue; }
 			System.out.println(cr.getItemRecipe().getItem().getRegistryName() + ":" + cr.getMeta());
-			//Helper.addChatMessage(cr.getItemRecipe().getItem().getUnlocalizedName() + ":" + cr.getMeta(), (EntityPlayer) sender, false);
+		}
+	}
+	
+	private void processAddRecipe(World world, ICommandSender sender) {
+		EntityPlayer player = (EntityPlayer) sender;
+		ItemStack stack = player.getActiveItemStack();
+		if (stack != null) {
+			//TODO
+		}
+	}
+	
+	private void processRemoveRecipe(World world, ICommandSender sender) throws IOException {
+		EntityPlayer player = (EntityPlayer) sender;
+		ItemStack stack = player.getHeldItemMainhand();
+		if (stack != null) {
+			RecyclingManager.getInstance().removeRecipe(stack);
 		}
 	}
 
