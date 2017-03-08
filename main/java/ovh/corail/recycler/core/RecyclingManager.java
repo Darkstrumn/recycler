@@ -6,13 +6,17 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -97,7 +101,20 @@ public class RecyclingManager {
 		if (stack.isEmpty() || stack.getCount() <= 0) {
 			return -1;
 		}
-		ItemStack testStack = stack.copy(); // For damaged items
+		// don't allow binding cursed items
+		Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
+		Iterator i = enchants.entrySet().iterator();
+		Enchantment enchant;
+		while (i.hasNext()) {
+			Map.Entry pair = (Map.Entry)i.next();
+			enchant = (Enchantment) pair.getKey();
+			if (enchant.getRegistryName().getResourcePath().equals("binding_curse")) {
+				return -1;
+			}
+			i.remove();
+		}
+		// For damaged items
+		ItemStack testStack = stack.copy();
 		if (testStack.getItem().isRepairable()) {
 			testStack.setItemDamage(0);
 		}

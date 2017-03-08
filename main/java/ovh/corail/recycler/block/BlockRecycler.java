@@ -35,7 +35,6 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 		this.isBlockContainer = true;
 		setHardness(2.0f);
 		setResistance(10.0f);
-		this.setCreativeTab(Main.tabRecycler);
 		this.blockSoundType = SoundType.STONE;
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 	}

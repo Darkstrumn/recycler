@@ -54,7 +54,7 @@ public class CommandHandler implements ICommand {
 			return;
 		}
 		if (args.length != 1) {
-			Helper.addChatMessage("Invalid argument", (EntityPlayer) sender, false);
+			Helper.sendMessage("Invalid argument", (EntityPlayer) sender, false);
 			return;
 		}
 		if (args[0].equals("viewRecipes")) {
@@ -64,7 +64,7 @@ public class CommandHandler implements ICommand {
 			/*} else if (args[0].equals("command3")) {
 			processDeleteGraves(world, sender);*/
 		} else {
-			Helper.addChatMessage("Invalid argument", (EntityPlayer) sender, false);
+			Helper.sendMessage("Invalid argument", (EntityPlayer) sender, false);
 			return;
 		}
 		

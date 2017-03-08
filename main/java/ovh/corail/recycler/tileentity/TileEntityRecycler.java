@@ -42,29 +42,29 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 	private boolean canRecycle(EntityPlayer currentPlayer) {
 		/** item input slot empty */
 		if (getStackInSlot(0).isEmpty()) {
-			Helper.addChatMessage("tile.recycler.message.emptySlot", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.emptySlot", currentPlayer, true);
 			return false;
 		}
 		if (getStackInSlot(0).getCount() <= 0) {
-			Helper.addChatMessage("tile.recycler.message.emptySlot", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.emptySlot", currentPlayer, true);
 			setInventorySlotContents(0, ItemStack.EMPTY);
 			return false;
 		}
 		/** disk input slot empty */
 		ItemStack diskStack = getStackInSlot(1);
 		if (diskStack.isEmpty()) {
-			Helper.addChatMessage("tile.recycler.message.noDisk", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.noDisk", currentPlayer, true);
 			return false;
 		}
 		if (diskStack.getCount() <= 0) {
-			Helper.addChatMessage("tile.recycler.message.noDisk", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.noDisk", currentPlayer, true);
 			setInventorySlotContents(1, ItemStack.EMPTY);
 			return false;
 		}
 		// TODO nécessaire?
 		if (getStackInSlot(1).getItemDamage() >= getStackInSlot(1).getMaxDamage()) {
 			setInventorySlotContents(1, ItemStack.EMPTY);
-			Helper.addChatMessage("tile.recycler.message.noDisk", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.noDisk", currentPlayer, true);
 			return false;
 		}
 		return true;
@@ -87,7 +87,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		/** corresponding recipe */
 		int num_recipe = recyclingManager.hasRecipe(getStackInSlot(0));
 		if (num_recipe < 0) {
-			Helper.addChatMessage("tile.recycler.message.noRecipe", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.noRecipe", currentPlayer, true);
 			transferSlotInput();
 			emptyVisual();
 			return false;
@@ -95,7 +95,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		RecyclingRecipe currentRecipe = recyclingManager.getRecipe(num_recipe);
 		/** enough stacksize for the input slot */
 		if (getStackInSlot(0).getCount() < currentRecipe.getItemRecipe().getCount()) {
-			Helper.addChatMessage("tile.recycler.message.noEnoughInput", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.noEnoughInput", currentPlayer, true);
 			return false;
 		}
 		int nb_input = (int) Math.floor((double) getStackInSlot(0).getCount() / (double) currentRecipe.getItemRecipe().getCount());
@@ -144,7 +144,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			}
 
 		} else {
-			Helper.addChatMessage("tile.recycler.message.notEnoughOutputSlots", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.notEnoughOutputSlots", currentPlayer, true);
 			return false;
 		}
 		/** empty the input slot */
@@ -159,7 +159,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		/** damage the disk */
 		diskStack.setItemDamage(diskStack.getItemDamage() + (10 * nb_input));
 		if (diskStack.getItemDamage() >= diskStack.getMaxDamage()) {
-			Helper.addChatMessage("tile.recycler.message.BrokenDisk", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.BrokenDisk", currentPlayer, true);
 			this.setInventorySlotContents(1, ItemStack.EMPTY);
 		} else {
 			this.setInventorySlotContents(1, diskStack);

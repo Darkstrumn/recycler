@@ -60,7 +60,7 @@ public class Helper {
 		return tmp;
 	}
 	
-	public static void addChatMessage(String message, EntityPlayer currentPlayer, boolean translate) {
+	public static void sendMessage(String message, EntityPlayer currentPlayer, boolean translate) {
 		if (currentPlayer != null) {
 			if (translate) {
 				message = getTranslation(message);
