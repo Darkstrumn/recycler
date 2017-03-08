@@ -15,6 +15,7 @@ button.auto=Auto
 config.unbalancedRecipes=Ajoute des recettes moins crédibles
 config.onlyUserRecipes=Utilise uniquement vos recettes de recyclage
 config.fancyGui=Utilise le GUI fantaisie
+config.allowCommand=Autoriser les commandes
 achievement.PlaceRecycler=Un moyen de recycler
 achievement.PlaceRecycler.desc=Tu as fabriqué un Recycleur !
 achievement.BuildDisk=Un disque nécessaire

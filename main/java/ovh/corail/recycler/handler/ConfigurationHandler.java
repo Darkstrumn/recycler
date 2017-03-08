@@ -9,7 +9,7 @@ public class ConfigurationHandler {
 	public static Configuration config;
 	public static File configDir;
 
-	public static boolean unbalancedRecipes, onlyUserRecipes, fancyGui;
+	public static boolean unbalancedRecipes, onlyUserRecipes, fancyGui, allowCommand;
 
 	public static void refreshConfig() {
 		unbalancedRecipes=config.getBoolean("unbalancedRecipes", config.CATEGORY_GENERAL, false, Helper.getTranslation("config.unbalancedRecipes"));
@@ -18,5 +18,6 @@ public class ConfigurationHandler {
 		if (config.hasChanged()) {
 			config.save();
 		}
+		allowCommand=config.getBoolean("allowCommand", config.CATEGORY_GENERAL, true, Helper.getTranslation("config.allowCommand"));
 	}
 }

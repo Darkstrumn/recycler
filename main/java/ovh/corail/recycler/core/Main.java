@@ -16,7 +16,9 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import ovh.corail.recycler.block.BlockRecycler;
+import ovh.corail.recycler.handler.CommandHandler;
 import ovh.corail.recycler.handler.EventHandler;
 import ovh.corail.recycler.handler.SoundHandler;
 import ovh.corail.recycler.item.ItemAchievement001;
@@ -71,5 +73,12 @@ public class Main {
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		proxy.postInit(event);
+	}
+	
+	@Mod.EventHandler
+	public void serverLoad(FMLServerStartingEvent event) {
+		/** Only for development */
+		event.registerServerCommand(new CommandHandler());
+
 	}
 }

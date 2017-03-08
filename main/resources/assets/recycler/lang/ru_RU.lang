@@ -15,6 +15,7 @@ button.auto=Авто
 config.unbalancedRecipes=Добавить несбалансированные рецепты переработки
 config.onlyUserRecipes=Использовать только свои собственные рецепты переработки
 config.fancyGui=Использовать фантазийный GUI
+config.allowCommand=Allow commands
 achievement.PlaceRecycler=На пути к переработке
 achievement.PlaceRecycler.desc=Ты создал Переработчик !
 achievement.BuildDisk=Нужен диск
