@@ -16,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -148,6 +149,23 @@ public class RecyclingManager {
 		if (num_recipe < 0) {
 			return itemsList;
 		}
+		// check enchants
+		Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
+		if (!enchants.isEmpty()) {
+			Iterator i = enchants.entrySet().iterator();
+			ItemStack currentBook;
+			Enchantment enchant;
+			Integer level;
+			while (i.hasNext()) {
+				Map.Entry pair = (Map.Entry)i.next();
+				enchant = (Enchantment) pair.getKey();
+		        level = (Integer) pair.getValue();
+		        currentBook = new ItemStack(Items.ENCHANTED_BOOK);
+				Items.ENCHANTED_BOOK.addEnchantment(currentBook, new EnchantmentData(enchant, level));
+				itemsList.add(currentBook);
+			}
+		}
+		
 		RecyclingRecipe currentRecipe = recipes.get(num_recipe);
 
 		/* Calcul du résultat du stack */
