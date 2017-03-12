@@ -14,6 +14,7 @@ import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
 import ovh.corail.recycler.core.RecyclingRecipe;
+import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.packet.ServerProgressMessage;
 import ovh.corail.recycler.packet.SoundMessage;
@@ -111,6 +112,24 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		// TODO calcul des stacksizes pour les slots libres à  mettre plus bas
 		int emptyCount = hasEmptySlot();
 		if (emptyCount >= itemsList.size()) {
+			
+			// TODO test
+			/** Loss chance */
+			double losses = 0.0D;
+			for (int i = 0 ; i < nb_input ; i++) {
+				losses += Helper.getRandom(1, 100) <= ConfigurationHandler.chanceLoss ? 0.5D : 1.0D;
+			}
+			losses /= nb_input;
+			if (losses < 1.0D) {
+				for (int i = 0; i < itemsList.size(); i++) {
+					int stacksize = (int) Math.floor(itemsList.get(i).getCount() * losses);
+					if (stacksize > 0) {
+						itemsList.get(i).setCount(stacksize);
+					} else {
+						itemsList.set(i, ItemStack.EMPTY);
+					}
+				}
+			}
 			/** fill the identical slots not fullstack */
 			/** for each result of the recipe */
 			for (int i = 0; i < itemsList.size(); i++) {

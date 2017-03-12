@@ -26,7 +26,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 import ovh.corail.recycler.handler.ConfigurationHandler;
 
 public class RecyclingManager {
@@ -1108,7 +1114,7 @@ public class RecyclingManager {
 		return recipe;
 	}
 	
-	private JsonRecyclingRecipe convertRecipeToJson(RecyclingRecipe recipe) {
+	public JsonRecyclingRecipe convertRecipeToJson(RecyclingRecipe recipe) {
 		String inputItem = ItemStackToString(recipe.getItemRecipe());
 		if (inputItem.isEmpty()) { return null; }
 		String outputItems[] = new String[recipe.getCount()];
@@ -1118,7 +1124,7 @@ public class RecyclingManager {
 		}
 		JsonRecyclingRecipe jRecipe = new JsonRecyclingRecipe(inputItem, outputItems, recipe.canBeRepaired(), recipe.isUnbalanced());
 		
-		return null;
+		return jRecipe;
 	}
 
 	private String ItemStackToString(ItemStack stack) {
@@ -1136,6 +1142,60 @@ public class RecyclingManager {
 		}
 		return ItemStack.EMPTY;
 
+	}
+	
+	public RecyclingRecipe convertCraftingRecipe(IRecipe iRecipe) {
+		RecyclingRecipe recipe = new RecyclingRecipe(iRecipe.getRecipeOutput());		
+		if (iRecipe instanceof ShapedRecipes) {
+			ShapedRecipes craftingRecipe = (ShapedRecipes) iRecipe;
+			for (int j = 0; j < craftingRecipe.recipeItems.length; j++) {
+				if (!craftingRecipe.recipeItems[j].isEmpty()) {
+					recipe.addStack(craftingRecipe.recipeItems[j]);
+				}
+			}
+		} else if (iRecipe instanceof ShapelessRecipes) {
+			ShapelessRecipes craftingRecipe = (ShapelessRecipes) iRecipe;
+			for (int j = 0; j < craftingRecipe.recipeItems.size(); j++) {
+				if (!craftingRecipe.recipeItems.get(j).isEmpty()) {
+					recipe.addStack(craftingRecipe.recipeItems.get(j));
+				}
+			}
+		} else if (iRecipe  instanceof ShapedOreRecipe) {
+			ShapedOreRecipe craftingRecipe = (ShapedOreRecipe) iRecipe;
+			ItemStack currentStack = ItemStack.EMPTY;
+			for (int j = 0; j < craftingRecipe.getInput().length; j++) {
+				if (craftingRecipe.getInput()[j] instanceof ItemStack) {
+					currentStack = (ItemStack) craftingRecipe.getInput()[j];
+				} else if (craftingRecipe.getInput()[j] instanceof List) {
+					Object o = ((List) craftingRecipe.getInput()[j]).get(0);
+					if (o instanceof ItemStack) {
+						currentStack = (ItemStack) o;
+		            }
+				}
+				if (!currentStack.isEmpty()) {
+					recipe.addStack(currentStack);
+				}
+			}
+		} else if (iRecipe  instanceof ShapelessOreRecipe) {
+			ShapelessOreRecipe craftingRecipe = (ShapelessOreRecipe) iRecipe;
+			ItemStack currentStack = ItemStack.EMPTY;
+			for (int j = 0; j < craftingRecipe.getInput().size(); j++) {
+				if (craftingRecipe.getInput().get(j) instanceof ItemStack) {
+					currentStack = (ItemStack) craftingRecipe.getInput().get(j);
+				} else if (craftingRecipe.getInput().get(j) instanceof List) {
+					Object o = ((List) craftingRecipe.getInput().get(j)).get(0);
+					if (o instanceof ItemStack) {
+						currentStack = (ItemStack) o;
+					}
+				}
+				if (!currentStack.isEmpty()) {
+					recipe.addStack(currentStack);
+				}
+			}
+		}
+		recipe.setCanBeRepaired(recipe.getItemRecipe().getItem().isRepairable());
+		recipe.setUnbalanced(false);
+		return recipe;
 	}
 	
 }

@@ -17,6 +17,7 @@ config.onlyUserRecipes=Utilise uniquement vos recettes de recyclage
 config.fancyGui=Utilise le GUI fantaisie
 config.allowCommand=Autoriser les commandes
 config.enchantedBooks=Recycler des objets magiques donne des livres enchantés
+config.chanceLoss=Chance de ne récupérer que la moitié
 achievement.PlaceRecycler=Un moyen de recycler
 achievement.PlaceRecycler.desc=Tu as fabriqué un Recycleur !
 achievement.BuildDisk=Un disque nécessaire

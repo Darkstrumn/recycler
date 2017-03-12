@@ -17,6 +17,7 @@ config.onlyUserRecipes=Использовать только свои собст
 config.fancyGui=Использовать фантазийный GUI
 config.allowCommand=Allow commands
 config.enchantedBooks=Recycle magic items give enchanted books
+config.chanceLoss=Chance of only recovery half
 achievement.PlaceRecycler=На пути к переработке
 achievement.PlaceRecycler.desc=Ты создал Переработчик !
 achievement.BuildDisk=Нужен диск

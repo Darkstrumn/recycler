@@ -1,5 +1,7 @@
 package ovh.corail.recycler.core;
 
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -16,6 +18,12 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class Helper {
+	private static Random random = new Random();
+	
+	public static int getRandom(int min, int max) {
+		return random.nextInt(max - min + 1) + min;
+	}
+	
 	public static ItemStack addToInventoryWithLeftover(ItemStack stack, IInventory inventory, boolean simulate) {
 		int left = stack.getCount();
 		int minus = inventory instanceof InventoryPlayer ? 4 : 0;

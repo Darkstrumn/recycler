@@ -11,6 +11,7 @@ public class ConfigurationHandler {
 	private static File configDir;
 
 	public static boolean unbalancedRecipes, onlyUserRecipes, fancyGui, allowCommand, enchantedBooks;
+	public static int chanceLoss;
 	
 	private ConfigurationHandler() {
 	}
@@ -31,6 +32,7 @@ public class ConfigurationHandler {
 		fancyGui=config.getBoolean("fancyGui", config.CATEGORY_GENERAL, false, Helper.getTranslation("config.fancyGui"));
 		allowCommand=config.getBoolean("allowCommand", config.CATEGORY_GENERAL, true, Helper.getTranslation("config.allowCommand"));
 		enchantedBooks=config.getBoolean("enchantedBooks", config.CATEGORY_GENERAL, true, Helper.getTranslation("config.enchantedBooks"));
+		chanceLoss=config.getInt("chanceLoss", config.CATEGORY_GENERAL, 0, 0, 100, Helper.getTranslation("config.chanceLoss"));
 		if (config.hasChanged()) {
 			config.save();
 		}
