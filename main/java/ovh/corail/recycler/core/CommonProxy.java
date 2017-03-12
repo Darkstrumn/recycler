@@ -27,12 +27,9 @@ import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class CommonProxy {
-	public void preInit(FMLPreInitializationEvent event) throws IOException {
+	public void preInit(FMLPreInitializationEvent event) {
 		/** config */
-		ConfigurationHandler.config = new Configuration(event.getSuggestedConfigurationFile(), Main.MOD_VER);
-		ConfigurationHandler.config.load();
-		ConfigurationHandler.refreshConfig();
-		ConfigurationHandler.configDir = event.getModConfigurationDirectory();
+		ConfigurationHandler.loadConfig(new File(event.getModConfigurationDirectory(), Main.MOD_ID));
 		/** register items and blocks */
 		Helper.register();
 		/** register tileentities */
@@ -41,12 +38,8 @@ public class CommonProxy {
 		Helper.getNewRecipes();
 		/** packet handler */
 		PacketHandler.init();
-		/** load blacklist recipes */
-		RecyclingManager.getInstance().loadBlacklist();
-		/** load default recycling recipes */
-		RecyclingManager.getInstance().loadJsonRecipes(false);
-		/** load json user defined recycling recipes */
-		RecyclingManager.getInstance().loadJsonRecipes(true);
+		/** load recycling recipes */
+		RecyclingManager.getInstance().loadRecipes();
 	}
 
 	public void init(FMLInitializationEvent event) {

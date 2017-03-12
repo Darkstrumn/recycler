@@ -14,12 +14,15 @@ public class RecyclingRecipe {
 	private boolean isUserDefined=false;
 	private boolean isAllowed=true;
 	private List<ItemStack> itemsList=new ArrayList<ItemStack>();
+	
 	public RecyclingRecipe(Item item, int count, int meta) {
 		this.itemRecipe=new ItemStack(item, count, meta);
 	}
+	
 	public RecyclingRecipe(ItemStack itemStack) {
 		this.itemRecipe=itemStack;
 	}
+	
 	public RecyclingRecipe(ItemStack stackIn, Object... recipeComponents) {
 		this.itemRecipe=stackIn.copy();
 		for (Object object : recipeComponents) {
@@ -28,6 +31,7 @@ public class RecyclingRecipe {
 			} 
 		}
 	}
+	
 	public RecyclingRecipe(ItemStack stackIn, ItemStack stackOut) {
 		this.itemRecipe=stackIn.copy();
 		itemsList.add(stackOut.copy());

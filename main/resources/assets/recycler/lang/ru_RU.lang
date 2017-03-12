@@ -16,6 +16,7 @@ config.unbalancedRecipes=Добавить несбалансированные �
 config.onlyUserRecipes=Использовать только свои собственные рецепты переработки
 config.fancyGui=Использовать фантазийный GUI
 config.allowCommand=Allow commands
+config.enchantedBooks=Recycle magic items give enchanted books
 achievement.PlaceRecycler=На пути к переработке
 achievement.PlaceRecycler.desc=Ты создал Переработчик !
 achievement.BuildDisk=Нужен диск

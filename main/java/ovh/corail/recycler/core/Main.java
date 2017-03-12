@@ -33,7 +33,7 @@ public class Main {
 	@Instance(Main.MOD_ID)
 	public static Main instance;
 	@SidedProxy(clientSide = "ovh.corail.recycler.core.ClientProxy", serverSide = "ovh.corail.recycler.core.CommonProxy")
-	private static CommonProxy proxy;
+	public static CommonProxy proxy;
 	
 	public static CreativeTabs tabRecycler = new CreativeTabs(Main.MOD_ID) {
 		@Override
