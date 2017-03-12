@@ -7,11 +7,13 @@ import java.util.List;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.JsonRecyclingRecipe;
@@ -107,14 +109,15 @@ public class CommandHandler implements ICommand {
 		List<IRecipe> craftingList = cm.getRecipeList();
 		List<JsonRecyclingRecipe> list = new ArrayList<JsonRecyclingRecipe>();
 		for (int i = 0 ; i < craftingList.size() ; i++) {
-			list.add(rm.convertRecipeToJson(rm.convertCraftingRecipe(craftingList.get(i))));
+			/* only recipes not in the recycler */
+			if (!craftingList.get(i).getRecipeOutput().isEmpty() && rm.hasRecipe(craftingList.get(i).getRecipeOutput()) == -1) {
+				list.add(rm.convertRecipeToJson(rm.convertCraftingRecipe(craftingList.get(i))));
+			}
 
 		}
 		File exportFile = new File(ConfigurationHandler.getConfigDir(), "export_crafting_recipes.json");
-		if (exportFile.exists()) {
-			exportFile.delete();
-		}
 		EntityPlayer player = (EntityPlayer) sender;
+		Helper.sendMessage(list.size() + " " + Helper.getTranslation("message.command.recipesFound"), player, false);
 		boolean success = rm.saveAsJson(exportFile, list);
 		if (success) {
 			Helper.sendMessage("message.command.exportSucceeded", player, true);
@@ -133,10 +136,8 @@ public class CommandHandler implements ICommand {
 			list.add(rm.convertRecipeToJson(cr));
 		}
 		File exportFile = new File(ConfigurationHandler.getConfigDir(), "export_recycling_recipes.json");
-		if (exportFile.exists()) {
-			exportFile.delete();
-		}
 		EntityPlayer player = (EntityPlayer) sender;
+		Helper.sendMessage(list.size() + " " + Helper.getTranslation("message.command.recipesFound"), player, false);
 		boolean success = rm.saveAsJson(exportFile, list);
 		if (success) {
 			Helper.sendMessage("message.command.exportSucceeded", player, true);
@@ -147,17 +148,37 @@ public class CommandHandler implements ICommand {
 	
 	private void processAddRecipe(World world, ICommandSender sender) {
 		EntityPlayer player = (EntityPlayer) sender;
+		RecyclingManager rm = RecyclingManager.getInstance();
 		if (player != null && player.getActiveItemStack() != null) {
-			ItemStack stack = player.getActiveItemStack();	
-			List<IRecipe> craftingList = CraftingManager.getInstance().getRecipeList();
-			for (int i = 0 ; i < craftingList.size() ; i++) {
-				if (craftingList.get(i).getRecipeOutput().isItemEqual(stack)) {
-					RecyclingRecipe recipe = RecyclingManager.getInstance().convertCraftingRecipe(craftingList.get(i));
-					RecyclingManager.getInstance().addRecipe(recipe);
-					break;
+			ItemStack stack = player.getActiveItemStack();
+			int hasRecipe = rm.hasRecipe(stack);
+			/** Recipe already in recycler */
+			if (hasRecipe > -1) {
+				/** isn't blacklist */
+				if (rm.getRecipe(hasRecipe).isAllowed()) {
+					Helper.sendMessage("message.command.addRecipeFailed", player, true);
+				} else {
+					rm.getRecipe(hasRecipe).setAllowed(true);
+					rm.saveBlacklist();
+					Helper.sendMessage("message.command.addRecipeSuceeded", player, true);
+				}
+			} else {
+				/** new recipe added */
+				List<IRecipe> craftingList = CraftingManager.getInstance().getRecipeList();
+				for (int i = 0 ; i < craftingList.size() ; i++) {
+					if (craftingList.get(i).getRecipeOutput().isItemEqual(stack)) {
+						RecyclingRecipe recipe = rm.convertCraftingRecipe(craftingList.get(i));
+						rm.addRecipe(recipe);
+						break;
+					}
+				}
+				/** save user defined recipes to json */
+				if (rm.saveUserDefinedRecipes()) {
+					Helper.sendMessage("message.command.addRecipeSuceeded", player, true);
+				} else {
+					Helper.sendMessage("message.command.addRecipeFailed", player, true);
 				}
 			}
-			// TODO add to json file
 		}
 	}
 	
@@ -165,12 +186,10 @@ public class CommandHandler implements ICommand {
 		EntityPlayer player = (EntityPlayer) sender;
 		if (player != null && player.getHeldItemMainhand() != null) {
 			boolean success = RecyclingManager.getInstance().removeRecipe(player.getHeldItemMainhand());
-			if (player != null) {
-				if (success) {
-					Helper.sendMessage("message.command.removeRecipeSucceeded", player, true);
-				} else {
-					Helper.sendMessage("message.command.removeRecipeFailed", player, true);
-				}
+			if (success) {
+				Helper.sendMessage("message.command.removeRecipeSucceeded", player, true);
+			} else {
+				Helper.sendMessage("message.command.removeRecipeFailed", player, true);
 			}
 		}
 	}

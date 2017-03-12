@@ -51,7 +51,7 @@ public class RecyclingManager {
 		loadJsonRecipes(true);
 	}
 	
-	private boolean saveBlacklist() {
+	public boolean saveBlacklist() {
 		List<String> blacklistItems = new ArrayList<String>();
 		for (int i = 0 ; i < recipes.size() ; i++) {
 			if (!recipes.get(i).isAllowed()) {
@@ -1008,21 +1008,20 @@ public class RecyclingManager {
 	private RecyclingManager() {
 	}
 	
-	private boolean saveUserDefinedRecipes() {
-		if (userDefinedFile.delete()) {
-			List<JsonRecyclingRecipe> jRecipes = new ArrayList<JsonRecyclingRecipe>();
-			for (int i = 0 ; i < recipes.size() ; i++) {
-				if (recipes.get(i).isUserDefined()) {
-					jRecipes.add(convertRecipeToJson(recipes.get(i)));				
-				}
+	public boolean saveUserDefinedRecipes() {
+		List<JsonRecyclingRecipe> jRecipes = new ArrayList<JsonRecyclingRecipe>();
+		for (int i = 0 ; i < recipes.size() ; i++) {
+			if (recipes.get(i).isUserDefined()) {
+				jRecipes.add(convertRecipeToJson(recipes.get(i)));				
 			}
-			return saveAsJson(userDefinedFile, jRecipes);
-		} else {
-			return false;
 		}
+		return saveAsJson(userDefinedFile, jRecipes);
 	}
 	
 	public boolean saveAsJson(File file, List<?> list) {
+		if (file.exists()) {
+			file.delete();
+		}
 		try {
 			if (file.createNewFile()) {
 				FileWriter fw = new FileWriter(file);
@@ -1186,6 +1185,8 @@ public class RecyclingManager {
 		}
 		recipe.setCanBeRepaired(recipe.getItemRecipe().getItem().isRepairable());
 		recipe.setUnbalanced(false);
+		recipe.setUserDefined(true);
+		recipe.setAllowed(true);
 		return recipe;
 	}
 	
