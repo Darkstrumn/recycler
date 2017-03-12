@@ -1,7 +1,6 @@
 package ovh.corail.recycler.handler;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,13 +10,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.ShapedOreRecipe;
-import net.minecraftforge.oredict.ShapelessOreRecipe;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.JsonRecyclingRecipe;
 import ovh.corail.recycler.core.RecyclingManager;
@@ -49,7 +44,7 @@ public class CommandHandler implements ICommand {
 	@Override
 	public String getUsage(ICommandSender sender) {
 		// TODO translate
-		return "recycler exportRecipes|addRecipe|removeRecipe\n" + 
+		return "recycler ExportRecyclingRecipe|exportCraftingRecipes|addRecipe|removeRecipe\n" + 
 		"exportRecyclingRecipes   - create a json file in the config directory with the list of all items that are allowed to recycle\n" +
 		"exportCraftingRecipes    - create a json file in the config directory with the list of all reverse crafting recipes" + 
 		"addRecipe    - add the recycling recipe of the crafting result of the item hold in main hand\n" + 
@@ -64,25 +59,24 @@ public class CommandHandler implements ICommand {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) {
 		World world = sender.getEntityWorld();
-		//TODO translate
 		if (world.isRemote) {
-			System.out.println("Not processing on Client side");
+			Helper.sendMessage("message.command.denyClient", (EntityPlayer) sender, true);
 			return;
 		}
 		if (args.length != 1) {
-			Helper.sendMessage("Invalid argument", (EntityPlayer) sender, false);
+			Helper.sendMessage("message.command.invalidArgument", (EntityPlayer) sender, true);
 			return;
 		}
 		if (args[0].equals("exportRecyclingRecipes")) {
 			processExportRecyclingRecipes(world, sender);
+		} else if (args[0].equals("exportCraftingRecipes")) {
+			processExportCraftingRecipes(world, sender);	
 		} else if (args[0].equals("addRecipe")) {
 			processAddRecipe(world, sender);
 		} else if (args[0].equals("removeRecipe")) {
 			processRemoveRecipe(world, sender);
-		} else if (args[0].equals("exportCraftingRecipes")) {
-			processExportCraftingRecipes(world, sender);
 		} else {
-			Helper.sendMessage("Invalid argument", (EntityPlayer) sender, false);
+			Helper.sendMessage("message.command.invalidArgument", (EntityPlayer) sender, true);
 			return;
 		}
 		
@@ -122,11 +116,10 @@ public class CommandHandler implements ICommand {
 		}
 		EntityPlayer player = (EntityPlayer) sender;
 		boolean success = rm.saveAsJson(exportFile, list);
-		//TODO translate
 		if (success) {
-			Helper.sendMessage("Exportation réussie", player, false);
+			Helper.sendMessage("message.command.exportSucceeded", player, true);
 		} else {
-			Helper.sendMessage("Impossible d'exporter les données", player, false);
+			Helper.sendMessage("message.command.exportFailed", player, true);
 		}
 	}
 	
@@ -145,11 +138,10 @@ public class CommandHandler implements ICommand {
 		}
 		EntityPlayer player = (EntityPlayer) sender;
 		boolean success = rm.saveAsJson(exportFile, list);
-		//TODO translate
 		if (success) {
-			Helper.sendMessage("Exportation réussie", player, false);
+			Helper.sendMessage("message.command.exportSucceeded", player, true);
 		} else {
-			Helper.sendMessage("Impossible d'exporter les données", player, false);
+			Helper.sendMessage("message.command.exportFailed", player, true);
 		}
 	}
 	
@@ -174,11 +166,10 @@ public class CommandHandler implements ICommand {
 		if (player != null && player.getHeldItemMainhand() != null) {
 			boolean success = RecyclingManager.getInstance().removeRecipe(player.getHeldItemMainhand());
 			if (player != null) {
-				//TODO translate
 				if (success) {
-					Helper.sendMessage("Recette supprimée", player, false);
+					Helper.sendMessage("message.command.removeRecipeSucceeded", player, true);
 				} else {
-					Helper.sendMessage("Impossible de suprimer la recette", player, false);
+					Helper.sendMessage("message.command.removeRecipeFailed", player, true);
 				}
 			}
 		}

@@ -1,8 +1,5 @@
 package ovh.corail.recycler.core;
 
-import java.io.File;
-import java.io.IOException;
-
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -59,7 +56,7 @@ public class Main {
 	public static ResourceLocation textureFancyRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/fancy_recycler.png");
 	
 	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent event) throws IOException {
+	public void preInit(FMLPreInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new EventHandler());
 		SoundHandler.registerSounds();
 		proxy.preInit(event);
@@ -77,7 +74,6 @@ public class Main {
 	
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
-		/** Only for development */
 		event.registerServerCommand(new CommandHandler());
 
 	}

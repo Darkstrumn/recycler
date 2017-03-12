@@ -1,7 +1,5 @@
 package ovh.corail.recycler.core;
 
-import java.io.IOException;
-
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;

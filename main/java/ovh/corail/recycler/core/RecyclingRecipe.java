@@ -15,9 +15,10 @@ public class RecyclingRecipe {
 	private boolean isAllowed=true;
 	private List<ItemStack> itemsList=new ArrayList<ItemStack>();
 	
+	/** TODO code not used
 	public RecyclingRecipe(Item item, int count, int meta) {
 		this.itemRecipe=new ItemStack(item, count, meta);
-	}
+	}*/
 	
 	public RecyclingRecipe(ItemStack itemStack) {
 		this.itemRecipe=itemStack;

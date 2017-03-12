@@ -2,7 +2,6 @@ package ovh.corail.recycler.core;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,8 +14,6 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import net.minecraft.enchantment.Enchantment;
@@ -26,7 +23,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
@@ -77,7 +73,6 @@ public class RecyclingManager {
 			stringlist = (List<String>) loadAsJson(blacklistFile, token);
 		}
 		ItemStack currentStack;
-		// TODO change without amount in stack
 		for (String currentString : stringlist) {
 			currentStack = StringToItemStack(currentString);
 			if (currentStack != null && !currentStack.isEmpty()) {
@@ -86,7 +81,7 @@ public class RecyclingManager {
 		}
 	}
 	
-	public boolean isBlacklist(ItemStack stack) {
+	private boolean isBlacklist(ItemStack stack) {
 		for (ItemStack blackstack : blacklist) {
 			if (blackstack.isItemEqual(stack)) {
 				return true;
@@ -107,24 +102,52 @@ public class RecyclingManager {
 		recipes.add(recipe);
 	}
 
+	/** TODO code not used
 	public void addRecipe(ItemStack stack, Object... recipeComponents) {
 		addRecipe(stack, false, recipeComponents);
 	}
+	
+	public void addRecipe(ItemStack stackIn, ItemStack stackOut) {
+		addRecipe(stackIn, false, stackOut);
+	}
+		
+	public List<ItemStack> getResultList(List<ItemStack> itemsList) {
+		List<ItemStack> newItemsList = new ArrayList<ItemStack>();
+		for (int i = 0; i < itemsList.size(); i++) {
+			ItemStack currentStack = itemsList.get(i);
+			int numRecipe = hasRecipe(currentStack);
+			if (numRecipe < 0) {
+				newItemsList.add(itemsList.get(i).copy());
+				continue;
+			}
+			// Calcul du résultat
+			RecyclingRecipe currentRecipe = recipes.get(numRecipe);
+			if (currentStack.getCount() < currentRecipe.getItemRecipe().getCount()) {
+				newItemsList.add(currentStack.copy());
+				continue;
+			}
+			// code en trop
+			int nb_input = (int) Math.floor(currentStack.getCount() / currentRecipe.getItemRecipe().getCount());
+			List<ItemStack> itemsList2 = getResultStack(currentStack, nb_input);
+			for (int j = 0; j < itemsList2.size(); j++) {
+				if (!itemsList2.get(j).isEmpty()) {
+					newItemsList.add(itemsList2.get(j).copy());
+				}
+			}
+		}
+		return newItemsList;
+	}*/
 
-	public void addRecipe(ItemStack stack, boolean canBeRepaired, Object... recipeComponents) {
+	private void addRecipe(ItemStack stack, boolean canBeRepaired, Object... recipeComponents) {
 		RecyclingRecipe recipe = new RecyclingRecipe(stack, recipeComponents);
 		recipe.setCanBeRepaired(canBeRepaired);
 		recipes.add(recipe);
 	}
 
-	public void addRecipe(ItemStack stackIn, boolean canBeRepaired, ItemStack stackOut) {
+	private void addRecipe(ItemStack stackIn, boolean canBeRepaired, ItemStack stackOut) {
 		RecyclingRecipe recipe = new RecyclingRecipe(stackIn, stackOut);
 		recipe.setCanBeRepaired(canBeRepaired);
 		recipes.add(recipe);
-	}
-
-	public void addRecipe(ItemStack stackIn, ItemStack stackOut) {
-		addRecipe(stackIn, false, stackOut);
 	}
 	
 	public boolean removeRecipe(ItemStack stack) {
@@ -187,10 +210,6 @@ public class RecyclingManager {
 	}
 
 	public List<ItemStack> getResultStack(ItemStack stack, int nb_input) {
-		return getResultStack(stack, nb_input, false);
-	}
-
-	private List<ItemStack> getResultStack(ItemStack stack, int nb_input, boolean isGrind) {
 		List<ItemStack> itemsList = new ArrayList<ItemStack>();
 		int num_recipe = hasRecipe(stack);
 		if (num_recipe < 0) {
@@ -268,33 +287,6 @@ public class RecyclingManager {
 
 		}
 		return itemsList;
-	}
-
-	public List<ItemStack> getResultList(List<ItemStack> itemsList) {
-		List<ItemStack> newItemsList = new ArrayList<ItemStack>();
-		for (int i = 0; i < itemsList.size(); i++) {
-			ItemStack currentStack = itemsList.get(i);
-			int numRecipe = hasRecipe(currentStack);
-			if (numRecipe < 0) {
-				newItemsList.add(itemsList.get(i).copy());
-				continue;
-			}
-			/* Calcul du résultat */
-			RecyclingRecipe currentRecipe = recipes.get(numRecipe);
-			if (currentStack.getCount() < currentRecipe.getItemRecipe().getCount()) {
-				newItemsList.add(currentStack.copy());
-				continue;
-			}
-			// TODO CODE en trop
-			int nb_input = (int) Math.floor(currentStack.getCount() / currentRecipe.getItemRecipe().getCount());
-			List<ItemStack> itemsList2 = getResultStack(currentStack, nb_input);
-			for (int j = 0; j < itemsList2.size(); j++) {
-				if (!itemsList2.get(j).isEmpty()) {
-					newItemsList.add(itemsList2.get(j).copy());
-				}
-			}
-		}
-		return newItemsList;
 	}
 	
 	private List<JsonRecyclingRecipe> getJsonRecyclingRecipes() {
@@ -1044,7 +1036,7 @@ public class RecyclingManager {
 		return false;
 	}
 	
-	public List<?> loadAsJson(File file, Type token) {
+	private List<?> loadAsJson(File file, Type token) {
 		List<?> list = null;
 		try {
 			list = new Gson().fromJson(new BufferedReader(new FileReader(file)), token);
@@ -1093,8 +1085,7 @@ public class RecyclingManager {
 					recipes.set(foundRecipe, recipe);
 				}
 			} else {
-				//TODO translate
-				System.out.println("Erreur.... Recette : "+i+"  Item : "+jsonRecipesList.get(i).inputItem);
+				System.out.println("Error while reading json recipe : "+jsonRecipesList.get(i).inputItem);
 			}
 		}
 	}
