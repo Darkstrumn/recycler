@@ -79,16 +79,17 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 	}
 	
 	public boolean recycle(EntityPlayer currentPlayer) {
+		/** can't recycle */
 		if (!canRecycle(currentPlayer)) {
 			return false;
 		}
 		ItemStack diskStack = getStackInSlot(1);
-		/** corresponding recipe */
+		/** no recipe */
 		int num_recipe = recyclingManager.hasRecipe(getStackInSlot(0));
 		if (num_recipe < 0) {
 			Helper.sendMessage("tile.recycler.message.noRecipe", currentPlayer, true);
-			transferSlotInput();
 			emptyVisual();
+			transferSlotInput();
 			return false;
 		}
 		RecyclingRecipe currentRecipe = recyclingManager.getRecipe(num_recipe);
@@ -107,17 +108,15 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		}
 		/** calculation of the result */
 		List<ItemStack> itemsList = recyclingManager.getResultStack(getStackInSlot(0), nb_input);
-		// TODO calcul des stacksizes pour les slots libres à  mettre plus bas
-		int emptyCount = hasEmptySlot();
-		if (emptyCount >= itemsList.size()) {
-			
-			// TODO test
+		// TODO merge same items for the count of empty slots
+		if (hasEmptySlot() >= itemsList.size()) {
 			/** Loss chance */
 			double losses = 0.0D;
 			for (int i = 0 ; i < nb_input ; i++) {
 				losses += Helper.getRandom(1, 100) <= ConfigurationHandler.chanceLoss ? 0.5D : 1.0D;
 			}
 			losses /= nb_input;
+			// TODO smaller units
 			if (losses < 1.0D) {
 				for (int i = 0; i < itemsList.size(); i++) {
 					int stacksize = (int) Math.floor(itemsList.get(i).getCount() * losses);
