@@ -34,15 +34,19 @@ import ovh.corail.recycler.handler.ConfigurationHandler;
 public class RecyclingManager {
 	private static final RecyclingManager instance = new RecyclingManager();
 	private List<RecyclingRecipe> recipes = Lists.<RecyclingRecipe> newArrayList();
+	private List<ItemStack> unbalanced = new ArrayList<ItemStack>();
 	private List<ItemStack> blacklist = new ArrayList<ItemStack>();
-	private File blacklistFile = new File(ConfigurationHandler.getConfigDir(), "blacklist.json");
-	private File userDefinedFile = new File(ConfigurationHandler.getConfigDir(), "user_defined.json");
+	private File unbalancedFile = new File(ConfigurationHandler.getConfigDir(), "unbalanced_recipes.json");
+	private File blacklistFile = new File(ConfigurationHandler.getConfigDir(), "blacklist_recipes.json");
+	private File userDefinedFile = new File(ConfigurationHandler.getConfigDir(), "user_defined_recipes.json");
 
 	public static RecyclingManager getInstance() {
 		return instance;
 	}
 	
 	public void loadRecipes() {
+		/** load unbalanced recipes */
+		loadUnbalanced();
 		/** load blacklist recipes */
 		loadBlacklist();
 		/** load default recycling recipes */
@@ -51,15 +55,45 @@ public class RecyclingManager {
 		loadJsonRecipes(true);
 	}
 	
-	public boolean saveBlacklist() {
-		List<String> blacklistItems = new ArrayList<String>();
-		for (int i = 0 ; i < recipes.size() ; i++) {
-			if (!recipes.get(i).isAllowed()) {
-				blacklistItems.add(ItemStackToString(recipes.get(i).getItemRecipe()));				
+	private void loadUnbalanced() {
+		List<String> stringlist;
+		if (!unbalancedFile.exists()) {
+			stringlist = new ArrayList<String>();
+			stringlist.add("minecraft:stone:1:1"); /** granite */
+			stringlist.add("minecraft:stone:1:3"); /** diorite */
+			stringlist.add("minecraft:stone:2:5"); /** andesite */
+			stringlist.add("minecraft:paper:1:0"); /** paper */
+			stringlist.add("minecraft:sugar:1:0"); /** sugar */
+			stringlist.add("minecraft:ender_eye:1:0"); /** ender eye */
+			stringlist.add("minecraft:blaze_powder:2:0"); /** blaze powder */
+			stringlist.add("minecraft:magma_cream:1:0"); /** magma cream */
+			stringlist.add("minecraft:fire_charge:3:0"); /** fire charge */				
+			saveAsJson(unbalancedFile, stringlist);
+		} else {
+			Type token = new TypeToken<List<String>>() {}.getType();
+			stringlist = (List<String>) loadAsJson(unbalancedFile, token);
+		}
+		ItemStack currentStack;
+		for (String currentString : stringlist) {
+			currentStack = StringToItemStack(currentString);
+			if (currentStack != null && !currentStack.isEmpty()) {
+				unbalanced.add(currentStack);
 			}
 		}
-		saveAsJson(blacklistFile, blacklistItems);
-		return false;
+	}
+	
+	public boolean saveUnbalanced() {
+		List<String> unbalancedItems = new ArrayList<String>();
+		for (int i = 0 ; i < recipes.size() ; i++) {
+			if (recipes.get(i).isUnbalanced()) {
+				unbalancedItems.add(ItemStackToString(recipes.get(i).getItemRecipe()));				
+			}
+		}
+		return saveAsJson(unbalancedFile, unbalancedItems);
+	}
+	
+	private boolean isUnbalanced(ItemStack stack) {
+		return Helper.existInList(stack, unbalanced);
 	}
 
 	private void loadBlacklist() {
@@ -81,13 +115,18 @@ public class RecyclingManager {
 		}
 	}
 	
-	private boolean isBlacklist(ItemStack stack) {
-		for (ItemStack blackstack : blacklist) {
-			if (blackstack.isItemEqual(stack)) {
-				return true;
+	public boolean saveBlacklist() {
+		List<String> blacklistItems = new ArrayList<String>();
+		for (int i = 0 ; i < recipes.size() ; i++) {
+			if (!recipes.get(i).isAllowed()) {
+				blacklistItems.add(ItemStackToString(recipes.get(i).getItemRecipe()));				
 			}
 		}
-		return false;
+		return saveAsJson(blacklistFile, blacklistItems);
+	}
+	
+	private boolean isBlacklist(ItemStack stack) {
+		return Helper.existInList(stack, blacklist);
 	}
 
 	public int getRecipesCount() {
@@ -138,16 +177,12 @@ public class RecyclingManager {
 		return newItemsList;
 	}*/
 
-	private void addRecipe(ItemStack stack, boolean canBeRepaired, Object... recipeComponents) {
-		RecyclingRecipe recipe = new RecyclingRecipe(stack, recipeComponents);
-		recipe.setCanBeRepaired(canBeRepaired);
-		recipes.add(recipe);
+	private void addRecipe(ItemStack stack, Object... recipeComponents) {
+		recipes.add(new RecyclingRecipe(stack, recipeComponents));
 	}
 
-	private void addRecipe(ItemStack stackIn, boolean canBeRepaired, ItemStack stackOut) {
-		RecyclingRecipe recipe = new RecyclingRecipe(stackIn, stackOut);
-		recipe.setCanBeRepaired(canBeRepaired);
-		recipes.add(recipe);
+	private void addRecipe(ItemStack stackIn, ItemStack stackOut) {
+		recipes.add(new RecyclingRecipe(stackIn, stackOut));
 	}
 	
 	public boolean removeRecipe(ItemStack stack) {
@@ -293,23 +328,23 @@ public class RecyclingManager {
 		List<JsonRecyclingRecipe> jsonRecipesList = new ArrayList<JsonRecyclingRecipe>();
 		/** unbalanced recipe */
 		/* granite */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone:1:1", new String[] { "minecraft:stone:1:3", "minecraft:quartz:1:0", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone:1:1", new String[] { "minecraft:stone:1:3", "minecraft:quartz:1:0", }));
 		/* diorite */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone:1:3", new String[] { "minecraft:cobblestone:1:0", "minecraft:quartz:1:0", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone:1:3", new String[] { "minecraft:cobblestone:1:0", "minecraft:quartz:1:0", }));
 		/* andesite */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone:2:5", new String[] { "minecraft:cobblestone:1:0", "minecraft:stone:1:3", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone:2:5", new String[] { "minecraft:cobblestone:1:0", "minecraft:stone:1:3", }));
 		/* paper */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:paper:1:0", new String[] { "minecraft:reeds:1:0", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:paper:1:0", new String[] { "minecraft:reeds:1:0", }));
 		/* sugar */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:sugar:1:0", new String[] { "minecraft:reeds:1:0", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:sugar:1:0", new String[] { "minecraft:reeds:1:0", }));
 		/* ender eye */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:ender_eye:1:0", new String[] { "minecraft:ender_pearl:1:0", "minecraft:blaze_powder:1:0", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:ender_eye:1:0", new String[] { "minecraft:ender_pearl:1:0", "minecraft:blaze_powder:1:0", }));
 		/* blaze powder */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:blaze_powder:2:0", new String[] { "minecraft:blaze_rod:1:0", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:blaze_powder:2:0", new String[] { "minecraft:blaze_rod:1:0", }));
 		/* magma cream */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:magma_cream:1:0", new String[] { "minecraft:blaze_powder:1:0", "minecraft:slime_ball:1:0", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:magma_cream:1:0", new String[] { "minecraft:blaze_powder:1:0", "minecraft:slime_ball:1:0", }));
 		/* fire charge */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:fire_charge:3:0", new String[] { "minecraft:blaze_powder:1:0", "minecraft:gunpowder:1:0", "minecraft:coal:1:0", }, false, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:fire_charge:3:0", new String[] { "minecraft:blaze_powder:1:0", "minecraft:gunpowder:1:0", "minecraft:coal:1:0", }));
 			
 		/** 1.9 recipes */
 		/* purpur slab */
@@ -331,7 +366,7 @@ public class RecyclingManager {
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:acacia_boat:1:0", new String[] { "minecraft:planks:5:4" }));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:dark_oak_boat:1:0", new String[] { "minecraft:planks:5:5" }));
 		/* shield */
-		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:shield:1:0", new String[] { "minecraft:iron_ingot:1:0", "minecraft:planks:6:0", }, true));
+		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:shield:1:0", new String[] { "minecraft:iron_ingot:1:0", "minecraft:planks:6:0", }));
 		/** block */
 		/* stone */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone:1:0", new String[] { "minecraft:cobblestone:1:0", }));
@@ -754,7 +789,7 @@ public class RecyclingManager {
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:fishing_rod:1:0", new String[] { 
 				"minecraft:string:2:0",
 				"minecraft:stick:3:0",
-		}, true));
+		}));
 		/** clock */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:clock:1:0", new String[] { 
 				"minecraft:gold_ingot:4:0",
@@ -833,117 +868,117 @@ public class RecyclingManager {
 		/** shears */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:shears:1:0", new String[] {
 				"minecraft:iron_ingot:2:0",
-		}, true));
+		}));
 		/** pickaxe */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:wooden_pickaxe:1:0", new String[] {
 				"minecraft:planks:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone_pickaxe:1:0", new String[] {
 				"minecraft:cobblestone:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_pickaxe:1:0", new String[] {
 				"minecraft:iron_ingot:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_pickaxe:1:0", new String[] {
 				"minecraft:gold_ingot:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_pickaxe:1:0", new String[] {
 				"minecraft:diamond:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		/** axe */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:wooden_axe:1:0", new String[] {
 				"minecraft:planks:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone_axe:1:0", new String[] {
 				"minecraft:cobblestone:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_axe:1:0", new String[] {
 				"minecraft:iron_ingot:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_axe:1:0", new String[] {
 				"minecraft:gold_ingot:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_axe:1:0", new String[] {
 				"minecraft:diamond:3:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		/** shovel/spade */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:wooden_shovel:1:0", new String[] {
 				"minecraft:planks:1:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone_shovel:1:0", new String[] {
 				"minecraft:cobblestone:1:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_shovel:1:0", new String[] {
 				"minecraft:iron_ingot:1:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_shovel:1:0", new String[] {
 				"minecraft:gold_ingot:1:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_shovel:1:0", new String[] {
 				"minecraft:diamond:1:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		/** sword */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:wooden_sword:1:0", new String[] {
 				"minecraft:planks:2:0",
 				"minecraft:stick:1:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone_sword:1:0", new String[] {
 				"minecraft:cobblestone:2:0",
 				"minecraft:stick:1:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_sword:1:0", new String[] {
 				"minecraft:iron_ingot:2:0",
 				"minecraft:stick:1:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_sword:1:0", new String[] {
 				"minecraft:gold_ingot:2:0",
 				"minecraft:stick:1:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_sword:1:0", new String[] {
 				"minecraft:diamond:2:0",
 				"minecraft:stick:1:0",
-		}, true));
+		}));
 		/** hoe */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:wooden_hoe:1:0", new String[] {
 				"minecraft:planks:2:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:stone_hoe:1:0", new String[] {
 				"minecraft:cobblestone:2:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_hoe:1:0", new String[] {
 				"minecraft:iron_ingot:2:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_hoe:1:0", new String[] {
 				"minecraft:gold_ingot:2:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_hoe:1:0", new String[] {
 				"minecraft:diamond:2:0",
 				"minecraft:stick:2:0",
-		}, true));
+		}));
 		/** bow */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:bow:1:0", new String[] {
 				"minecraft:string:3:0",
 				"minecraft:stick:3:0",
-		}, true));
+		}));
 		/** arrow */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:arrow:1:0", new String[] {
 				"minecraft:feather:1:0",
@@ -957,52 +992,52 @@ public class RecyclingManager {
 		/** armor */
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:leather_boots:1:0", new String[] {
 				"minecraft:leather:4:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:leather_helmet:1:0", new String[] {
 				"minecraft:leather:5:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:leather_chestplate:1:0", new String[] {
 				"minecraft:leather:8:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:leather_leggings:1:0", new String[] {
 				"minecraft:leather:7:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_boots:1:0", new String[] {
 				"minecraft:iron_ingot:4:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_helmet:1:0", new String[] {
 				"minecraft:iron_ingot:5:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_chestplate:1:0", new String[] {
 				"minecraft:iron_ingot:8:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:iron_leggings:1:0", new String[] {
 				"minecraft:iron_ingot:7:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_boots:1:0", new String[] {
 				"minecraft:gold_ingot:4:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_helmet:1:0", new String[] {
 				"minecraft:gold_ingot:5:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_chestplate:1:0", new String[] {
 				"minecraft:gold_ingot:8:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:golden_leggings:1:0", new String[] {
 				"minecraft:gold_ingot:7:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_boots:1:0", new String[] {
 				"minecraft:diamond:4:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_helmet:1:0", new String[] {
 				"minecraft:diamond:5:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_chestplate:1:0", new String[] {
 				"minecraft:diamond:8:0",
-		}, true));
+		}));
 		jsonRecipesList.add(new JsonRecyclingRecipe("minecraft:diamond_leggings:1:0", new String[] {
 				"minecraft:diamond:7:0",
-		}, true));
+		}));
 		return jsonRecipesList;
 	}
 	private RecyclingManager() {
@@ -1099,8 +1134,7 @@ public class RecyclingManager {
 				recipe.addStack(outputItem);
 			}
 		}
-		recipe.setCanBeRepaired(jRecipe.canBeRepaired);
-		recipe.setUnbalanced(jRecipe.isUnbalanced);
+		recipe.setUnbalanced(isUnbalanced(recipe.getItemRecipe()));
 		return recipe;
 	}
 	
@@ -1112,8 +1146,7 @@ public class RecyclingManager {
 			String outputItem = ItemStackToString(recipe.getStack(i));
 			outputItems[i] = outputItem;
 		}
-		JsonRecyclingRecipe jRecipe = new JsonRecyclingRecipe(inputItem, outputItems, recipe.canBeRepaired(), recipe.isUnbalanced());
-		
+		JsonRecyclingRecipe jRecipe = new JsonRecyclingRecipe(inputItem, outputItems);
 		return jRecipe;
 	}
 
@@ -1183,7 +1216,6 @@ public class RecyclingManager {
 				}
 			}
 		}
-		recipe.setCanBeRepaired(recipe.getItemRecipe().getItem().isRepairable());
 		recipe.setUnbalanced(false);
 		recipe.setUserDefined(true);
 		recipe.setAllowed(true);

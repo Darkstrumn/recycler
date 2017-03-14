@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 
 public class RecyclingRecipe {
 	private ItemStack itemRecipe;
-	private boolean canBeRepaired=false;
 	private boolean isUnbalanced=false;
 	private boolean isUserDefined=false;
 	private boolean isAllowed=true;
@@ -42,12 +41,8 @@ public class RecyclingRecipe {
 		return itemRecipe;
 	}
 	
-	public void setCanBeRepaired(boolean state) {
-		canBeRepaired=state;
-	}
-	
 	public boolean canBeRepaired() {
-		return canBeRepaired;
+		return getItemRecipe().getItem().isRepairable();
 	}
 	
 	public void setUnbalanced(boolean state) {

@@ -1,5 +1,6 @@
 package ovh.corail.recycler.core;
 
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -22,6 +23,19 @@ public class Helper {
 	
 	public static int getRandom(int min, int max) {
 		return random.nextInt(max - min + 1) + min;
+	}
+	
+	public static <T> boolean existInList(T stack, List<T> list) {
+		for (T item : list) {
+			if (stack instanceof ItemStack) {
+				if (((ItemStack) stack).isItemEqual((ItemStack) item)) {
+					return true;
+				}
+			} else if (item.equals(stack)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public static ItemStack addToInventoryWithLeftover(ItemStack stack, IInventory inventory, boolean simulate) {
