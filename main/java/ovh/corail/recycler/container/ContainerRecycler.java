@@ -100,9 +100,6 @@ public class ContainerRecycler extends Container {
 		}
 
 		return itemstack;
-		/*if (index < 0 || index > 19) { return null; }
-		Slot slot = (Slot)this.inventorySlots.get(index);
-        return slot != null ? slot.getStack() : null;*/
 	}
 
 	public void onContainerClosed(EntityPlayer player) {

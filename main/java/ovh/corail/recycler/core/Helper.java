@@ -25,17 +25,28 @@ public class Helper {
 		return random.nextInt(max - min + 1) + min;
 	}
 	
-	public static <T> boolean existInList(T stack, List<T> list) {
-		for (T item : list) {
-			if (stack instanceof ItemStack) {
-				if (((ItemStack) stack).isItemEqual((ItemStack) item)) {
-					return true;
-				}
-			} else if (item.equals(stack)) {
-				return true;
-			}
+	public static <T1, T2> boolean existInList(T1 element, List<T2> list) {
+		if (!(element instanceof ItemStack)) { return list.contains(element); }
+		if (list.isEmpty()) { return false; }
+		boolean compare;
+		for (T2 elementList : list) {
+			compare = ((ItemStack)element).isItemEqual(elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : ((ItemStack)elementList));
+			if (compare) { return true; }
 		}
 		return false;
+	}
+	
+	public static <T1, T2> int indexOfList(T1 element, List<T2> list) {
+		if (!(element instanceof ItemStack)) { return list.indexOf(element); }
+		int index = -1;
+		if (list.isEmpty()) { return index; }
+		boolean compare;
+		for (T2 elementList : list) {
+			index++;
+			compare = ((ItemStack)element).isItemEqual(elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : ((ItemStack)elementList));
+			if (compare) { return index; }
+		}
+		return index;
 	}
 	
 	public static ItemStack addToInventoryWithLeftover(ItemStack stack, IInventory inventory, boolean simulate) {

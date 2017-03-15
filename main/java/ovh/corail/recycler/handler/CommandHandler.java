@@ -151,7 +151,7 @@ public class CommandHandler implements ICommand {
 		RecyclingManager rm = RecyclingManager.getInstance();
 		if (player != null && player.getActiveItemStack() != null) {
 			ItemStack stack = player.getActiveItemStack();
-			int hasRecipe = rm.hasRecipe(stack);
+			int hasRecipe = Helper.indexOfList(stack, rm.recipes);
 			/** Recipe already in recycler */
 			if (hasRecipe > -1) {
 				/** isn't blacklist */

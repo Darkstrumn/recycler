@@ -33,7 +33,7 @@ import ovh.corail.recycler.handler.ConfigurationHandler;
 
 public class RecyclingManager {
 	private static final RecyclingManager instance = new RecyclingManager();
-	private List<RecyclingRecipe> recipes = Lists.<RecyclingRecipe> newArrayList();
+	public List<RecyclingRecipe> recipes = Lists.<RecyclingRecipe> newArrayList();
 	private List<ItemStack> unbalanced = new ArrayList<ItemStack>();
 	private List<ItemStack> blacklist = new ArrayList<ItemStack>();
 	private File unbalancedFile = new File(ConfigurationHandler.getConfigDir(), "unbalanced_recipes.json");
@@ -187,20 +187,16 @@ public class RecyclingManager {
 	
 	public boolean removeRecipe(ItemStack stack) {
 		if (stack.isEmpty()) { return false; }
-		for (int i = 0 ; i < recipes.size() ; i++) {
-			if (stack.isItemEqual(recipes.get(i).getItemRecipe())) {
-				if (recipes.get(i).isUserDefined()) {
-					recipes.remove(i);
-					saveUserDefinedRecipes();
-					return true;
-				} else {
-					recipes.get(i).setAllowed(false);
-					saveBlacklist();
-					return true;
-				}
-			}
+		int index = Helper.indexOfList(stack, recipes);
+		if (index < 0 ) { return false; }
+		if (recipes.get(index).isUserDefined()) {
+			recipes.remove(index);
+			saveUserDefinedRecipes();
+		} else {
+			recipes.get(index).setAllowed(false);
+			saveBlacklist();
 		}
-		return false;
+		return true;
 	}
 
 	public int hasRecipe(ItemStack stack) {
@@ -224,24 +220,21 @@ public class RecyclingManager {
 		if (testStack.getItem().isRepairable()) {
 			testStack.setItemDamage(0);
 		}
-		for (int recipe_num = 0; recipe_num < getRecipesCount(); recipe_num++) {
-			if (testStack.isItemEqual(recipes.get(recipe_num).getItemRecipe())) {
-				/** unbalanced recipes */
-				if (!ConfigurationHandler.unbalancedRecipes && recipes.get(recipe_num).isUnbalanced()) {
-					return -1;
-				}
-				/** only user defined recipes */
-				if (ConfigurationHandler.onlyUserRecipes && !recipes.get(recipe_num).isUserDefined()) {
-					return -1;
-				}
-				/** only allowed recipes */
-				if (!recipes.get(recipe_num).isAllowed()) {
-					return -1;
-				}
-				return recipe_num;
-			}
+		int recipe_num = Helper.indexOfList(testStack, recipes);
+		if (recipe_num < 0) { return -1; }
+		/** unbalanced recipes */
+		if (!ConfigurationHandler.unbalancedRecipes && recipes.get(recipe_num).isUnbalanced()) {
+			return -1;
 		}
-		return -1;
+		/** only user defined recipes */
+		if (ConfigurationHandler.onlyUserRecipes && !recipes.get(recipe_num).isUserDefined()) {
+			return -1;
+		}
+		/** only allowed recipes */
+		if (!recipes.get(recipe_num).isAllowed()) {
+			return -1;
+		}
+		return recipe_num;
 	}
 
 	public List<ItemStack> getResultStack(ItemStack stack, int nb_input) {
@@ -1104,12 +1097,7 @@ public class RecyclingManager {
 				/** check for same existing recipe */
 				int foundRecipe = -1;
 				if (userDefined) {
-					for (int numRecipe=0 ; numRecipe < recipes.size() ; numRecipe++) {
-						if (recipes.get(numRecipe).getItemRecipe() == recipe.getItemRecipe()) {
-							foundRecipe = numRecipe;
-							break;
-						}
-					}
+					foundRecipe = Helper.indexOfList(recipe, recipes);
 					recipe.setUserDefined(true);
 				}
 				recipe.setAllowed(!isBlacklist(recipe.getItemRecipe()));

@@ -4,6 +4,7 @@
         "sounds": [
             {
                 "name": "recycler:recycler",
+				"volume": 0.5,
                 "stream": true
             }
         ]
