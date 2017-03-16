@@ -32,8 +32,15 @@ public class RecyclingRecipe {
 		}
 	}
 	
+	public RecyclingRecipe(ItemStack stackIn, ItemStack[] stacksOut) {
+		itemRecipe=stackIn;
+		for (ItemStack stack : stacksOut) {
+			itemsList.add(stack);
+		}
+	}
+	
 	public RecyclingRecipe(ItemStack stackIn, ItemStack stackOut) {
-		this.itemRecipe=stackIn.copy();
+		itemRecipe=stackIn.copy();
 		itemsList.add(stackOut.copy());
 	}
 
