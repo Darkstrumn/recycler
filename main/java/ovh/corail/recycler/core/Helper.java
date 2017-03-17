@@ -113,6 +113,7 @@ public class Helper {
 		render(Main.diamond_fragment);
 		render(Main.diamond_disk);
 		render(Main.itemAchievement001);
+		render(Main.recycling_book);
 	}
 
 	private static void render(Block block) {
@@ -139,6 +140,7 @@ public class Helper {
 		register(Main.diamond_fragment);
 		register(Main.diamond_disk);
 		register(Main.itemAchievement001);
+		register(Main.recycling_book);
 	}
 	
 	private static void register(Block block) {
@@ -163,6 +165,6 @@ public class Helper {
 		/** diamond disk recipe */
 		GameRegistry.addRecipe(new ItemStack(Main.diamond_disk, 1),
 				new Object[] { " 0 ", "010", " 0 ", Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1),
-						Character.valueOf('1'), new ItemStack(Items.IRON_INGOT, 1), });
+						Character.valueOf('1'), new ItemStack(Items.IRON_INGOT, 1), });	
 	}
 }

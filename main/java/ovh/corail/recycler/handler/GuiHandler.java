@@ -7,34 +7,44 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import ovh.corail.recycler.container.ContainerRecycler;
 import ovh.corail.recycler.gui.GuiRecycler;
+import ovh.corail.recycler.gui.GuiRecyclingBook;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class GuiHandler implements IGuiHandler {
-	private static final int MOD_TILE_ENTITY_GUI =0;
-	private static int getGuiID() {
-		return MOD_TILE_ENTITY_GUI;
-	}
+	private static final int RECYCLER = 0;
+	private static final int RECYCLING_BOOK = 1;
 	
 	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if (ID != getGuiID()) {
-			System.err.println("Invalid ID: expected " + getGuiID() + ", received " + ID);
+	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
+		switch (id) {
+			case RECYCLER:
+				TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+				if (tileEntity instanceof TileEntityRecycler) { 
+					return new ContainerRecycler(player, world, x, y, z, (TileEntityRecycler) tileEntity);
+				}
+				break;
+			case RECYCLING_BOOK:
+				break;
+			default:
+				System.err.println("Invalid gui id, received : " + id);
 		}
-		TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
-		if (tileEntity instanceof TileEntityRecycler) { 
-			return new ContainerRecycler(player, world, x, y, z, (TileEntityRecycler) tileEntity);
-		} 
 		return null;
 	} 
 
 	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if (ID != getGuiID()) {
-			System.err.println("Invalid ID: expected " + getGuiID() + ", received " + ID);
-		}
-		TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
-		if (tileEntity instanceof TileEntityRecycler) {
-			return new GuiRecycler(player, world, x, y, z, (TileEntityRecycler) tileEntity);
+	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
+		switch (id) {
+			case RECYCLER:
+				TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+				if (tileEntity instanceof TileEntityRecycler) {
+					return new GuiRecycler(player, world, x, y, z, (TileEntityRecycler) tileEntity);
+				}
+				break;
+			case RECYCLING_BOOK:
+				return new GuiRecyclingBook();
+				//break;
+			default:
+				System.err.println("Invalid gui id, received : " + id);
 		}
 		return null;
 	}

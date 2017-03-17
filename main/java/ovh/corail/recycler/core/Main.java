@@ -21,6 +21,7 @@ import ovh.corail.recycler.handler.SoundHandler;
 import ovh.corail.recycler.item.ItemAchievement001;
 import ovh.corail.recycler.item.ItemDiamondDisk;
 import ovh.corail.recycler.item.ItemDiamondFragment;
+import ovh.corail.recycler.item.ItemRecyclingBook;
 
 @Mod(modid = Main.MOD_ID, name = Main.MOD_NAME, version = Main.MOD_VER, guiFactory = "ovh.corail.recycler.gui.GuiFactoryRecycler")
 public class Main {
@@ -46,6 +47,7 @@ public class Main {
 	public static ItemDiamondFragment diamond_fragment = new ItemDiamondFragment();
 	public static ItemDiamondDisk diamond_disk = new ItemDiamondDisk();
 	public static BlockRecycler recycler = new BlockRecycler();
+	public static ItemRecyclingBook recycling_book = new ItemRecyclingBook();
 	
 	public static ItemAchievement001 itemAchievement001 = new ItemAchievement001();
 	public static Achievement achievementPlaceRecycler = new Achievement("achievement.PlaceRecycler", "PlaceRecycler", 0, 0, Main.itemAchievement001, (Achievement) null);
