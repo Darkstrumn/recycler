@@ -3,9 +3,12 @@ package ovh.corail.recycler.container;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import net.minecraft.item.ItemStack;
+
 public class SlotRecyclingBook {
 	private int slotNum;
 	private Rectangle pos;
+	private ItemStack stack = ItemStack.EMPTY;
 	
 	public SlotRecyclingBook(int slotNum, int x, int y, int dimCase) {
 		this.slotNum = slotNum;
@@ -22,5 +25,13 @@ public class SlotRecyclingBook {
 	
 	public int getSlotNum() {
 		return slotNum;
+	}
+	
+	public ItemStack getStack() {
+		return stack;
+	}
+	
+	public void setStack(ItemStack stack) {
+		this.stack = stack;
 	}
 }

@@ -45,7 +45,7 @@ public class GuiHandler implements IGuiHandler {
 			case RECYCLING_BOOK:
 				ItemStack stack = player.getHeldItemMainhand();
 				if (stack.getItem() instanceof ItemRecyclingBook) {
-					return new GuiRecyclingBook(stack);
+					return new GuiRecyclingBook();
 				}
 				break;
 			default:
