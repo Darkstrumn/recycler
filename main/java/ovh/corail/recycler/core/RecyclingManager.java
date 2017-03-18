@@ -92,7 +92,7 @@ public class RecyclingManager {
 		return saveAsJson(unbalancedFile, unbalancedItems);
 	}
 	
-	private boolean isUnbalanced(ItemStack stack) {
+	public boolean isUnbalanced(ItemStack stack) {
 		return Helper.existInList(stack, unbalanced);
 	}
 
@@ -125,7 +125,7 @@ public class RecyclingManager {
 		return saveAsJson(blacklistFile, blacklistItems);
 	}
 	
-	private boolean isBlacklist(ItemStack stack) {
+	public boolean isBlacklist(ItemStack stack) {
 		return Helper.existInList(stack, blacklist);
 	}
 

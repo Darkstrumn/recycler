@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import ovh.corail.recycler.container.SlotRecyclingBook;
 
@@ -39,9 +38,8 @@ public class PageManager {
 		return listOut;
 	}
 	
-	public void addCharToSearch(char c) {
-		search = search + c;
-		System.out.println("Searching for "+search);
+	public void setSearch(String text) {
+		search = text;
 		updatePages();
 		updateSlots();
 	}

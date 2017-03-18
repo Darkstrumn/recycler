@@ -6,19 +6,14 @@ import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import ovh.corail.recycler.container.SlotRecyclingBook;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.PageManager;
-import ovh.corail.recycler.core.RecyclingManager;
 import ovh.corail.recycler.core.RecyclingRecipe;
 
 public class GuiRecyclingBook extends GuiScreen {
@@ -50,7 +45,7 @@ public class GuiRecyclingBook extends GuiScreen {
 	
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		if (searchBox.textboxKeyTyped(typedChar, keyCode)) {
-			pm.addCharToSearch(typedChar);
+			pm.setSearch(searchBox.getText());
 			enableButtons();
 		} else {
 			super.keyTyped(typedChar, keyCode);
@@ -140,9 +135,18 @@ public class GuiRecyclingBook extends GuiScreen {
 			displayItems(pm.getStackForSlot(slot), pm.getSlotPos(slot));
 		}
 		RenderHelper.disableStandardItemLighting();
+		/** TODO draw icon for blacklist/unbalanced/user defined */
+		/*for (int i = 0 ; i < pm.getSlotCount() ; i += 10) {
+			stack = pm.getStackForSlot(i);
+			RecyclingManager rm = RecyclingManager.getInstance();
+			//if (rm.isBlacklist(stack)) {
+			if (rm.isUnbalanced(stack)) {
+				Point pos = pm.getSlotPos(i);
+				this.drawString(fontRenderer, "Unbalanced", pos.x, (pos.y+50), 505050);
+			}
+		}*/
 		super.drawScreen(mouseX, mouseY, par3);
 		/** hover slots */
-		//RecyclingRecipe recipe;
 		int slotHover = pm.getSlotAtPos(mouseX, mouseY);
 		if (slotHover > -1) {
 			stack = pm.getStackForSlot(slotHover);
