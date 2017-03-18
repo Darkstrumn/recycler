@@ -1,6 +1,7 @@
 package ovh.corail.recycler.handler;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -8,6 +9,7 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import ovh.corail.recycler.container.ContainerRecycler;
 import ovh.corail.recycler.gui.GuiRecycler;
 import ovh.corail.recycler.gui.GuiRecyclingBook;
+import ovh.corail.recycler.item.ItemRecyclingBook;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class GuiHandler implements IGuiHandler {
@@ -41,8 +43,11 @@ public class GuiHandler implements IGuiHandler {
 				}
 				break;
 			case RECYCLING_BOOK:
-				return new GuiRecyclingBook();
-				//break;
+				ItemStack stack = player.getHeldItemMainhand();
+				if (stack.getItem() instanceof ItemRecyclingBook) {
+					return new GuiRecyclingBook(stack);
+				}
+				break;
 			default:
 				System.err.println("Invalid gui id, received : " + id);
 		}

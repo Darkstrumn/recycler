@@ -10,9 +10,11 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import ovh.corail.recycler.container.SlotRecyclingBook;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
@@ -23,11 +25,14 @@ public class GuiRecyclingBook extends GuiScreen {
 	private int bookWidth = 176;
 	private int bookHeight = 179;
 	private int dimCase = 16;
-	private List<List<RecyclingRecipe>> pages = Lists.newArrayList();
+	private List<List<RecyclingRecipe>> pages;
 	private List<SlotRecyclingBook> slots = Lists.newArrayList();
+	private GuiTextField searchBox;
+	private ItemStack currentBook;
 	
-	public GuiRecyclingBook() {
+	public GuiRecyclingBook(ItemStack stack) {
 		super();
+		currentBook = stack;
 	}
 	
 	private void createSlots() {
@@ -55,8 +60,19 @@ public class GuiRecyclingBook extends GuiScreen {
 		}
 	}
 	
+	private List<RecyclingRecipe> getSubList(List<RecyclingRecipe> listIn, String match) {
+		List<RecyclingRecipe> listOut = Lists.newArrayList();
+		for (RecyclingRecipe recipe : listIn) {
+			if (recipe.getItemRecipe().getDisplayName().contains(match)) {
+				listOut.add(recipe);
+			}
+		}
+		return listOut;
+	}
+	
 	private void createPages() {
-		List<RecyclingRecipe> list = RecyclingManager.getInstance().recipes;
+		List<RecyclingRecipe> list = getSubList(RecyclingManager.getInstance().recipes, searchBox.getText());
+		pages = Lists.newArrayList();
 		int pageCount = (int) Math.ceil(list.size()/6.0D);
 		int currentPage = 0;
 		int startingId, endingId;
@@ -66,18 +82,37 @@ public class GuiRecyclingBook extends GuiScreen {
 			pages.add(currentPage, list.subList(startingId, endingId));
 			currentPage++;
 		}
+		if (pages.size() == 0) {
+			pages.add(0, list);
+		}
+		if (pageNum >= pages.size()) { pageNum = pages.size()-1; }
 	}
 	
 	private void enableButtons() {
 		if (pageNum > 0 && pageNum+1 < pages.size()) {
-			buttonList.get(0).enabled=true;
-			buttonList.get(1).enabled=true;
+			buttonList.get(0).enabled = true;
+			buttonList.get(1).enabled = true;
 		} else if (pageNum == 0) {
-			buttonList.get(0).enabled=false;
-			buttonList.get(1).enabled=true;
+			buttonList.get(0).enabled = false;
+			buttonList.get(1).enabled = pages.size() > 1 ? true : false;
 		} else {
-			buttonList.get(0).enabled=true;
-			buttonList.get(1).enabled=false;
+			buttonList.get(0).enabled = true;
+			buttonList.get(1).enabled = false;
+		}
+	}
+	
+	protected void keyTyped(char typedChar, int keyCode) throws IOException {
+		if (searchBox.textboxKeyTyped(typedChar, keyCode)) {
+			NBTTagCompound nbt = currentBook.getTagCompound();
+			String search = nbt.getString("search");
+			search += ""+typedChar;
+			nbt.setString("search", search);
+			pageNum=0;
+			createPages();
+			enableButtons();
+			// TODO packet.sendMessage(nbt);
+		} else {
+			super.keyTyped(typedChar, keyCode);
 		}
 	}
 	
@@ -87,12 +122,34 @@ public class GuiRecyclingBook extends GuiScreen {
 		int posX = ((this.width - this.bookWidth) / 2);
 		int posY = ((this.height - this.bookHeight) / 2);
 		Keyboard.enableRepeatEvents(true);
-		buttonList.clear();
-		buttonList.add(new GuiButton(0, posX+10, posY+160, 40, 14, "<--"));
-		buttonList.add(new GuiButton(1, posX+120, posY+160, 40, 14, "-->"));
-		enableButtons();
+		loadSearchBox(posX, posY);
 		createSlots();
 		createPages();
+		loadButtons(posX, posY);
+	}
+	
+	private void loadButtons(int posX, int posY) {
+		buttonList.clear();
+		buttonList.add(new GuiButton(0, posX+10, posY+160, 40, 14, "<--"));
+		buttonList.add(new GuiButton(1, posX+125, posY+160, 40, 14, "-->"));
+		enableButtons();
+	}
+	
+	private void loadSearchBox(int posX, int posY) {
+		String searchContent = "";
+		if (!currentBook.hasTagCompound()) {
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setString("search", searchContent);
+			currentBook.setTagCompound(nbt);
+		} else {
+			NBTTagCompound nbt = currentBook.getTagCompound();
+			searchContent = nbt.getString("search");
+		}
+		searchBox = new GuiTextField(2, fontRenderer, posX+57, posY+160, 64, 12);
+		searchBox.setEnableBackgroundDrawing(true);
+		searchBox.setFocused(true);
+		searchBox.setMaxStringLength(20);
+		searchBox.setText(searchContent);
 	}
 	
 	@Override
@@ -187,6 +244,8 @@ public class GuiRecyclingBook extends GuiScreen {
 				}
 			}
 		}
+		/** search box */
+		searchBox.drawTextBox();
 	}
 	
 	private void displayItems(RecyclingRecipe recipe, int startX, int startY) {
