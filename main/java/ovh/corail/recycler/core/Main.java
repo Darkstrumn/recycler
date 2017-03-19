@@ -56,6 +56,7 @@ public class Main {
 	
 	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
 	public static ResourceLocation textureFancyRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/fancy_recycler.png");
+	public static ResourceLocation textureRecyclingBook = new ResourceLocation("textures/gui/book.png");
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

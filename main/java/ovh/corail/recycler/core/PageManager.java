@@ -30,8 +30,9 @@ public class PageManager {
 	
 	private List<RecyclingRecipe> getSubList(List<RecyclingRecipe> listIn, String match) {
 		List<RecyclingRecipe> listOut = Lists.newArrayList();
+		match = match.toLowerCase();
 		for (RecyclingRecipe recipe : listIn) {
-			if (recipe.getItemRecipe().getDisplayName().contains(match)) {
+			if (recipe.getItemRecipe().getDisplayName().toLowerCase().contains(match)) {
 				listOut.add(recipe);
 			}
 		}
@@ -109,8 +110,8 @@ public class PageManager {
 		int slotNum = 0;
 		/** each recipes line */
 		for (int j=0 ; j < 3 ; j++) {
-			startX = posX+10;
-			startY = posY+5+(j*dimCase*3)+(5*j);
+			startX = posX+30;
+			startY = posY+10+(j*dimCase*3)+(2*j);
 			/** 2 recipes on each line */
 			for (int i=0 ; i < 2 ; i++) {
 				/** recycle item */
@@ -122,7 +123,7 @@ public class PageManager {
 						slots.add(new SlotRecyclingBook(slotNum++, (startX+(caseX*dimCase)), (startY+(caseY*dimCase)), dimCase));
 					}
 				}
-				startX += dimCase*4;
+				startX = posX+175;
 			}
 		}
 		updateSlots();

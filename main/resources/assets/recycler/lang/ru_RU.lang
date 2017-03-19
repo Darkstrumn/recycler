@@ -8,6 +8,7 @@ tile.recycler.message.BrokenDisk=Алмазный Диск сломан
 item.diamond_fragment.name=Алмазный фрагмент
 item.diamond_disk.name=Алмазный диск
 item.diamond_disk.desc=Переработчик не может работать без диска
+item.recycling_book.name=The Recycling Handbook
 message.recycler.notEnoughOutputSlots=Не хватает слотов для вывода
 message.command.exportSucceeded=Exportation succeeded
 message.command.exportFailed=Exportation failed

@@ -27,4 +27,5 @@ public class ItemRecyclingBook extends Item {
 		}
         return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
     }
+	
 }

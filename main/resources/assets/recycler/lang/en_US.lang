@@ -8,6 +8,7 @@ tile.recycler.message.BrokenDisk=The Diamond Disk is broken
 item.diamond_fragment.name=Diamond Fragment
 item.diamond_disk.name=Diamond disk
 item.diamond_disk.desc=The Recycleur can't work without this disk
+item.recycling_book.name=The Recycling Handbook
 message.recycler.notEnoughOutputSlots=Not enough output slots
 message.command.exportSucceeded=Exportation succeeded
 message.command.exportFailed=Exportation failed

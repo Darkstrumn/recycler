@@ -8,6 +8,7 @@ tile.recycler.message.BrokenDisk=钻石圆片坏了
 item.diamond_fragment.name=钻石粒
 item.diamond_disk.name=钻石圆片
 item.diamond_disk.desc=回收站需要钻石圆片才能工作
+item.recycling_book.name=The Recycling Handbook
 message.recycler.notEnoughOutputSlots=输出空间不足
 message.command.exportSucceeded=Exportation succeeded
 message.command.exportFailed=Exportation failed
