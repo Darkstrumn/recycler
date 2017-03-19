@@ -1,5 +1,6 @@
 package ovh.corail.recycler.gui;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -16,6 +18,7 @@ import ovh.corail.recycler.container.ContainerRecycler;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
+import ovh.corail.recycler.core.VisualManager;
 import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.packet.RecycleMessage;
@@ -26,6 +29,7 @@ import ovh.corail.recycler.tileentity.TileEntityRecycler;
 public class GuiRecycler extends GuiContainer {
 	private TileEntityRecycler inventory;
 	private EntityPlayer currentPlayer;
+	private VisualManager visual = new VisualManager();
 	
 	public GuiRecycler(EntityPlayer player, World world, int x, int y, int z, TileEntityRecycler inventory) {
 		super(new ContainerRecycler(player, world, x, y, z, inventory));
@@ -34,23 +38,76 @@ public class GuiRecycler extends GuiContainer {
 		this.xSize = 176;
 		this.ySize = ConfigurationHandler.fancyGui? 176 : 179;
 	}
+	
+	public void refreshVisual(ItemStack stack) {
+		List<ItemStack> itemsList = RecyclingManager.getInstance().getResultStack(stack, 1);
+		visual.emptyVisual();
+		/** no recipe */
+		if (itemsList.isEmpty() && !inventory.getStackInSlot(0).isEmpty()) {
+			itemsList.add(inventory.getStackInSlot(0));
+		}
+		visual.fillVisual(itemsList);
+	}
+	
+	private void createVisual() {
+		int posX = ((this.width - this.xSize) / 2);
+		int posY = ((this.height - this.ySize) / 2);
+		int startX = posX + 118;
+		int startY = posY + 3;
+		int dimCase = 16;
+		int slotNum = 0;
+		for (int caseY = 0 ; caseY < 3 ; caseY++) {
+			for (int caseX = 0 ; caseX < 3 ; caseX++) {
+				visual.addVisual(slotNum, startX + (caseX*dimCase), startY + (caseY*dimCase));
+				slotNum++;
+			}
+		}
+	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GL11.glScalef(1F, 1F, 1F);
+		/** recycler texture */
 		mc.renderEngine.bindTexture(ConfigurationHandler.fancyGui ? Main.textureFancyRecycler : Main.textureVanillaRecycler);
 		int posX = ((this.width - this.xSize) / 2);
 		int posY = ((this.height - this.ySize) / 2);
 		this.drawTexturedModalRect(posX, posY, 0, 0, this.xSize, this.ySize);
-		int i, j;
+		/** draw slots */
 		int dimCase = 16;
 		List<Slot> slots = this.inventorySlots.inventorySlots;
 		Slot slot;
-		for (i = 0; i < slots.size(); i++) {
+		for (int i = 0; i < slots.size(); i++) {
 			slot = slots.get(i);
 			this.drawTexturedModalRect(posX + slot.xPos, posY + slot.yPos, 240, 0, dimCase, dimCase);
 		}
+		/** draw visual grid */
+		Point pos;
+		for (int i = 0 ; i < visual.getVisualCount() ; i++)  {
+			pos = visual.getPosInVisual(i);
+			drawTexturedModalRect(pos.x, pos.y, 240, 0, dimCase, dimCase);	
+		}
+		/** draw visual item and tootip */
+		RenderHelper.enableGUIStandardItemLighting();
+		ItemStack stack = inventory.getStackInSlot(0);
+		if (stack.isEmpty()) {
+			visual.emptyVisual();
+		} else {
+			refreshVisual(stack);
+		}
+		int slotHover = visual.getSlotAtPos(mouseX, mouseY);
+		for (int i = 0 ; i < visual.getVisualCount() ; i++)  {
+			stack = visual.getStackInVisual(i);
+			pos = visual.getPosInVisual(i);
+			itemRender.renderItemAndEffectIntoGUI(stack, pos.x, pos.y);
+			itemRender.renderItemOverlays(fontRenderer, stack, pos.x, pos.y);
+			if (!stack.isEmpty() && slotHover == i) {
+				pos = visual.getPosInVisual(i);
+				this.renderToolTip(stack, pos.x, pos.y);
+			}
+			
+		}
+		RenderHelper.disableStandardItemLighting();
 		zLevel = 100.0F;
 		
 	}
@@ -102,6 +159,7 @@ public class GuiRecycler extends GuiContainer {
 		this.buttonList.add(new GuiButtonRecycler(0, this.guiLeft + 8, this.guiTop + 90, 53, 14, Helper.getTranslation("button.recycle"), inventory));
 		this.buttonList.add(new GuiButtonRecycler(1, this.guiLeft + 62, this.guiTop + 90, 53, 14, Helper.getTranslation("button.auto"), inventory));
 		this.buttonList.add(new GuiButtonRecycler(2, this.guiLeft + 116, this.guiTop + 90, 53, 14, Helper.getTranslation("button.takeAll"), inventory));
+		createVisual();
 	}
 
 	@Override

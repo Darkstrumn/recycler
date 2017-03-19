@@ -1,27 +1,37 @@
 package ovh.corail.recycler.container;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.inventory.Slot;
+import java.awt.Point;
+import java.awt.Rectangle;
+
 import net.minecraft.item.ItemStack;
 
-public class SlotVisual extends Slot {
-	private int id;
-
-	public SlotVisual(InventoryBasic visual, int index, int xPos, int yPos) {
-		super(visual, index, xPos, yPos);
-		this.id = index;
+public class SlotVisual {
+	private int slotNum;
+	private Rectangle pos;
+	private ItemStack stack = ItemStack.EMPTY;
+	
+	public SlotVisual(int slotNum, int x, int y, int dimCase) {
+		this.slotNum = slotNum;
+		pos = new Rectangle(x, y, dimCase, dimCase);
 	}
-	@Override
-	public boolean isItemValid(ItemStack stack) {
-		return false;
+	
+	public boolean hasPos(int x, int y) {
+		return pos.contains(x, y);
 	}
-	@Override
-	public void onSlotChange(ItemStack item1, ItemStack item2) {
-		super.onSlotChange(item1, item2);
+	
+	public  Point getPos() {
+		return pos.getLocation();
 	}
-	@Override
-	public boolean canTakeStack(EntityPlayer playerIn) {
-        return false;
-    }
+	
+	public int getSlotNum() {
+		return slotNum;
+	}
+	
+	public ItemStack getStack() {
+		return stack;
+	}
+	
+	public void setStack(ItemStack stack) {
+		this.stack = stack;
+	}
 }

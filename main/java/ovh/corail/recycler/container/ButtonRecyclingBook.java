@@ -8,9 +8,9 @@ import ovh.corail.recycler.core.Main;
 public class ButtonRecyclingBook extends GuiButton {
 	private final boolean isForward;
 
-	public ButtonRecyclingBook(int buttonId, int x, int y, boolean isForwardIn) {
+	public ButtonRecyclingBook(int buttonId, int x, int y) {
 		super(buttonId, x, y, 23, 13, "");
-		this.isForward = isForwardIn;
+		this.isForward = buttonId == 0 ? false : true;
 	}
 	
     public void drawButton(Minecraft mc, int mouseX, int mouseY) {
@@ -20,17 +20,12 @@ public class ButtonRecyclingBook extends GuiButton {
             mc.getTextureManager().bindTexture(Main.textureRecyclingBook);
             int i = 0;
             int j = 192;
-
-            if (flag)
-            {
+            if (flag) {
                 i += 23;
             }
-
-            if (!this.isForward)
-            {
+            if (!this.isForward) {
                 j += 13;
             }
-
             this.drawTexturedModalRect(this.xPosition, this.yPosition, i, j, 23, 13);
         }
     }

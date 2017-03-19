@@ -7,10 +7,8 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.packet.ServerProgressMessage;
-import ovh.corail.recycler.packet.VisualMessage;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class ContainerRecycler extends Container {
@@ -27,25 +25,13 @@ public class ContainerRecycler extends Container {
 			this.addSlotToContainer(new SlotRecycler(inventory, i, ((i - inventory.firstOutput) * 18) + 8, 54));
 			this.addSlotToContainer(new SlotRecycler(inventory, i + 9, ((i - inventory.firstOutput) * 18) + 8, 72));
 		}
-		/** visual slots 20-28 */
-		for (int i = 0 ; i < 3 ; i++) {
-			for (int j = 0 ; j < 3 ; j++) {
-				this.addSlotToContainer(new SlotVisual(inventory.visual, (i*3) + j, (j * 16) + 118, i*16 + (ConfigurationHandler.fancyGui?2:3)));
-			}
-		}
-		PacketHandler.INSTANCE.sendToServer(new VisualMessage(inventory.getPos()));
-		inventory.refreshVisual(inventory.getStackInSlot(0));
-		/** player slots 29-64 */
+		/** player slots 20-55 */
 		bindPlayerInventory(player.inventory);
 	}
 
 	@Override
 	public ItemStack slotClick(int slotId, int dragType, ClickType clickType, EntityPlayer player) {
 		ItemStack stack = super.slotClick(slotId, dragType, clickType, player);
-		if (slotId == 0) {
-			PacketHandler.INSTANCE.sendToServer(new VisualMessage(inventory.getPos()));
-			inventory.refreshVisual(inventory.getStackInSlot(0));
-		}
 		/** reset progress */
 		if ((slotId == 0 || slotId == 1) && inventory.isWorking()) {
 			PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(inventory.getPos(), 0));
@@ -81,7 +67,7 @@ public class ContainerRecycler extends Container {
 			itemstack = itemstack1.copy();
 			
 			if (index < 19) {
-				if (!this.mergeItemStack(itemstack1, 29, 64, true)) {
+				if (!this.mergeItemStack(itemstack1, 20, 55, true)) {
 					return ItemStack.EMPTY;
 				}
 			} else if (!this.mergeItemStack(itemstack1, 0, 19, false)) {

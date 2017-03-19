@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
+import com.google.common.collect.Lists;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -16,12 +18,14 @@ import ovh.corail.recycler.container.ButtonRecyclingBook;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.PageManager;
 import ovh.corail.recycler.core.RecyclingRecipe;
+import ovh.corail.recycler.core.VisualManager;
 
 public class GuiRecyclingBook extends GuiScreen {
 	private int bookWidth = 290;
 	private int bookHeight = 179;
 	private int dimCase = 16;
 	private PageManager pm;
+	private VisualManager visual = new VisualManager();
 
 	private GuiTextField searchBox;
 	private ItemStack currentBook;
@@ -30,17 +34,23 @@ public class GuiRecyclingBook extends GuiScreen {
 		super();
 	}
 	
+	public void enableButton(int buttonNum, boolean state) {
+		if (buttonNum < 0 || buttonNum >= buttonList.size()) { return; }
+		buttonList.get(buttonNum).enabled = state;
+		buttonList.get(buttonNum).visible = state;
+	}
+	
 	private void enableButtons() {
 		int pageNum = pm.getPageNum();
 		if (pageNum > 0 && pageNum+1 < pm.getPageCount()) {
-			buttonList.get(0).enabled = true;
-			buttonList.get(1).enabled = true;
+			enableButton(0, true);
+			enableButton(1, true);
 		} else if (pageNum == 0) {
-			buttonList.get(0).enabled = false;
-			buttonList.get(1).enabled = pm.getPageCount() > 1 ? true : false;
+			enableButton(0, false);
+			enableButton(1, (pm.getPageCount() > 1 ? true : false));
 		} else {
-			buttonList.get(0).enabled = true;
-			buttonList.get(1).enabled = false;
+			enableButton(0, true);
+			enableButton(1, false);
 		}
 	}
 	
@@ -60,14 +70,15 @@ public class GuiRecyclingBook extends GuiScreen {
 		int posY = ((this.height - this.bookHeight) / 2);
 		Keyboard.enableRepeatEvents(true);
 		loadSearchBox(posX, posY);
-		pm = new PageManager(posX, posY);
+		pm = new PageManager();
 		loadButtons(posX, posY);
+		createVisual();
 	}
 	
 	private void loadButtons(int posX, int posY) {
 		buttonList.clear();
-		buttonList.add(new ButtonRecyclingBook(0, posX+20, posY+150, false));
-		buttonList.add(new ButtonRecyclingBook(1, posX+247, posY+150, true));
+		buttonList.add(new ButtonRecyclingBook(0, posX+20, posY+150));
+		buttonList.add(new ButtonRecyclingBook(1, posX+247, posY+150));
 		enableButtons();
 	}
 	
@@ -126,26 +137,27 @@ public class GuiRecyclingBook extends GuiScreen {
 		int startY = posY+5;
 		
 		/** draw grid */
-		for (int slot = 0 ; slot < pm.getSlotCount() ; slot++) {
-			displayGrid(pm.getSlotPos(slot));
+		for (int slot = 0 ; slot < visual.getVisualCount() ; slot++) {
+			displayGrid(visual.getPosInVisual(slot));
 		}
+		refreshVisual();
 		/** draw items render */
 		RenderHelper.enableGUIStandardItemLighting();
 		RecyclingRecipe recipe;
 		List<RecyclingRecipe> currentPage = pm.getPage(pm.getPageNum());
 		ItemStack stack = ItemStack.EMPTY;
-		for (int slot = 0 ; slot < pm.getSlotCount() ; slot++) {
-			displayItems(pm.getStackForSlot(slot), pm.getSlotPos(slot));
+		for (int slot = 0 ; slot < visual.getVisualCount() ; slot++) {
+			displayItems(visual.getStackInVisual(slot), visual.getPosInVisual(slot));
 		}
 		RenderHelper.disableStandardItemLighting();
 		/** draw buttons */
 		super.drawScreen(mouseX, mouseY, par3);
-		/** draw tooltip on hivered slot */
-		int slotHover = pm.getSlotAtPos(mouseX, mouseY);
+		/** draw tooltip on hover slot */
+		int slotHover = visual.getSlotAtPos(mouseX, mouseY);
 		if (slotHover > -1) {
-			stack = pm.getStackForSlot(slotHover);
+			stack = visual.getStackInVisual(slotHover);
 			if (!stack.isEmpty()) {
-				Point pos = pm.getSlotPos(slotHover);
+				Point pos = visual.getPosInVisual(slotHover);
 				this.renderToolTip(stack, pos.x, pos.y);
 			}
 		}
@@ -162,6 +174,52 @@ public class GuiRecyclingBook extends GuiScreen {
 	private void displayGrid(Point pos) {
 		mc.getTextureManager().bindTexture(Main.textureVanillaRecycler);
 		drawTexturedModalRect(pos.x, pos.y, 240, 0, dimCase, dimCase);
+	}
+	
+	public void refreshVisual() {
+		List<RecyclingRecipe> recipes = pm.getPage(pm.getPageNum());
+		visual.emptyVisual();
+		ItemStack stack;
+		int slotNum = 0;
+		List<ItemStack> itemsList = Lists.newArrayList();
+		for (RecyclingRecipe recipe : recipes) {
+			itemsList.add(recipe.getItemRecipe());
+			slotNum++;
+			for (int i = 0 ; i < 9 ; i++) {
+				if (i < recipe.getCount()) {
+					itemsList.add(recipe.getStack(i));
+				} else {
+					itemsList.add(ItemStack.EMPTY);
+				}
+				slotNum++;
+			}
+		}
+		visual.fillVisual(itemsList);
+	}
+	
+	private void createVisual() {
+		int posX = ((this.width - this.bookWidth) / 2);
+		int posY = ((this.height - this.bookHeight) / 2);
+		int startX, startY;
+		int slotNum = 0;
+		/** each recipes line */
+		for (int j=0 ; j < 3 ; j++) {
+			startX = posX+30;
+			startY = posY+10+(j*dimCase*3)+(2*j);
+			/** 2 recipes on each line */
+			for (int i=0 ; i < 2 ; i++) {
+				/** recycle item */
+				visual.addVisual(slotNum++, startX, (startY+dimCase));
+				startX += dimCase+5;
+				/** each result item */
+				for (int caseY=0 ; caseY < 3 ; caseY++) {
+					for (int caseX=0 ; caseX < 3 ; caseX++) {
+						visual.addVisual(slotNum++, (startX+(caseX*dimCase)), (startY+(caseY*dimCase)));
+					}
+				}
+				startX = posX+175;
+			}
+		}
 	}
 
 }

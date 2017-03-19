@@ -3,7 +3,6 @@ package ovh.corail.recycler.tileentity;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
@@ -19,7 +18,7 @@ import ovh.corail.recycler.packet.SoundMessage;
 import ovh.corail.recycler.packet.WorkingMessage;
 
 public class TileEntityRecycler extends TileEntityInventory implements ITickable {
-	public InventoryBasic visual;
+
 	public RecyclingManager recyclingManager;
 	private int countTicks = 0;
 	private final int maxTicks = 100;
@@ -31,10 +30,6 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 
 	public TileEntityRecycler() {
 		super();
-		this.visual = new InventoryBasic("visual", true, 9);
-		for (int i = 0 ; i < 9 ; i++) {
-			this.visual.setInventorySlotContents(i, ItemStack.EMPTY);
-		}
 		recyclingManager = RecyclingManager.getInstance();
 	}
 
@@ -88,7 +83,6 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		int num_recipe = recyclingManager.hasRecipe(getStackInSlot(0));
 		if (num_recipe < 0) {
 			Helper.sendMessage("tile.recycler.message.noRecipe", currentPlayer, true);
-			emptyVisual();
 			transferSlotInput();
 			return false;
 		}
@@ -166,7 +160,6 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		/** empty the input slot */
 		if (currentRecipe.getItemRecipe().getCount() * nb_input == getStackInSlot(0).getCount()) {
 			setInventorySlotContents(0, ItemStack.EMPTY);
-			emptyVisual();
 		} else {
 			ItemStack stack = getStackInSlot(0).copy();
 			stack.setCount(getStackInSlot(0).getCount() - (nb_input * currentRecipe.getItemRecipe().getCount()));
@@ -230,29 +223,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		return true;
 	}
 
-	private void fillVisual(List<ItemStack> itemsList) {
-		int num_slot = 0;
-		for (int i = 0; i < itemsList.size(); i++) {
-			if (num_slot < visual.getSizeInventory()) {
-				visual.setInventorySlotContents(num_slot++, itemsList.get(i));
-			}
-		}
-	}
 
-	private void emptyVisual() {
-		for (int i = 0; i < visual.getSizeInventory(); i++) {
-			visual.setInventorySlotContents(i, ItemStack.EMPTY);
-		}
-	}
-
-	public void refreshVisual(ItemStack stack) {
-		emptyVisual();
-		List<ItemStack> itemsList = recyclingManager.getResultStack(stack, 1);		
-		if (itemsList.isEmpty() && !getStackInSlot(0).isEmpty()) {
-			itemsList.add(getStackInSlot(0));
-		}
-		fillVisual(itemsList);
-	}
 
 	@Override
 	public void update() {
