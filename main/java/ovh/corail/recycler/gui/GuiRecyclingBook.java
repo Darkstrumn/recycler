@@ -123,8 +123,8 @@ public class GuiRecyclingBook extends GuiScreen {
         int posX = ((this.width - this.bookWidth) / 2);
 		int posY = ((this.height - this.bookHeight) / 2);
 		int bookSize = 162;
-		drawTexturedModalRect(posX, posY, 20, 1, 145, 179);//this.bookHeight);
-		drawTexturedModalRect(posX+145, posY, 20, 1, 145, 179);//this.bookHeight);
+		drawTexturedModalRect(posX, posY, 20, 1, 145, 179);
+		drawTexturedModalRect(posX+145, posY, 20, 1, 145, 179);
     }
 	
 	@Override

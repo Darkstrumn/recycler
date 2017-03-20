@@ -200,14 +200,17 @@ public class RecyclingManager {
 		}
 		return recipe_num;
 	}
-
 	public List<ItemStack> getResultStack(ItemStack stack, int nb_input) {
+		return getResultStack(stack, nb_input, false);
+	}
+	
+	public List<ItemStack> getResultStack(ItemStack stack, int nb_input, boolean half) {
 		List<ItemStack> itemsList = new ArrayList<ItemStack>();
 		int num_recipe = hasRecipe(stack);
 		if (num_recipe < 0) {
 			return itemsList;
 		}
-		/* check enchants */
+		/** check enchants, not half */
 		if (ConfigurationHandler.enchantedBooks) {
 			Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
 			if (!enchants.isEmpty()) {
@@ -228,55 +231,61 @@ public class RecyclingManager {
 		
 		RecyclingRecipe currentRecipe = recipes.get(num_recipe);
 
-		/* Calcul du résultat du stack */
+		/** foreach stacks in recipe */
+		//int newStackCount;
+		ItemStack currentStack;
+		Item currentItem;
+		int currentSize;
 		for (int i = 0; i < currentRecipe.getCount(); i++) {
-			/* Pour chaque stack résultat de la recette */
-			ItemStack currentStack = currentRecipe.getStack(i);
-			int newStackCount = currentStack.getCount() * nb_input;
-			/* Objets abimés */
-			if (currentRecipe.canBeRepaired() && stack.getItemDamage() > 0) {
-				int currentSize = currentStack.getCount();
-				/* Unités plus petites */
+			currentStack = currentRecipe.getStack(i);
+			currentItem = currentStack.getItem();
+			currentSize = currentStack.getCount();
+			/** damaged items */
+			if (currentItem.isRepairable() && stack.getItemDamage() > 0) {
+				/** smaller units */
+				// TODO check for stacksize of smaller units and meta */
 				if (currentStack.getItem()==Items.IRON_INGOT) {
-					currentStack = new ItemStack(Items.field_191525_da, currentSize * 9, 0); // Iron Nugget
-					newStackCount = currentStack.getCount() * nb_input;
+					currentItem = Items.field_191525_da; /** iron nugget */
+					currentSize *= 9;
 				}
 				if (currentStack.getItem()==Items.GOLD_INGOT) {
-					currentStack = new ItemStack(Items.GOLD_NUGGET, currentSize * 9, 0);
-					newStackCount = currentStack.getCount() * nb_input;
+					currentItem = Items.GOLD_NUGGET;
+					currentSize *= 9;
 				}
 				if (currentStack.getItem()==Items.DIAMOND) {
-					currentStack = new ItemStack(Main.diamond_fragment, currentSize * 9, 0);
-					newStackCount = currentStack.getCount() * nb_input;
+					currentItem = Main.diamond_fragment;
+					currentSize *= 9;
 				}
 				if (currentStack.getItem()==Items.LEATHER) {
-					currentStack = new ItemStack(Items.RABBIT_HIDE, currentSize * 4, 0);
-					newStackCount = currentStack.getCount() * nb_input;
+					currentItem = Items.RABBIT_HIDE;
+					currentSize *= 4;
 				}
 				if (currentStack.getItem()==Item.getItemFromBlock(Blocks.PLANKS)) {
-					currentStack = new ItemStack(Items.STICK, currentSize * 2, 0);
-					newStackCount = currentStack.getCount() * nb_input;
+					currentItem = Items.STICK;
 				}
 				int maxDamage = currentRecipe.getItemRecipe().getMaxDamage();
 				float pourcent = (float) (maxDamage - (stack.getItemDamage())) / maxDamage;
-				newStackCount = (int) Math.floor(newStackCount * pourcent);
+				/** losses from damage */
+				currentSize = (int) Math.floor(currentSize * pourcent);
 			}
-			int slotCount = (int) Math.floor(newStackCount / currentStack.getMaxStackSize());
-			ItemStack fullStack;
-			/* Ajout des full stacks */
-			for (int j = 0; j < slotCount; j++) {
-				fullStack = currentStack.copy();
-				fullStack.setCount(fullStack.getMaxStackSize());
+			/** losses with chance */
+			if (half) {
+				currentSize = (int) Math.floor(currentSize/2);
+			}
+			/** size for nb_input */
+			currentSize *= nb_input;
+			/** fill with fullstack */
+			int slotCount = (int) Math.floor(currentSize / currentStack.getMaxStackSize());
+			ItemStack fullStack = new ItemStack(currentItem, currentStack.getMaxStackSize());
+			for (int j = 0; j < slotCount; j++) {	
 				itemsList.add(fullStack);
 			}
-			/* Reste de stack */
-			int resteStackCount = newStackCount - (slotCount * currentStack.getMaxStackSize());
-			if (resteStackCount > 0) {
-				fullStack = currentStack.copy();
-				fullStack.setCount(resteStackCount);
+			/** stack left */
+			int leftStackCount = currentSize - (slotCount * currentStack.getMaxStackSize());
+			if (leftStackCount > 0) {
+				fullStack.setCount(leftStackCount);
 				itemsList.add(fullStack);
 			}
-
 		}
 		return itemsList;
 	}

@@ -2,6 +2,8 @@ package ovh.corail.recycler.tileentity;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -55,7 +57,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			setInventorySlotContents(1, ItemStack.EMPTY);
 			return false;
 		}
-		// TODO nécessaire?
+		// TODO needed?
 		if (getStackInSlot(1).getItemDamage() >= getStackInSlot(1).getMaxDamage()) {
 			setInventorySlotContents(1, ItemStack.EMPTY);
 			Helper.sendMessage("tile.recycler.message.noDisk", currentPlayer, true);
@@ -73,26 +75,70 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		return true;
 	}
 	
+	public boolean hasSpaceInInventory(List<ItemStack> itemsList, boolean simulate) {
+		List<ItemStack> resultList = Lists.newArrayList(inventory.subList(firstOutput, count));
+		int space, maxSize, add, left, emptySlot;
+		ItemStack stackCopy;
+		for (ItemStack stackIn : itemsList) {
+			if (stackIn.isEmpty()) { continue; }
+			left = stackIn.getCount();
+			maxSize = stackIn.getMaxStackSize();
+			for (ItemStack stackOut : resultList) {
+				if (stackOut.isItemEqual(stackIn) && ItemStack.areItemStackTagsEqual(stackOut, stackIn)) {
+					space = maxSize - stackOut.getCount();
+					add = Math.min(space, left);
+					if (add > 0) {
+						stackOut.grow(add);
+						left -= add;
+						if (left <= 0) { break; }
+					}
+				}
+			}
+			if (left > 0) {
+				emptySlot = -1;
+				for (int i = 0 ; i < resultList.size() ; i++) {
+					if (resultList.get(i).isEmpty()) {
+						emptySlot = i;
+						break;
+					}
+				}
+				if (emptySlot==-1) {
+					return false;
+				} else {
+					stackCopy = stackIn.copy();
+					stackCopy.setCount(left);
+					resultList.set(emptySlot, stackCopy);
+				}
+			}
+		}
+		if (!simulate) {
+			for (int i = firstOutput ; i < inventory.size() ; i++) {
+				this.setInventorySlotContents(i, resultList.get(i-firstOutput));
+			}
+		}
+		return true;
+	}
+	
 	public boolean recycle(EntityPlayer currentPlayer) {
-		/** can't recycle */
+		/** test if diamond disk and recycled item are not empty */
 		if (!canRecycle(currentPlayer)) {
 			return false;
 		}
 		ItemStack diskStack = getStackInSlot(1);
-		/** no recipe */
+		/** find the recipe */
 		int num_recipe = recyclingManager.hasRecipe(getStackInSlot(0));
-		if (num_recipe < 0) {
-			Helper.sendMessage("tile.recycler.message.noRecipe", currentPlayer, true);
+		if (num_recipe < 0) { /** no recipe */
+			//Helper.sendMessage("tile.recycler.message.noRecipe", currentPlayer, true);
 			transferSlotInput();
 			return false;
 		}
 		RecyclingRecipe currentRecipe = recyclingManager.getRecipe(num_recipe);
-		/** enough stacksize for the input slot */
-		if (getStackInSlot(0).getCount() < currentRecipe.getItemRecipe().getCount()) {
-			Helper.sendMessage("tile.recycler.message.noEnoughInput", currentPlayer, true);
+		/** number of times that the recipe can be used with this input */
+		int nb_input = (int) Math.floor((double) getStackInSlot(0).getCount() / (double) currentRecipe.getItemRecipe().getCount());
+		if (nb_input == 0) { /** not enough input for at least one recipe */
+			//Helper.sendMessage("tile.recycler.message.noEnoughInput", currentPlayer, true);
 			return false;
 		}
-		int nb_input = (int) Math.floor((double) getStackInSlot(0).getCount() / (double) currentRecipe.getItemRecipe().getCount());
 		/** by unit in auto recycle */
 		if (isWorking) { nb_input = 1; }
 		/** max uses of the disk */
@@ -102,61 +148,36 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		}
 		/** calculation of the result */
 		List<ItemStack> itemsList = recyclingManager.getResultStack(getStackInSlot(0), nb_input);
-		// TODO merge same items for the count of empty slots
-		if (hasEmptySlot() >= itemsList.size()) {
-			/** Loss chance */
-			double losses = 0.0D;
-			for (int i = 0 ; i < nb_input ; i++) {
-				losses += Helper.getRandom(1, 100) <= ConfigurationHandler.chanceLoss ? 0.5D : 1.0D;
-			}
-			losses /= nb_input;
-			// TODO smaller units
-			if (losses < 1.0D) {
-				for (int i = 0; i < itemsList.size(); i++) {
-					int stacksize = (int) Math.floor(itemsList.get(i).getCount() * losses);
-					if (stacksize > 0) {
-						itemsList.get(i).setCount(stacksize);
-					} else {
-						itemsList.set(i, ItemStack.EMPTY);
-					}
-				}
-			}
-			/** fill the identical slots not fullstack */
-			/** for each result of the recipe */
-			for (int i = 0; i < itemsList.size(); i++) {
-				/** if the slot isn't fullstack */
-				if (itemsList.get(i).getCount() != itemsList.get(i).getMaxStackSize()) {
-					/** for each slot */
-					for (int j = firstOutput; j < this.count; j++) {
-						/** same item */
-						if (!itemsList.get(i).isEmpty() && itemsList.get(i).isItemEqual(inventory.get(j))) {
-							int sommeStackSize = inventory.get(j).getCount() + itemsList.get(i).getCount();
-							if (sommeStackSize > inventory.get(j).getMaxStackSize()) {
-								inventory.get(j).setCount(inventory.get(j).getMaxStackSize());
-								ItemStack resteStack = itemsList.get(i).copy();
-								resteStack.setCount(sommeStackSize - inventory.get(j).getMaxStackSize());
-								itemsList.set(i, resteStack);
-							} else {
-								inventory.get(j).setCount(sommeStackSize);
-								itemsList.set(i, ItemStack.EMPTY);
-								// break;
-							}
-						}
-					}
-				}
-			}
-			/** fill the output slots left */
-			for (int i = 0; i < itemsList.size(); i++) {
-				if (!itemsList.get(i).isEmpty()) {
-					int emptySlot = getEmptySlot();
-					setInventorySlotContents(emptySlot, itemsList.get(i).copy());
-				}
-			}
-
-		} else {
+		/** simule the space needed */
+		if (!hasSpaceInInventory(itemsList, true)) {
 			Helper.sendMessage("tile.recycler.message.notEnoughOutputSlots", currentPlayer, true);
 			return false;
 		}
+		/** Loss chance */
+		int loss = 0;
+		if (ConfigurationHandler.chanceLoss > 0) {
+			for (int i = 0 ; i < nb_input ; i++) {
+				if (Helper.getRandom(1, 100) <= ConfigurationHandler.chanceLoss) {
+					loss++;
+				}
+			}
+			if (loss > 0) {
+			// TODO translate
+				Helper.sendMessage("Il y a eu des pertes lors du recyclage", currentPlayer, false);
+			}
+		}
+		List<ItemStack> stackList;
+		if (nb_input-loss > 0) {
+			stackList = recyclingManager.getResultStack(getStackInSlot(0), nb_input-loss);
+		} else {
+			stackList = Lists.newArrayList();
+		}
+		if (loss > 0) {
+			List<ItemStack> halfstackList = recyclingManager.getResultStack(getStackInSlot(0), loss, true);
+			stackList.addAll(halfstackList);
+		}
+		/** transfer stacks */
+		hasSpaceInInventory(stackList, false);
 		/** empty the input slot */
 		if (currentRecipe.getItemRecipe().getCount() * nb_input == getStackInSlot(0).getCount()) {
 			setInventorySlotContents(0, ItemStack.EMPTY);
