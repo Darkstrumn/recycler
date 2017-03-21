@@ -40,6 +40,7 @@ public class GuiButtonRecycler extends GuiButton {
 						break;
 					}
 				}
+			// TODO make a check with leftover
 			/** input slot empty */
 			} else if (!invent.getStackInSlot(0).isEmpty() && !invent.getStackInSlot(1).isEmpty()) {
 				valid = false;

@@ -57,12 +57,12 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			setInventorySlotContents(1, ItemStack.EMPTY);
 			return false;
 		}
-		// TODO needed?
 		if (getStackInSlot(1).getItemDamage() >= getStackInSlot(1).getMaxDamage()) {
 			setInventorySlotContents(1, ItemStack.EMPTY);
 			Helper.sendMessage("tile.recycler.message.noDisk", currentPlayer, true);
 			return false;
 		}
+		// TODO test space here
 		return true;
 	}
 
@@ -76,46 +76,101 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 	}
 	
 	public boolean hasSpaceInInventory(List<ItemStack> itemsList, boolean simulate) {
+		Helper.sendLog("hasSpaceInInventory with simulate = " + simulate);
+		/** only slots output */
 		List<ItemStack> resultList = Lists.newArrayList(inventory.subList(firstOutput, count));
+		/** list of empty slots */
+		List<Integer> emptySlots = Lists.newArrayList();
+		for (int i = 0 ; i < resultList.size() ; i++) {
+			if (resultList.get(i).isEmpty()) {
+				emptySlots.add(i);
+			}
+		}
+		Helper.sendLog(emptySlots.size() + " empty slots found");
+		/** simulate : enough empty slots */
+		if (simulate && emptySlots.size() >= itemsList.size()) {
+			Helper.sendLog("there's enough empty slots");
+			return true; 
+		}
+		/** simulate : try to fill at least minCount stacks depending of empty slots */
+		int minCount = simulate ? itemsList.size() - emptySlots.size() : 0;
 		int space, maxSize, add, left, emptySlot;
 		ItemStack stackCopy;
+		if (simulate) {
+			Helper.sendLog("try to fill at least " + minCount + " same stacks");
+		} else {
+			Helper.sendLog("try to fill same stacks");
+		}
+		/** each stack of the input List */
 		for (ItemStack stackIn : itemsList) {
-			if (stackIn.isEmpty()) { continue; }
+			/** input stack empty or max stacksize */
+			if (stackIn.isEmpty()) {
+				if (simulate) {	minCount--;	}
+				Helper.sendLog("SKIP - current input stack is empty");
+				continue;
+			}
+			if (stackIn.getCount()==stackIn.getMaxStackSize()) {
+				Helper.sendLog("SKIP - current input stack is fullstack : "+stackIn.getDisplayName());
+				continue;
+			}
+			Helper.sendLog("current stack : " + stackIn.getCount() + " " + stackIn.getDisplayName());
+			/** try to fill same stacks not full */
 			left = stackIn.getCount();
 			maxSize = stackIn.getMaxStackSize();
+			/** each stack of the output List */
 			for (ItemStack stackOut : resultList) {
-				if (stackOut.isItemEqual(stackIn) && ItemStack.areItemStackTagsEqual(stackOut, stackIn)) {
+				/** output stack empty or max stacksize */
+				if (stackOut.isEmpty() || stackOut.getCount()==stackOut.getMaxStackSize()) { continue; }
+				/** stacks equal and same meta/nbt */
+				if (Helper.areItemEqual(stackIn, stackOut)) {
 					space = maxSize - stackOut.getCount();
 					add = Math.min(space, left);
 					if (add > 0) {
 						stackOut.grow(add);
 						left -= add;
+						Helper.sendLog("found stack with space for " + space + ", left : " + left);
 						if (left <= 0) { break; }
 					}
 				}
 			}
-			if (left > 0) {
-				emptySlot = -1;
-				for (int i = 0 ; i < resultList.size() ; i++) {
-					if (resultList.get(i).isEmpty()) {
-						emptySlot = i;
-						break;
-					}
+			/** stack completely filled */
+			if (left <= 0) {
+				Helper.sendLog("stack completely filled");
+				if (simulate) {
+					minCount--;
+					Helper.sendLog("try to fill at least " + minCount + " same stacks");
 				}
-				if (emptySlot==-1) {
-					return false;
-				} else {
+			}
+			/** place the stack left in an empty stack */
+			if (left > 0) {
+				if (emptySlots.size() > 0) {
+					Helper.sendLog("place the stack left in an empty stack");
+					emptySlot = emptySlots.get(0);
+					emptySlots.remove(0);
 					stackCopy = stackIn.copy();
 					stackCopy.setCount(left);
 					resultList.set(emptySlot, stackCopy);
+					if (simulate) { minCount++; }
+				/** no empty stack */
+				} else {
+					Helper.sendLog("no empty stack to place the stack left");
+					Helper.sendLog("FAILED");
+					return false;
 				}
 			}
+			if (simulate && minCount <= 0) {
+				Helper.sendLog("SUCCESS");
+				return true;
+			}
 		}
+		/** overwrite the output slots */
 		if (!simulate) {
+			Helper.sendLog("overwriting output slots");
 			for (int i = firstOutput ; i < inventory.size() ; i++) {
 				this.setInventorySlotContents(i, resultList.get(i-firstOutput));
 			}
 		}
+		Helper.sendLog("SUCCESS");
 		return true;
 	}
 	

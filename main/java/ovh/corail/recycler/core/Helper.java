@@ -25,12 +25,16 @@ public class Helper {
 		return random.nextInt(max - min + 1) + min;
 	}
 	
+	public static boolean areItemEqual(ItemStack s1, ItemStack s2) {
+		return s1.isItemEqual(s2) && s1.getMetadata() == s2.getMetadata() && ItemStack.areItemStackTagsEqual(s1, s2);
+	}
+	
 	public static <T1, T2> boolean existInList(T1 element, List<T2> list) {
 		if (!(element instanceof ItemStack)) { return list.contains(element); }
 		if (list.isEmpty()) { return false; }
 		boolean compare;
 		for (T2 elementList : list) {
-			compare = ((ItemStack)element).isItemEqual(elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : ((ItemStack)elementList));
+			compare = areItemEqual((ItemStack)element, (elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : (ItemStack)elementList ));
 			if (compare) { return true; }
 		}
 		return false;
@@ -43,7 +47,7 @@ public class Helper {
 		boolean compare;
 		for (T2 elementList : list) {
 			index++;
-			compare = ((ItemStack)element).isItemEqual(elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : ((ItemStack)elementList));
+			compare = areItemEqual((ItemStack)element, (elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : (ItemStack)elementList ));
 			if (compare) { return index; }
 		}
 		return index;
@@ -57,7 +61,7 @@ public class Helper {
 			ItemStack in = inventory.getStackInSlot(i);
 			// if (!inventory.isItemValidForSlot(i, stack))
 			// continue;
-			if (!in.isEmpty() && stack.isItemEqual(in) && ItemStack.areItemStackTagsEqual(stack, in)) {
+			if (!in.isEmpty() && areItemEqual(in, stack)) {
 				int space = max - in.getCount();
 				int add = Math.min(space, stack.getCount());
 				if (add > 0) {
@@ -99,6 +103,13 @@ public class Helper {
 				message = getTranslation(message);
 			}
 			currentPlayer.sendMessage(new TextComponentString(message));
+		}
+	}
+	
+	public static void sendLog(String message) {
+		boolean develop = true;
+		if (develop) {
+			System.out.println(message);
 		}
 	}
 	

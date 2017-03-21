@@ -167,7 +167,7 @@ public class RecyclingManager {
 		if (stack.isEmpty() || stack.getCount() <= 0) {
 			return -1;
 		}
-		// don't allow binding cursed items
+		/** don't allow binding cursed items */
 		Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
 		Iterator i = enchants.entrySet().iterator();
 		Enchantment enchant;
@@ -179,7 +179,7 @@ public class RecyclingManager {
 			}
 			i.remove();
 		}
-		// For damaged items
+		/** damaged items */
 		ItemStack testStack = stack.copy();
 		if (testStack.getItem().isRepairable()) {
 			testStack.setItemDamage(0);
@@ -210,7 +210,7 @@ public class RecyclingManager {
 		if (num_recipe < 0) {
 			return itemsList;
 		}
-		/** check enchants, not half */
+		/** check enchants, no loss */
 		if (ConfigurationHandler.enchantedBooks) {
 			Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
 			if (!enchants.isEmpty()) {
@@ -230,38 +230,41 @@ public class RecyclingManager {
 		}
 		
 		RecyclingRecipe currentRecipe = recipes.get(num_recipe);
-
 		/** foreach stacks in recipe */
-		//int newStackCount;
 		ItemStack currentStack;
 		Item currentItem;
-		int currentSize;
+		int currentSize, currentMeta;
 		for (int i = 0; i < currentRecipe.getCount(); i++) {
 			currentStack = currentRecipe.getStack(i);
 			currentItem = currentStack.getItem();
 			currentSize = currentStack.getCount();
+			currentMeta = currentStack.getMetadata();
 			/** damaged items */
 			if (currentItem.isRepairable() && stack.getItemDamage() > 0) {
 				/** smaller units */
-				// TODO check for stacksize of smaller units and meta */
 				if (currentStack.getItem()==Items.IRON_INGOT) {
 					currentItem = Items.field_191525_da; /** iron nugget */
 					currentSize *= 9;
+					currentMeta = 0;
 				}
 				if (currentStack.getItem()==Items.GOLD_INGOT) {
 					currentItem = Items.GOLD_NUGGET;
 					currentSize *= 9;
+					currentMeta = 0;
 				}
 				if (currentStack.getItem()==Items.DIAMOND) {
 					currentItem = Main.diamond_fragment;
 					currentSize *= 9;
+					currentMeta = 0;
 				}
 				if (currentStack.getItem()==Items.LEATHER) {
 					currentItem = Items.RABBIT_HIDE;
 					currentSize *= 4;
+					currentMeta = 0;
 				}
 				if (currentStack.getItem()==Item.getItemFromBlock(Blocks.PLANKS)) {
 					currentItem = Items.STICK;
+					currentMeta = 0;
 				}
 				int maxDamage = currentRecipe.getItemRecipe().getMaxDamage();
 				float pourcent = (float) (maxDamage - (stack.getItemDamage())) / maxDamage;
@@ -276,7 +279,7 @@ public class RecyclingManager {
 			currentSize *= nb_input;
 			/** fill with fullstack */
 			int slotCount = (int) Math.floor(currentSize / currentStack.getMaxStackSize());
-			ItemStack fullStack = new ItemStack(currentItem, currentStack.getMaxStackSize());
+			ItemStack fullStack = new ItemStack(currentItem, currentStack.getMaxStackSize(), currentMeta);
 			for (int j = 0; j < slotCount; j++) {	
 				itemsList.add(fullStack);
 			}
