@@ -1,8 +1,10 @@
 package ovh.corail.recycler.container;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import ovh.corail.recycler.gui.GuiRecycler;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 
@@ -34,5 +36,6 @@ public class SlotRecycler extends Slot {
 	@Override
 	public void onSlotChanged() {
 		super.onSlotChanged();
+		((GuiRecycler)Minecraft.getMinecraft().currentScreen).updateButtons();
 	}
 }

@@ -230,16 +230,18 @@ public class RecyclingManager {
 		}
 		
 		RecyclingRecipe currentRecipe = recipes.get(num_recipe);
-		/** foreach stacks in recipe */
 		ItemStack currentStack;
 		Item currentItem;
 		int currentSize, currentMeta;
+		/** foreach stacks in the recipe */
 		for (int i = 0; i < currentRecipe.getCount(); i++) {
 			currentStack = currentRecipe.getStack(i);
 			currentItem = currentStack.getItem();
 			currentSize = currentStack.getCount();
 			currentMeta = currentStack.getMetadata();
 			/** damaged items */
+			// TODO only change stack when smaller units, same nbt
+			// TODO also smaller units when loss chance > 0
 			if (currentItem.isRepairable() && stack.getItemDamage() > 0) {
 				/** smaller units */
 				if (currentStack.getItem()==Items.IRON_INGOT) {
@@ -267,13 +269,13 @@ public class RecyclingManager {
 					currentMeta = 0;
 				}
 				int maxDamage = currentRecipe.getItemRecipe().getMaxDamage();
-				float pourcent = (float) (maxDamage - (stack.getItemDamage())) / maxDamage;
+				double pourcent = (double) (maxDamage - (stack.getItemDamage())) / (double) maxDamage;
 				/** losses from damage */
 				currentSize = (int) Math.floor(currentSize * pourcent);
 			}
 			/** losses with chance */
 			if (half) {
-				currentSize = (int) Math.floor(currentSize/2);
+				currentSize = (int) Math.floor(currentSize/2.0D);
 			}
 			/** size for nb_input */
 			currentSize *= nb_input;

@@ -18,6 +18,7 @@ import ovh.corail.recycler.container.ContainerRecycler;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
+import ovh.corail.recycler.core.RecyclingRecipe;
 import ovh.corail.recycler.core.VisualManager;
 import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.PacketHandler;
@@ -53,7 +54,7 @@ public class GuiRecycler extends GuiContainer {
 		int posX = ((this.width - this.xSize) / 2);
 		int posY = ((this.height - this.ySize) / 2);
 		int startX = posX + 118;
-		int startY = posY + 3;
+		int startY = posY + 2 + (ConfigurationHandler.fancyGui ? 0 : 1);
 		int dimCase = 16;
 		int slotNum = 0;
 		for (int caseY = 0 ; caseY < 3 ; caseY++) {
@@ -117,13 +118,14 @@ public class GuiRecycler extends GuiContainer {
 	}
 
 	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
+		// TODO diskMaxUse and nb_input could be stored before in slotchanged() 
 		if (!inventory.getStackInSlot(0).isEmpty()) {
 			RecyclingManager rm = RecyclingManager.getInstance();
 			int num_recipe=rm.hasRecipe(inventory.getStackInSlot(0));
 			if (num_recipe>=0) {
 				int inputCount=rm.getRecipe(num_recipe).getItemRecipe().getCount();
 				boolean enoughStackSize = inventory.getStackInSlot(0).getCount() >= inputCount;
-				// TODO Current Changes
+				/** progress bar */
 				if (inventory.isWorking() && enoughStackSize) {
 					mc.renderEngine.bindTexture(ConfigurationHandler.fancyGui ? Main.textureFancyRecycler : Main.textureVanillaRecycler);
 					drawTexturedModalRect(78, 41, 0, 225, 19, 4);
@@ -131,7 +133,9 @@ public class GuiRecycler extends GuiContainer {
 					drawTexturedModalRect(79, 42, 1, 229, widthWorking, 2);
 					//this.fontRendererObj.drawString(Integer.toString(inventory.getPercentWorking())+" %", (74), (11), 0xffffff);
 				}
-				this.fontRenderer.drawString("X " + Integer.toString(inventory.getStackInSlot(0).getCount()/inputCount), (70), (13), (enoughStackSize?0x00ff00:0xff0000));
+				/** max recipe for input stacksize */
+				int nb_input = (int) Math.floor((double) inventory.getStackInSlot(0).getCount() / (double) inputCount);
+				this.fontRenderer.drawString("X " + Integer.toString(nb_input), (70), (13), (enoughStackSize?0x00ff00:0xff0000));
 			}
 		}
 		ItemStack disk = inventory.getStackInSlot(1);
@@ -139,7 +143,7 @@ public class GuiRecycler extends GuiContainer {
 		if (disk.isEmpty()) {
 			diskMaxUse = 0;
 		} else {
-			diskMaxUse = (disk.getMaxDamage()-disk.getItemDamage())/10;
+			diskMaxUse = (int) Math.floor((disk.getMaxDamage()-disk.getItemDamage())/10.0D);
 		}
 		this.fontRenderer.drawString("X "+Integer.toString(diskMaxUse), (70), (31), (diskMaxUse>0?0x00ff00:0xff0000));
 
@@ -160,6 +164,7 @@ public class GuiRecycler extends GuiContainer {
 		this.buttonList.add(new GuiButtonRecycler(1, this.guiLeft + 62, this.guiTop + 90, 53, 14, Helper.getTranslation("button.auto"), inventory));
 		this.buttonList.add(new GuiButtonRecycler(2, this.guiLeft + 116, this.guiTop + 90, 53, 14, Helper.getTranslation("button.takeAll"), inventory));
 		createVisual();
+		updateButtons();
 	}
 
 	@Override
@@ -179,6 +184,7 @@ public class GuiRecycler extends GuiContainer {
 			break;
 		case 1: /** Switch Working */
 			inventory.setWorking(!this.inventory.isWorking());
+			updateButtons();
 			PacketHandler.INSTANCE.sendToServer(new WorkingMessage(inventory.getPos(), inventory.isWorking()));
 			break;
 		case 2: /** Take All */
@@ -190,6 +196,49 @@ public class GuiRecycler extends GuiContainer {
 
 	public boolean doesGuiPauseGame() {
 		return false;
+	}
+
+	public void updateButtons() {
+		/** button take all */
+		/** at least one stack to transfer */
+		boolean valid = false;
+		for (int i=inventory.firstOutput;i<inventory.getSizeInventory();i++) {
+			if (!inventory.getStackInSlot(i).isEmpty()) {
+				valid = true;
+				break;
+			}
+		}
+		buttonList.get(2).enabled = valid;
+		/** button recycle and auto */
+		valid = false;
+		if (inventory.isWorking()) {
+			buttonList.get(0).enabled = false;
+			buttonList.get(1).enabled = true;
+		} else {
+			/** input slot not empty */
+			if (!inventory.getStackInSlot(0).isEmpty() && !inventory.getStackInSlot(1).isEmpty()) {
+				int numRecipe = inventory.recyclingManager.hasRecipe(inventory.getStackInSlot(0));
+				/** existing recipe and enough input stacksize */
+				if (numRecipe >= 0) {
+					RecyclingRecipe currentRecipe = inventory.recyclingManager.getRecipe(numRecipe);
+					int nb_input = (int) Math.floor((double) inventory.getStackInSlot(0).getCount() / (double) currentRecipe.getItemRecipe().getCount());
+					if (nb_input > 0) {
+						if (inventory.isWorking()) { nb_input = 1; }	
+						int maxDiskUse = (int) Math.floor((double) (inventory.getStackInSlot(1).getMaxDamage() - inventory.getStackInSlot(1).getItemDamage()) / 10.0);
+						if (maxDiskUse < nb_input) {
+							nb_input = maxDiskUse;
+						}
+						/** calculation of the result */
+						List<ItemStack> itemsList = inventory.recyclingManager.getResultStack(inventory.getStackInSlot(0), nb_input);
+						if (inventory.hasSpaceInInventory(itemsList, true)) {
+							valid = true;
+						}
+					}
+				}
+			}
+			buttonList.get(0).enabled = valid;
+			buttonList.get(1).enabled = valid;
+		}
 	}
 
 }

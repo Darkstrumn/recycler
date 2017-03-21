@@ -12,10 +12,8 @@ public class GuiButtonRecycler extends GuiButton {
 	private TileEntityRecycler invent;
 
 	public GuiButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, TileEntityRecycler invent) {
-		super(buttonId, x, y, buttonText);
+		super(buttonId, x, y, widthIn, heightIn, buttonText);
 		this.invent = invent;
-		this.width = widthIn;
-		this.height = heightIn;
 	}
 
 	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
@@ -30,37 +28,8 @@ public class GuiButtonRecycler extends GuiButton {
 			GlStateManager.enableBlend();
 			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,	GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-			
-			boolean valid = false;
-			/** button take all */
-			if (id == 2) {
-				for (int i=invent.firstOutput;i<invent.getSizeInventory();i++) {
-					if (!invent.getStackInSlot(i).isEmpty()) {
-						valid = true;
-						break;
-					}
-				}
-			// TODO make a check with leftover
-			/** input slot empty */
-			} else if (!invent.getStackInSlot(0).isEmpty() && !invent.getStackInSlot(1).isEmpty()) {
-				valid = false;
-				/** input stacksize */
-				if ((id == 0 || id == 1) && !invent.getStackInSlot(0).isEmpty()) {
-					int numRecipe = invent.recyclingManager.hasRecipe(invent.getStackInSlot(0));
-					if (numRecipe >= 0 && invent.getStackInSlot(0).getCount() >= invent.recyclingManager.getRecipe(numRecipe).getItemRecipe().getCount()) {
-						if (id == 1) {
-							valid= true;
-						/** button recycle */
-						} else if (!invent.isWorking()) {
-							valid = true;
-						}				
-					}
-				}
-			}
-			this.enabled=valid;
-
 			/** texture height to read the button */
-			int readButton = (!valid?28:(isHovered==2?14:0));
+			int readButton = (!enabled?28:(isHovered==2?14:0));
 			this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 183 + readButton, this.width / 2, this.height);
 			this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, buttonWidth - this.width / 2, 183 + readButton, this.width / 2, this.height);
 			this.mouseDragged(mc, mouseX, mouseY);

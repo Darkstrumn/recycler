@@ -197,7 +197,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		/** by unit in auto recycle */
 		if (isWorking) { nb_input = 1; }
 		/** max uses of the disk */
-		int maxDiskUse = (int) Math.floor((double) (diskStack.getMaxDamage() - diskStack.getItemDamage()) / 10.0);
+		int maxDiskUse = (int) Math.floor((double) (diskStack.getMaxDamage() - diskStack.getItemDamage()) / 10.0D);
 		if (maxDiskUse < nb_input) {
 			nb_input = maxDiskUse;
 		}
@@ -217,8 +217,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 				}
 			}
 			if (loss > 0) {
-			// TODO translate
-				Helper.sendMessage("Il y a eu des pertes lors du recyclage", currentPlayer, false);
+				Helper.sendMessage("tile.recycler.message.loss", currentPlayer, true);
 			}
 		}
 		List<ItemStack> stackList;
@@ -244,7 +243,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		/** damage the disk */
 		diskStack.setItemDamage(diskStack.getItemDamage() + (10 * nb_input));
 		if (diskStack.getItemDamage() >= diskStack.getMaxDamage()) {
-			Helper.sendMessage("tile.recycler.message.BrokenDisk", currentPlayer, true);
+			Helper.sendMessage("tile.recycler.message.brokenDisk", currentPlayer, true);
 			this.setInventorySlotContents(1, ItemStack.EMPTY);
 		} else {
 			this.setInventorySlotContents(1, diskStack);
