@@ -23,6 +23,7 @@ public class ItemRecyclingBook extends Item {
 	@Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		if (playerIn != null) {
+			playerIn.addStat(Main.achievementReadRecyclingBook, 1);
 			playerIn.openGui(Main.instance, 1, worldIn, 0, 0, 0);
 		}
         return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));

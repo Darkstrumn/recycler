@@ -1,4 +1,4 @@
-package ovh.corail.recycler.container;
+package ovh.corail.recycler.gui;
 
 import java.awt.Point;
 import java.awt.Rectangle;

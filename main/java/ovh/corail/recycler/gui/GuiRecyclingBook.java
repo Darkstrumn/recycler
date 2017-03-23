@@ -5,24 +5,23 @@ import java.io.IOException;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
-import ovh.corail.recycler.container.ButtonRecyclingBook;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.PageManager;
 import ovh.corail.recycler.core.RecyclingRecipe;
 import ovh.corail.recycler.core.VisualManager;
 
 public class GuiRecyclingBook extends GuiScreen {
-	private int bookWidth = 290;
-	private int bookHeight = 179;
+	private int bookWidth = 250;
+	private int bookHeight = 150;
 	private int dimCase = 16;
 	private PageManager pm;
 	private VisualManager visual = new VisualManager();
@@ -66,8 +65,8 @@ public class GuiRecyclingBook extends GuiScreen {
 	@Override
 	public void initGui() {
 		super.initGui();
-		int posX = ((this.width - this.bookWidth) / 2);
-		int posY = ((this.height - this.bookHeight) / 2);
+		int posX = (width - bookWidth) / 2;
+		int posY = (height - bookHeight) / 2;
 		Keyboard.enableRepeatEvents(true);
 		loadSearchBox(posX, posY);
 		pm = new PageManager();
@@ -77,13 +76,13 @@ public class GuiRecyclingBook extends GuiScreen {
 	
 	private void loadButtons(int posX, int posY) {
 		buttonList.clear();
-		buttonList.add(new ButtonRecyclingBook(0, posX+20, posY+150));
-		buttonList.add(new ButtonRecyclingBook(1, posX+247, posY+150));
+		buttonList.add(new ButtonRecyclingBook(0, posX+20, posY+135));
+		buttonList.add(new ButtonRecyclingBook(1, posX+208, posY+135));
 		enableButtons();
 	}
 	
 	private void loadSearchBox(int posX, int posY) {
-		searchBox = new GuiTextField(2, fontRenderer, (width/2)-32, posY+159, 64, 12);
+		searchBox = new GuiTextField(2, fontRenderer, (width/2)-32, posY+139, 64, 12);
 		searchBox.setEnableBackgroundDrawing(true);
 		searchBox.setFocused(true);
 		searchBox.setMaxStringLength(20);
@@ -117,25 +116,22 @@ public class GuiRecyclingBook extends GuiScreen {
 	
 	@Override
     public void drawDefaultBackground() {
-        super.drawDefaultBackground();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        //super.drawDefaultBackground();
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(Main.textureRecyclingBook);
-        int posX = ((this.width - this.bookWidth) / 2);
-		int posY = ((this.height - this.bookHeight) / 2);
-		int bookSize = 162;
-		drawTexturedModalRect(posX, posY, 20, 1, 145, 179);
-		drawTexturedModalRect(posX+145, posY, 20, 1, 145, 179);
+        int posX = (int) ((this.width - this.bookWidth) / 2.0D);
+		int posY = (int) ((this.height - this.bookHeight) / 2.0D);
+		drawTexturedModalRect(posX, posY, 0, 0, bookWidth, bookHeight);//20, 1, 145, 179);
     }
 	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float par3) {
 		drawDefaultBackground();
-		int posX = ((this.width - this.bookWidth) / 2);
-		int posY = ((this.height - this.bookHeight) / 2);
+		int posX = (int) ((this.width - this.bookWidth) / 2.0D);
+		int posY = (int) ((this.height - this.bookHeight) / 2.0D);
 
 		int startX = posX+10;
 		int startY = posY+5;
-		
 		/** draw grid */
 		for (int slot = 0 ; slot < visual.getVisualCount() ; slot++) {
 			displayGrid(visual.getPosInVisual(slot));
@@ -150,8 +146,6 @@ public class GuiRecyclingBook extends GuiScreen {
 			displayItems(visual.getStackInVisual(slot), visual.getPosInVisual(slot));
 		}
 		RenderHelper.disableStandardItemLighting();
-		/** draw buttons */
-		super.drawScreen(mouseX, mouseY, par3);
 		/** draw tooltip on hover slot */
 		int slotHover = visual.getSlotAtPos(mouseX, mouseY);
 		if (slotHover > -1) {
@@ -163,6 +157,8 @@ public class GuiRecyclingBook extends GuiScreen {
 		}
 		/** draw search box */
 		searchBox.drawTextBox();
+		/** draw buttons */
+		super.drawScreen(mouseX, mouseY, par3);
 	}
 	
 	private void displayItems(ItemStack stack, Point pos) {
@@ -173,7 +169,7 @@ public class GuiRecyclingBook extends GuiScreen {
 	
 	private void displayGrid(Point pos) {
 		mc.getTextureManager().bindTexture(Main.textureVanillaRecycler);
-		drawTexturedModalRect(pos.x, pos.y, 240, 0, dimCase, dimCase);
+		drawTexturedModalRect(pos.x, pos.y, 240, dimCase, dimCase, dimCase);
 	}
 	
 	public void refreshVisual() {
@@ -198,14 +194,14 @@ public class GuiRecyclingBook extends GuiScreen {
 	}
 	
 	private void createVisual() {
-		int posX = ((this.width - this.bookWidth) / 2);
-		int posY = ((this.height - this.bookHeight) / 2);
+		int posX = (int) ((width - bookWidth) / 2.0D);
+		int posY = (int) ((height - bookHeight) / 2.0D);
 		int startX, startY;
 		int slotNum = 0;
 		/** each recipes line */
-		for (int j=0 ; j < 3 ; j++) {
-			startX = posX+30;
-			startY = posY+10+(j*dimCase*3)+(2*j);
+		for (int j=0 ; j < 2 ; j++) {
+			startX = posX+40;
+			startY = posY+10+(j*dimCase*3)+(10*j);
 			/** 2 recipes on each line */
 			for (int i=0 ; i < 2 ; i++) {
 				/** recycle item */
@@ -217,7 +213,7 @@ public class GuiRecyclingBook extends GuiScreen {
 						visual.addVisual(slotNum++, (startX+(caseX*dimCase)), (startY+(caseY*dimCase)));
 					}
 				}
-				startX = posX+175;
+				startX = posX+145;
 			}
 		}
 	}

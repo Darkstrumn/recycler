@@ -48,6 +48,13 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 		world.setBlockState(pos, state.withProperty(FACING, getFacingFromEntity(pos, placer)), 2);
 		EntityPlayer player = (EntityPlayer) placer;
 		player.addStat(Main.achievementPlaceRecycler, 1);
+		/** place a recycling book in the recycler */
+		TileEntity tile = world.getTileEntity(pos);
+		if (world.getTileEntity(pos) != null && tile instanceof TileEntityRecycler) {
+			TileEntityRecycler recycler = (TileEntityRecycler) world.getTileEntity(pos);
+			recycler.setInventorySlotContents(2, new ItemStack(Main.recycling_book, 1, 0));
+		}
+		
     }
 	
 	@Override

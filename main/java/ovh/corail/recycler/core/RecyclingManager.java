@@ -33,9 +33,10 @@ import ovh.corail.recycler.handler.ConfigurationHandler;
 
 public class RecyclingManager {
 	private static final RecyclingManager instance = new RecyclingManager();
-	public List<RecyclingRecipe> recipes = Lists.<RecyclingRecipe> newArrayList();
-	private List<ItemStack> unbalanced = new ArrayList<ItemStack>();
-	private List<ItemStack> blacklist = new ArrayList<ItemStack>();
+	public List<RecyclingRecipe> recipes = Lists.newArrayList();
+	private List<ItemStack> unbalanced = Lists.newArrayList();
+	private List<ItemStack> blacklist = Lists.newArrayList();
+	private List<List<ItemStack>> grindList = Lists.newArrayList();
 	private File unbalancedFile = new File(ConfigurationHandler.getConfigDir(), "unbalanced_recipes.json");
 	private File blacklistFile = new File(ConfigurationHandler.getConfigDir(), "blacklist_recipes.json");
 	private File userDefinedFile = new File(ConfigurationHandler.getConfigDir(), "user_defined_recipes.json");
@@ -53,6 +54,8 @@ public class RecyclingManager {
 		loadDefaultRecipes();
 		/** load json user defined recycling recipes */
 		loadUserDefinedRecipes();
+		/** load grind List for damaged items and when losses */
+		loadGrindList();
 	}
 	
 	private void loadUnbalanced() {
@@ -235,42 +238,14 @@ public class RecyclingManager {
 		int currentSize, currentMeta;
 		/** foreach stacks in the recipe */
 		for (int i = 0; i < currentRecipe.getCount(); i++) {
-			currentStack = currentRecipe.getStack(i);
-			currentItem = currentStack.getItem();
+			currentStack = currentRecipe.getStack(i).copy();
 			currentSize = currentStack.getCount();
-			currentMeta = currentStack.getMetadata();
-			/** damaged items */
-			// TODO only change stack when smaller units, same nbt
-			// TODO also smaller units when loss chance > 0
-			if (currentItem.isRepairable() && stack.getItemDamage() > 0) {
-				/** smaller units */
-				if (currentStack.getItem()==Items.IRON_INGOT) {
-					currentItem = Items.field_191525_da; /** iron nugget */
-					currentSize *= 9;
-					currentMeta = 0;
-				}
-				if (currentStack.getItem()==Items.GOLD_INGOT) {
-					currentItem = Items.GOLD_NUGGET;
-					currentSize *= 9;
-					currentMeta = 0;
-				}
-				if (currentStack.getItem()==Items.DIAMOND) {
-					currentItem = Main.diamond_fragment;
-					currentSize *= 9;
-					currentMeta = 0;
-				}
-				if (currentStack.getItem()==Items.LEATHER) {
-					currentItem = Items.RABBIT_HIDE;
-					currentSize *= 4;
-					currentMeta = 0;
-				}
-				if (currentStack.getItem()==Item.getItemFromBlock(Blocks.PLANKS)) {
-					currentItem = Items.STICK;
-					currentMeta = 0;
-				}
-				int maxDamage = currentRecipe.getItemRecipe().getMaxDamage();
-				double pourcent = (double) (maxDamage - (stack.getItemDamage())) / (double) maxDamage;
-				/** losses from damage */
+			/** smaller units for damaged items and when losses chance */
+			if (half || (stack.isItemDamaged() && hasGrind(currentStack))) {
+				currentStack = getGrind(currentStack);
+				// TODO check for input amount > 1 for grind 
+				currentSize *= currentStack.getCount();
+				double pourcent = (double) (stack.getMaxDamage() - (stack.getItemDamage())) / (double) stack.getMaxDamage();
 				currentSize = (int) Math.floor(currentSize * pourcent);
 			}
 			/** losses with chance */
@@ -281,18 +256,49 @@ public class RecyclingManager {
 			currentSize *= nb_input;
 			/** fill with fullstack */
 			int slotCount = (int) Math.floor(currentSize / currentStack.getMaxStackSize());
-			ItemStack fullStack = new ItemStack(currentItem, currentStack.getMaxStackSize(), currentMeta);
+			currentStack.setCount(currentStack.getMaxStackSize());
 			for (int j = 0; j < slotCount; j++) {	
-				itemsList.add(fullStack);
+				itemsList.add(currentStack.copy());
 			}
 			/** stack left */
 			int leftStackCount = currentSize - (slotCount * currentStack.getMaxStackSize());
 			if (leftStackCount > 0) {
-				fullStack.setCount(leftStackCount);
-				itemsList.add(fullStack);
+				currentStack.setCount(leftStackCount);
+				itemsList.add(currentStack.copy());
 			}
 		}
 		return itemsList;
+	}
+	// TODO Make in json format
+	private void loadGrindList() {
+		grindList.add(Lists.newArrayList(new ItemStack(Items.IRON_INGOT, 1, 0), new ItemStack(Items.field_191525_da, 9, 0))); /** iron nugget */
+		grindList.add(Lists.newArrayList(new ItemStack(Items.GOLD_INGOT, 1, 0), new ItemStack(Items.GOLD_NUGGET, 9, 0)));
+		grindList.add(Lists.newArrayList(new ItemStack(Items.LEATHER, 1, 0), new ItemStack(Items.RABBIT_HIDE, 4, 0)));
+		for (int i = 0 ; i < 6 ; i++) {
+			grindList.add(Lists.newArrayList(new ItemStack(Blocks.PLANKS, 1, i), new ItemStack(Items.STICK, 4 ,0)));
+		}
+		
+	}
+
+	public boolean hasGrind(ItemStack stack) {
+		for (List<ItemStack> grind : grindList) {
+			/** Helper.areItemEqual() doesn't check stacksize */
+			if (Helper.areItemEqual(grind.get(0), stack)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/** only call when stack is damaged or there's losses to get smaller units */
+	public ItemStack getGrind(ItemStack stack) {
+		for (List<ItemStack> grind : grindList) {
+			/** Helper.areItemEqual() doesn't check stacksize */
+			if (Helper.areItemEqual(grind.get(0), stack)) {
+				return grind.get(1).copy();
+			}
+		}
+		return stack;
 	}
 	
 	private RecyclingManager() {

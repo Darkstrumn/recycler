@@ -8,10 +8,10 @@ import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
-public class GuiButtonRecycler extends GuiButton {
+public class ButtonRecycler extends GuiButton {
 	private TileEntityRecycler invent;
 
-	public GuiButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, TileEntityRecycler invent) {
+	public ButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, TileEntityRecycler invent) {
 		super(buttonId, x, y, widthIn, heightIn, buttonText);
 		this.invent = invent;
 	}

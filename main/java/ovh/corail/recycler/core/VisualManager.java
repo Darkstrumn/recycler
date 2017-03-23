@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import net.minecraft.item.ItemStack;
-import ovh.corail.recycler.container.SlotVisual;
+import ovh.corail.recycler.gui.SlotVisual;
 
 public class VisualManager {
 	private List<SlotVisual> visual = Lists.newArrayList();
@@ -16,8 +16,20 @@ public class VisualManager {
 		
 	}
 	
+	public int getDimCase() {
+		return dimCase;
+	}
+	
 	public void addVisual(int slotNum, int x, int y) {
-		visual.add(slotNum, new SlotVisual(slotNum, x, y, dimCase));
+		if (slotNum >= 0 && slotNum < visual.size()) {
+			visual.set(slotNum, new SlotVisual(slotNum, x, y, dimCase));
+		} else {
+			visual.add(slotNum, new SlotVisual(slotNum, x, y, dimCase));
+		}
+	}
+	
+	public void setVisual(int slotNum, int x, int y) {
+		
 	}
 	
 	public int getVisualCount() {

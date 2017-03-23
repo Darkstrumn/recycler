@@ -107,7 +107,7 @@ public class Helper {
 	}
 	
 	public static void sendLog(String message) {
-		boolean develop = true;
+		boolean develop = false;
 		if (develop) {
 			System.out.println(message);
 		}

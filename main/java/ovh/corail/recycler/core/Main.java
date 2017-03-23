@@ -53,10 +53,12 @@ public class Main {
 	public static Achievement achievementPlaceRecycler = new Achievement("achievement.PlaceRecycler", "PlaceRecycler", 0, 0, Main.itemAchievement001, (Achievement) null);
 	public static Achievement achievementBuildDisk = new Achievement("achievement.BuildDisk", "BuildDisk", 1, 1, Main.diamond_disk, achievementPlaceRecycler);
 	public static Achievement achievementFirstRecycle = new Achievement("achievement.FirstRecycle", "FirstRecycle", 2, 2, Items.field_191525_da, achievementBuildDisk);
+	public static Achievement achievementReadRecyclingBook = new Achievement("achievement.ReadRecyclingBook", "ReadRecyclingBook", -1, -1, Items.BOOK, achievementPlaceRecycler);
 	
+	/** TODO could move texture elsewhere */
 	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
 	public static ResourceLocation textureFancyRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/fancy_recycler.png");
-	public static ResourceLocation textureRecyclingBook = new ResourceLocation("textures/gui/book.png");
+	public static ResourceLocation textureRecyclingBook = new ResourceLocation(Main.MOD_ID + ":textures/gui/book.png");
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

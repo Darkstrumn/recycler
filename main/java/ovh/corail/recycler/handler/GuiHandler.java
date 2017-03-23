@@ -6,7 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
-import ovh.corail.recycler.container.ContainerRecycler;
+import ovh.corail.recycler.gui.ContainerRecycler;
 import ovh.corail.recycler.gui.GuiRecycler;
 import ovh.corail.recycler.gui.GuiRecyclingBook;
 import ovh.corail.recycler.item.ItemRecyclingBook;

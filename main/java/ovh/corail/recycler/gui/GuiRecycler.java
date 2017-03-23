@@ -14,7 +14,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import ovh.corail.recycler.container.ContainerRecycler;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
@@ -40,8 +39,8 @@ public class GuiRecycler extends GuiContainer {
 		this.ySize = ConfigurationHandler.fancyGui? 176 : 179;
 	}
 	
-	public void refreshVisual(ItemStack stack) {
-		List<ItemStack> itemsList = RecyclingManager.getInstance().getResultStack(stack, 1);
+	public void refreshVisual() {
+		List<ItemStack> itemsList = RecyclingManager.getInstance().getResultStack(inventory.getStackInSlot(0), 1);
 		visual.emptyVisual();
 		/** no recipe */
 		if (itemsList.isEmpty() && !inventory.getStackInSlot(0).isEmpty()) {
@@ -51,11 +50,9 @@ public class GuiRecycler extends GuiContainer {
 	}
 	
 	private void createVisual() {
-		int posX = ((this.width - this.xSize) / 2);
-		int posY = ((this.height - this.ySize) / 2);
-		int startX = posX + 118;
-		int startY = posY + 2 + (ConfigurationHandler.fancyGui ? 0 : 1);
-		int dimCase = 16;
+		int startX = guiLeft + 118;
+		int startY = guiTop + 2 + (ConfigurationHandler.fancyGui ? 0 : 1);
+		int dimCase = visual.getDimCase();
 		int slotNum = 0;
 		for (int caseY = 0 ; caseY < 3 ; caseY++) {
 			for (int caseX = 0 ; caseX < 3 ; caseX++) {
@@ -71,16 +68,14 @@ public class GuiRecycler extends GuiContainer {
 		GL11.glScalef(1F, 1F, 1F);
 		/** recycler texture */
 		mc.renderEngine.bindTexture(ConfigurationHandler.fancyGui ? Main.textureFancyRecycler : Main.textureVanillaRecycler);
-		int posX = ((this.width - this.xSize) / 2);
-		int posY = ((this.height - this.ySize) / 2);
-		this.drawTexturedModalRect(posX, posY, 0, 0, this.xSize, this.ySize);
+		this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, this.xSize, this.ySize);
 		/** draw slots */
 		int dimCase = 16;
 		List<Slot> slots = this.inventorySlots.inventorySlots;
 		Slot slot;
 		for (int i = 0; i < slots.size(); i++) {
 			slot = slots.get(i);
-			this.drawTexturedModalRect(posX + slot.xPos, posY + slot.yPos, 240, 0, dimCase, dimCase);
+			this.drawTexturedModalRect(guiLeft + slot.xPos, guiTop + slot.yPos, 240, 0, dimCase, dimCase);
 		}
 		/** draw visual grid */
 		Point pos;
@@ -91,11 +86,6 @@ public class GuiRecycler extends GuiContainer {
 		/** draw visual item and tootip */
 		RenderHelper.enableGUIStandardItemLighting();
 		ItemStack stack = inventory.getStackInSlot(0);
-		if (stack.isEmpty()) {
-			visual.emptyVisual();
-		} else {
-			refreshVisual(stack);
-		}
 		int slotHover = visual.getSlotAtPos(mouseX, mouseY);
 		for (int i = 0 ; i < visual.getVisualCount() ; i++)  {
 			stack = visual.getStackInVisual(i);
@@ -118,7 +108,6 @@ public class GuiRecycler extends GuiContainer {
 	}
 
 	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
-		// TODO diskMaxUse and nb_input could be stored before in slotchanged() 
 		if (!inventory.getStackInSlot(0).isEmpty()) {
 			RecyclingManager rm = RecyclingManager.getInstance();
 			int num_recipe=rm.hasRecipe(inventory.getStackInSlot(0));
@@ -135,7 +124,7 @@ public class GuiRecycler extends GuiContainer {
 				}
 				/** max recipe for input stacksize */
 				int nb_input = (int) Math.floor((double) inventory.getStackInSlot(0).getCount() / (double) inputCount);
-				this.fontRenderer.drawString("X " + Integer.toString(nb_input), (70), (13), (enoughStackSize?0x00ff00:0xff0000));
+				this.fontRenderer.drawString("X " + Integer.toString(nb_input), (inventorySlots.getSlot(0).xPos + 40), (inventorySlots.getSlot(0).yPos + 4), (enoughStackSize?0x00ff00:0xff0000));
 			}
 		}
 		ItemStack disk = inventory.getStackInSlot(1);
@@ -145,8 +134,7 @@ public class GuiRecycler extends GuiContainer {
 		} else {
 			diskMaxUse = (int) Math.floor((disk.getMaxDamage()-disk.getItemDamage())/10.0D);
 		}
-		this.fontRenderer.drawString("X "+Integer.toString(diskMaxUse), (70), (31), (diskMaxUse>0?0x00ff00:0xff0000));
-
+		this.fontRenderer.drawString("X "+Integer.toString(diskMaxUse), (inventorySlots.getSlot(1).xPos + 40), (inventorySlots.getSlot(1).yPos + 4), (diskMaxUse>0?0x00ff00:0xff0000));
 	}
 
 	public void onGuiClosed() {
@@ -156,13 +144,13 @@ public class GuiRecycler extends GuiContainer {
 
 	public void initGui() {
 		super.initGui();
-		this.guiLeft = (this.width - xSize) / 2;
-		this.guiTop = (this.height - ySize) / 2;
+		guiLeft = (this.width - xSize) / 2;
+		guiTop = (this.height - ySize) / 2;
 		Keyboard.enableRepeatEvents(true);
-		this.buttonList.clear();
-		this.buttonList.add(new GuiButtonRecycler(0, this.guiLeft + 8, this.guiTop + 90, 53, 14, Helper.getTranslation("button.recycle"), inventory));
-		this.buttonList.add(new GuiButtonRecycler(1, this.guiLeft + 62, this.guiTop + 90, 53, 14, Helper.getTranslation("button.auto"), inventory));
-		this.buttonList.add(new GuiButtonRecycler(2, this.guiLeft + 116, this.guiTop + 90, 53, 14, Helper.getTranslation("button.takeAll"), inventory));
+		buttonList.clear();
+		buttonList.add(new ButtonRecycler(0, guiLeft + 8, guiTop + 90, 53, 14, Helper.getTranslation("button.recycle"), inventory));
+		buttonList.add(new ButtonRecycler(1, guiLeft + 62, guiTop + 90, 53, 14, Helper.getTranslation("button.auto"), inventory));
+		buttonList.add(new ButtonRecycler(2, guiLeft + 116, guiTop + 90, 53, 14, Helper.getTranslation("button.takeAll"), inventory));
 		createVisual();
 		updateButtons();
 	}
@@ -216,7 +204,7 @@ public class GuiRecycler extends GuiContainer {
 			buttonList.get(1).enabled = true;
 		} else {
 			/** input slot not empty */
-			if (!inventory.getStackInSlot(0).isEmpty() && !inventory.getStackInSlot(1).isEmpty()) {
+			if (inventory.canRecycle((EntityPlayer) null)) {
 				int numRecipe = inventory.recyclingManager.hasRecipe(inventory.getStackInSlot(0));
 				/** existing recipe and enough input stacksize */
 				if (numRecipe >= 0) {
@@ -224,7 +212,7 @@ public class GuiRecycler extends GuiContainer {
 					int nb_input = (int) Math.floor((double) inventory.getStackInSlot(0).getCount() / (double) currentRecipe.getItemRecipe().getCount());
 					if (nb_input > 0) {
 						if (inventory.isWorking()) { nb_input = 1; }	
-						int maxDiskUse = (int) Math.floor((double) (inventory.getStackInSlot(1).getMaxDamage() - inventory.getStackInSlot(1).getItemDamage()) / 10.0);
+						int maxDiskUse = (int) Math.floor((double) (inventory.getStackInSlot(1).getMaxDamage() - inventory.getStackInSlot(1).getItemDamage()) / 10.0D);
 						if (maxDiskUse < nb_input) {
 							nb_input = maxDiskUse;
 						}

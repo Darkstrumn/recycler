@@ -8,6 +8,7 @@ public class PageManager {
 	private List<List<RecyclingRecipe>> pages;
 	private int pageNum;
 	private String search = "";
+	private int itemByPage = 4;
 	
 	public PageManager() {
 		updatePages();
@@ -42,12 +43,12 @@ public class PageManager {
 			list = getSubList(RecyclingManager.getInstance().recipes, search);
 		}
 		pages = Lists.newArrayList();
-		int pageCount = (int) Math.ceil(list.size()/6.0D);
+		int pageCount = (int) Math.ceil(list.size()/(double)itemByPage);
 		int currentPage = 0;
 		int startingId, endingId;
 		for (int i = 0 ; i < pageCount ; i++) {
-			startingId = currentPage*6;
-			endingId = startingId + 6 < list.size() ? startingId + 6 : list.size();
+			startingId = currentPage*itemByPage;
+			endingId = startingId + itemByPage < list.size() ? startingId + itemByPage : list.size();
 			pages.add(currentPage, list.subList(startingId, endingId));
 			currentPage++;
 		}

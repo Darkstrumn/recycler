@@ -35,13 +35,12 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		recyclingManager = RecyclingManager.getInstance();
 	}
 
-	private boolean canRecycle(EntityPlayer currentPlayer) {
+	public boolean canRecycle(EntityPlayer currentPlayer) {
 		/** item input slot empty */
 		if (getStackInSlot(0).isEmpty()) {
 			Helper.sendMessage("tile.recycler.message.emptySlot", currentPlayer, true);
 			return false;
-		}
-		if (getStackInSlot(0).getCount() <= 0) {
+		} else if (getStackInSlot(0).getCount() <= 0) {
 			Helper.sendMessage("tile.recycler.message.emptySlot", currentPlayer, true);
 			setInventorySlotContents(0, ItemStack.EMPTY);
 			return false;
@@ -51,13 +50,11 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		if (diskStack.isEmpty()) {
 			Helper.sendMessage("tile.recycler.message.noDisk", currentPlayer, true);
 			return false;
-		}
-		if (diskStack.getCount() <= 0) {
+		} else if (diskStack.getCount() <= 0) {
 			Helper.sendMessage("tile.recycler.message.noDisk", currentPlayer, true);
 			setInventorySlotContents(1, ItemStack.EMPTY);
 			return false;
-		}
-		if (getStackInSlot(1).getItemDamage() >= getStackInSlot(1).getMaxDamage()) {
+		} else if (getStackInSlot(1).getItemDamage() >= getStackInSlot(1).getMaxDamage()) {
 			setInventorySlotContents(1, ItemStack.EMPTY);
 			Helper.sendMessage("tile.recycler.message.noDisk", currentPlayer, true);
 			return false;
@@ -249,8 +246,10 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			this.setInventorySlotContents(1, diskStack);
 		}
 		/** play sound */
-		PacketHandler.INSTANCE.sendToAllAround(new SoundMessage(getPos(), 0),
-			new TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 20));
+		if (!ConfigurationHandler.soundOff) {
+			PacketHandler.INSTANCE.sendToAllAround(new SoundMessage(getPos(), 0),
+					new TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 20));
+		}
 		return true;
 	}
 
@@ -290,11 +289,6 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		if (stack.getItem()==Main.diamond_disk) {
 			return false;
 		}
-		/** item input slot */
-		/*int currentRecipe = recyclingManager.hasRecipe(stack);
-		if (currentRecipe < 0) {
-			return false;
-		}*/
 		return true;
 	}
 
@@ -347,7 +341,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			}
 			countTicks = maxTicks;
 			/** play sound */
-		} else if (cantRecycleTicks<=1 && countTicks%15==0) {
+		} else if (!ConfigurationHandler.soundOff && cantRecycleTicks<=1 && countTicks%15==0) {
 			PacketHandler.INSTANCE.sendToAllAround(new SoundMessage(getPos(), 1),
 				new TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 20));
 		}

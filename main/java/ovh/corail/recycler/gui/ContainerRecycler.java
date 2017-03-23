@@ -1,4 +1,4 @@
-package ovh.corail.recycler.container;
+package ovh.corail.recycler.gui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
