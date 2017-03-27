@@ -5,11 +5,14 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import ovh.corail.recycler.core.Main;
-import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class ButtonRecycler extends GuiButton {
 	private TileEntityRecycler invent;
+	private int textureX=182;
+	private int textureY=0;
+	private int buttonHeight = 14;
+	private int buttonWidth = 74;
 
 	public ButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, TileEntityRecycler invent) {
 		super(buttonId, x, y, widthIn, heightIn, buttonText);
@@ -18,10 +21,8 @@ public class ButtonRecycler extends GuiButton {
 
 	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 		if (this.visible) {
-			int buttonHeight = 14;
-			int buttonWidth = 74;
 			FontRenderer fontrenderer = mc.fontRenderer;
-			mc.getTextureManager().bindTexture(ConfigurationHandler.fancyGui ? Main.textureFancyRecycler : Main.textureVanillaRecycler);
+			mc.getTextureManager().bindTexture(Main.textureVanillaRecycler);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width	&& mouseY < this.yPosition + this.height;
 			int isHovered = this.getHoverState(this.hovered);
@@ -30,8 +31,9 @@ public class ButtonRecycler extends GuiButton {
 			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,	GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 			/** texture height to read the button */
 			int readButton = (!enabled?28:(isHovered==2?14:0));
-			this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 183 + readButton, this.width / 2, this.height);
-			this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, buttonWidth - this.width / 2, 183 + readButton, this.width / 2, this.height);
+			int halfWidth = width / 2;
+			drawTexturedModalRect(xPosition, yPosition, textureX, textureY + readButton, halfWidth, height);
+			drawTexturedModalRect(xPosition + halfWidth, yPosition, textureX + buttonWidth - halfWidth, textureY + readButton, halfWidth, height);
 			this.mouseDragged(mc, mouseX, mouseY);
 			int j = 14737632;
 

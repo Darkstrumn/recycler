@@ -246,7 +246,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			this.setInventorySlotContents(1, diskStack);
 		}
 		/** play sound */
-		if (!ConfigurationHandler.soundOff) {
+		if (ConfigurationHandler.allowSound) {
 			PacketHandler.INSTANCE.sendToAllAround(new SoundMessage(getPos(), 0),
 					new TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 20));
 		}
@@ -341,7 +341,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			}
 			countTicks = maxTicks;
 			/** play sound */
-		} else if (!ConfigurationHandler.soundOff && cantRecycleTicks<=1 && countTicks%15==0) {
+		} else if (ConfigurationHandler.allowSound && cantRecycleTicks<=1 && countTicks%15==0) {
 			PacketHandler.INSTANCE.sendToAllAround(new SoundMessage(getPos(), 1),
 				new TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 20));
 		}

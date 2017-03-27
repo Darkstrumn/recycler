@@ -29,4 +29,9 @@ public class ItemRecyclingBook extends Item {
         return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
     }
 	
+	@Override
+	public boolean hasEffect(ItemStack stack) {
+		return true;
+	}
+	
 }

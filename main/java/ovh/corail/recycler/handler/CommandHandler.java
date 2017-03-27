@@ -25,7 +25,6 @@ public class CommandHandler implements ICommand {
 	public CommandHandler() {
 		aliases.add("recycler");
 		aliases.add("corail");
-		commands.add("exportRecyclingRecipes");
 		commands.add("exportCraftingRecipes");
 		commands.add("addRecipe");
 		commands.add("removeRecipe");
@@ -44,10 +43,9 @@ public class CommandHandler implements ICommand {
 	@Override
 	public String getUsage(ICommandSender sender) {
 		// TODO translate
-		return "recycler ExportRecyclingRecipe|exportCraftingRecipes|addRecipe|removeRecipe\n" + 
-		"exportRecyclingRecipes   - create a json file in the config directory with the list of all items that are allowed to recycle\n" +
-		"exportCraftingRecipes    - create a json file in the config directory with the list of all reverse crafting recipes" + 
-		"addRecipe    - add the recycling recipe of the crafting result of the item hold in main hand\n" + 
+		return "recycler <command>\n" + 
+		"exportCraftingRecipes - save the list of all crafting recipes in \"recycling\" format in the config directory" + 
+		"addRecipe - add the recycling recipe of the crafting result of the item hold in main hand\n" + 
 		"removeRecipe - remove the recycling recipe of the item hold in main hand";
 	}
 
@@ -67,9 +65,7 @@ public class CommandHandler implements ICommand {
 			Helper.sendMessage("message.command.invalidArgument", (EntityPlayer) sender, true);
 			return;
 		}
-		if (args[0].equals("exportRecyclingRecipes")) {
-			processExportRecyclingRecipes(world, sender);
-		} else if (args[0].equals("exportCraftingRecipes")) {
+		if (args[0].equals("exportCraftingRecipes")) {
 			processExportCraftingRecipes(world, sender);	
 		} else if (args[0].equals("addRecipe")) {
 			processAddRecipe(world, sender);
@@ -108,32 +104,12 @@ public class CommandHandler implements ICommand {
 		List<JsonRecyclingRecipe> list = new ArrayList<JsonRecyclingRecipe>();
 		for (int i = 0 ; i < craftingList.size() ; i++) {
 			/* only recipes not in the recycler */
-			if (!craftingList.get(i).getRecipeOutput().isEmpty() && rm.hasRecipe(craftingList.get(i).getRecipeOutput()) == -1) {
+			/*if (!craftingList.get(i).getRecipeOutput().isEmpty() && rm.hasRecipe(craftingList.get(i).getRecipeOutput()) == -1) {
 				list.add(rm.convertRecipeToJson(rm.convertCraftingRecipe(craftingList.get(i))));
-			}
+			}*/
 
 		}
 		File exportFile = new File(ConfigurationHandler.getConfigDir(), "export_crafting_recipes.json");
-		EntityPlayer player = (EntityPlayer) sender;
-		Helper.sendMessage(list.size() + " " + Helper.getTranslation("message.command.recipesFound"), player, false);
-		boolean success = rm.saveAsJson(exportFile, list);
-		if (success) {
-			Helper.sendMessage("message.command.exportSucceeded", player, true);
-		} else {
-			Helper.sendMessage("message.command.exportFailed", player, true);
-		}
-	}
-	
-	private void processExportRecyclingRecipes(World world, ICommandSender sender) {
-		RecyclingManager rm = RecyclingManager.getInstance();
-		RecyclingRecipe cr;
-		List<JsonRecyclingRecipe> list = new ArrayList<JsonRecyclingRecipe>();
-		for (int i = 0 ; i < rm.getRecipesCount() ; i++) {
-			cr = rm.getRecipe(i);
-			if (!cr.isAllowed() || (cr.isUnbalanced() && !ConfigurationHandler.unbalancedRecipes)) { continue; }
-			list.add(rm.convertRecipeToJson(cr));
-		}
-		File exportFile = new File(ConfigurationHandler.getConfigDir(), "export_recycling_recipes.json");
 		EntityPlayer player = (EntityPlayer) sender;
 		Helper.sendMessage(list.size() + " " + Helper.getTranslation("message.command.recipesFound"), player, false);
 		boolean success = rm.saveAsJson(exportFile, list);

@@ -10,7 +10,7 @@ import ovh.corail.recycler.gui.SlotVisual;
 
 public class VisualManager {
 	private List<SlotVisual> visual = Lists.newArrayList();
-	private int dimCase = 16;
+	private int dimCase = 18;
 	
 	public VisualManager() {
 		

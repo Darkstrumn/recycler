@@ -1,5 +1,6 @@
 package ovh.corail.recycler.gui;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -129,6 +131,28 @@ public class GuiRecyclingBook extends GuiScreen {
 		drawTexturedModalRect(posX, posY, 0, 0, bookWidth, bookHeight);
     }
 	
+	/** draw the text on the left with transparent black background */
+	// TODO scale?
+	private void drawFilledStringOnLeft(FontRenderer fontRendererIn, String text, int x, int y, int color) {
+		int textWidth = fontRendererIn.getStringWidth(text);
+		int colorBg = new Color(0, 0, 0, 60).getRGB();
+		int spacing = fontRendererIn.FONT_HEIGHT/6;
+		int posLeft =  x - textWidth;
+		drawRect(posLeft-spacing, y-spacing, posLeft + textWidth+(2*spacing), y + fontRendererIn.FONT_HEIGHT+(2*spacing), colorBg);
+		fontRenderer.drawStringWithShadow(text, (float)posLeft+1, (float)y+1, color);
+	}
+	
+	/** draw the text centered with transparent black background */
+	private void drawFilledStringCentered(FontRenderer fontRendererIn, String text, int x, int y, int color) {
+		int textWidth = fontRendererIn.getStringWidth(text);
+		int colorBg = new Color(0, 0, 0, 60).getRGB();
+		int spacing = fontRendererIn.FONT_HEIGHT/4;
+		int posLeft = x - (textWidth/2);
+		drawRect(posLeft-spacing, y-spacing, posLeft + textWidth+(2*spacing), y + fontRendererIn.FONT_HEIGHT+(2*spacing), colorBg);
+		fontRenderer.drawStringWithShadow(text, (float)posLeft+1, (float)y+1, color);
+	}
+	
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float par3) {
 		drawDefaultBackground();
@@ -155,6 +179,7 @@ public class GuiRecyclingBook extends GuiScreen {
 				drawString(fontRenderer, stack.getDisplayName(), (int) Math.floor((slotPos.x - 2) * oldScale), (int) Math.floor((slotPos.y - dimCase - 6) * oldScale), 13938487);
 			}
 		}
+		drawFilledStringOnLeft(fontRenderer, (pm.getPageNum()+1) + "/" + pm.getPageCount(), (int) Math.floor((posX+214)*oldScale), (int) Math.floor((posY+120)*oldScale), 13938487);
 		GL11.glScaled(oldScale, oldScale, oldScale);
 		for (int slot = 0 ; slot < visual.getVisualCount() ; slot++) {
 			slotPos = visual.getPosInVisual(slot);
@@ -162,7 +187,7 @@ public class GuiRecyclingBook extends GuiScreen {
 		}
 		RenderHelper.disableStandardItemLighting();
 		/** title of the book */
-		drawCenteredString(fontRenderer, (TextFormatting.BOLD + Helper.getTranslation("item.recycling_book.name")+TextFormatting.WHITE), (width/2), (posY-10), 13938487);
+		drawFilledStringCentered(fontRenderer, (TextFormatting.BOLD + Helper.getTranslation("item.recycling_book.name")+TextFormatting.WHITE), (width/2), (posY-10), 13938487);
 		/** draw search box */
 		searchBox.drawTextBox();
 		/** draw buttons */
@@ -186,7 +211,7 @@ public class GuiRecyclingBook extends GuiScreen {
 	
 	private void displayGrid(Point pos) {
 		mc.getTextureManager().bindTexture(Main.textureVanillaRecycler);
-		drawTexturedModalRect(pos.x, pos.y, 240, dimCase, dimCase, dimCase);
+		drawTexturedModalRect(pos.x, pos.y, 240, 58, dimCase, dimCase);
 	}
 	
 	public void refreshVisual() {

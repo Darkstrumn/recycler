@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import ovh.corail.recycler.handler.ConfigurationHandler;
+
 public class PageManager {
 	private List<List<RecyclingRecipe>> pages;
 	private int pageNum;
@@ -41,6 +43,12 @@ public class PageManager {
 			list = RecyclingManager.getInstance().recipes;
 		} else {
 			list = getSubList(RecyclingManager.getInstance().recipes, search);
+		}
+		/** skip disabled recipes */
+		for (int i = 0 ; i < list.size() ; i++) {
+			if (!list.get(i).isAllowed() || (list.get(i).isUnbalanced() && !ConfigurationHandler.unbalancedRecipes)) {
+				list.remove(i);
+			}
 		}
 		pages = Lists.newArrayList();
 		int pageCount = (int) Math.ceil(list.size()/(double)itemByPage);
