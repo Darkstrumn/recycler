@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
@@ -13,6 +14,7 @@ public class ButtonRecycler extends GuiButton {
 	private int textureY=0;
 	private int buttonHeight = 14;
 	private int buttonWidth = 74;
+	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
 
 	public ButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, TileEntityRecycler invent) {
 		super(buttonId, x, y, widthIn, heightIn, buttonText);
@@ -22,7 +24,7 @@ public class ButtonRecycler extends GuiButton {
 	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 		if (this.visible) {
 			FontRenderer fontrenderer = mc.fontRenderer;
-			mc.getTextureManager().bindTexture(Main.textureVanillaRecycler);
+			mc.getTextureManager().bindTexture(textureVanillaRecycler);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width	&& mouseY < this.yPosition + this.height;
 			int isHovered = this.getHoverState(this.hovered);

@@ -40,6 +40,7 @@ public class RecyclingManager {
 	private File unbalancedFile = new File(ConfigurationHandler.getConfigDir(), "unbalanced_recipes.json");
 	private File blacklistFile = new File(ConfigurationHandler.getConfigDir(), "blacklist_recipes.json");
 	private File userDefinedFile = new File(ConfigurationHandler.getConfigDir(), "user_defined_recipes.json");
+	private File grindFile = new File(ConfigurationHandler.getConfigDir(), "converted_grind.json");
 
 	public static RecyclingManager getInstance() {
 		return instance;
@@ -243,7 +244,7 @@ public class RecyclingManager {
 			/** smaller units for damaged items and when losses chance */
 			if (half || (stack.isItemDamaged() && hasGrind(currentStack))) {
 				currentStack = getGrind(currentStack);
-				// TODO check for input amount > 1 for grind 
+				// TODO check for input amount > 1 for grind (couldn't be)
 				currentSize *= currentStack.getCount();
 				double pourcent = (double) (stack.getMaxDamage() - (stack.getItemDamage())) / (double) stack.getMaxDamage();
 				currentSize = (int) Math.floor(currentSize * pourcent);
@@ -269,15 +270,31 @@ public class RecyclingManager {
 		}
 		return itemsList;
 	}
-	// TODO Make in json format
+
 	private void loadGrindList() {
-		grindList.add(Lists.newArrayList(new ItemStack(Items.IRON_INGOT, 1, 0), new ItemStack(Items.field_191525_da, 9, 0))); /** iron nugget */
-		grindList.add(Lists.newArrayList(new ItemStack(Items.GOLD_INGOT, 1, 0), new ItemStack(Items.GOLD_NUGGET, 9, 0)));
-		grindList.add(Lists.newArrayList(new ItemStack(Items.LEATHER, 1, 0), new ItemStack(Items.RABBIT_HIDE, 4, 0)));
-		for (int i = 0 ; i < 6 ; i++) {
-			grindList.add(Lists.newArrayList(new ItemStack(Blocks.PLANKS, 1, i), new ItemStack(Items.STICK, 4 ,0)));
+		List<List<String>> jsonStringList;
+		if (!grindFile.exists()) {
+			jsonStringList = Lists.newArrayList();
+			jsonStringList.add(Lists.newArrayList("minecraft:diamond:1:0", "recycler:diamond_fragment:9:0"));
+			jsonStringList.add(Lists.newArrayList("minecraft:iron_ingot:1:0", "minecraft:iron_nugget:9:0"));
+			jsonStringList.add(Lists.newArrayList("minecraft:gold_ingot:1:0", "minecraft:gold_nugget:9:0"));
+			jsonStringList.add(Lists.newArrayList("minecraft:leather:1:0", "minecraft:rabbit_hide:4:0"));
+			for (int i = 0 ; i < 6 ; i++) {
+				jsonStringList.add(Lists.newArrayList("minecraft:planks:1:"+i, "minecraft:stick:4:0"));
+			}
+			saveAsJson(grindFile, jsonStringList);
+		} else {
+			Type token = new TypeToken<List<List<String>>>() {}.getType();
+			jsonStringList = (List<List<String>>) loadAsJson(grindFile, token);
 		}
-		
+		ItemStack input, output;
+		for (List<String> grindStringList : jsonStringList) {
+			input = StringToItemStack(grindStringList.get(0));
+			output = StringToItemStack(grindStringList.get(1));
+			if (!input.isEmpty() && !output.isEmpty()) {
+				grindList.add(Lists.newArrayList(input, output));
+			}
+		}	
 	}
 
 	public boolean hasGrind(ItemStack stack) {
@@ -340,7 +357,7 @@ public class RecyclingManager {
 		}
 		return list;
 	}
-	
+
 	private void loadUserDefinedRecipes() {
 		List<JsonRecyclingRecipe> jsonRecipesList;
 		if (!userDefinedFile.exists()) {

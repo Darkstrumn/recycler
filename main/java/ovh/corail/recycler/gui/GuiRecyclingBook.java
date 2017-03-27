@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
@@ -31,6 +32,8 @@ public class GuiRecyclingBook extends GuiScreen {
 	private VisualManager visual = new VisualManager();
 	private GuiTextField searchBox;
 	private ItemStack currentBook;
+	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
+	public static ResourceLocation textureRecyclingBook = new ResourceLocation(Main.MOD_ID + ":textures/gui/book.png");
 	
 	public GuiRecyclingBook() {
 		super();
@@ -125,7 +128,7 @@ public class GuiRecyclingBook extends GuiScreen {
     public void drawDefaultBackground() {
         //super.drawDefaultBackground();
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.getTextureManager().bindTexture(Main.textureRecyclingBook);
+        mc.getTextureManager().bindTexture(textureRecyclingBook);
         int posX = (int) ((this.width - this.bookWidth) / 2.0D);
 		int posY = (int) ((this.height - this.bookHeight) / 2.0D);
 		drawTexturedModalRect(posX, posY, 0, 0, bookWidth, bookHeight);
@@ -210,7 +213,7 @@ public class GuiRecyclingBook extends GuiScreen {
 	}
 	
 	private void displayGrid(Point pos) {
-		mc.getTextureManager().bindTexture(Main.textureVanillaRecycler);
+		mc.getTextureManager().bindTexture(textureVanillaRecycler);
 		drawTexturedModalRect(pos.x, pos.y, 240, 58, dimCase, dimCase);
 	}
 	

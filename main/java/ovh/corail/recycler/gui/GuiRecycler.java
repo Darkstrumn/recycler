@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
@@ -34,6 +35,7 @@ public class GuiRecycler extends GuiContainer {
 	private float oldMouseX;
 	private float oldMouseY;
 	private int inputMax;
+	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
 	
 	public GuiRecycler(EntityPlayer player, World world, int x, int y, int z, TileEntityRecycler inventory) {
 		super(new ContainerRecycler(player, world, x, y, z, inventory));
@@ -71,7 +73,7 @@ public class GuiRecycler extends GuiContainer {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		//GL11.glScalef(1F, 1F, 1F);
 		/** recycler texture */
-		mc.renderEngine.bindTexture(Main.textureVanillaRecycler);
+		mc.renderEngine.bindTexture(textureVanillaRecycler);
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, this.xSize, this.ySize);
 		/** draw slots */
 		int dimCase = 18;
@@ -119,7 +121,7 @@ public class GuiRecycler extends GuiContainer {
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-		mc.renderEngine.bindTexture(Main.textureVanillaRecycler);
+		mc.renderEngine.bindTexture(textureVanillaRecycler);
 		/** arrow in background */
 		drawTexturedModalRect(85, 28, 207, 46, 22, 15);
 		/** progress bar */
@@ -158,10 +160,8 @@ public class GuiRecycler extends GuiContainer {
 		super.actionPerformed(button);
 		switch (button.id) {
 		case 0: /** Recycle */
-			PacketHandler.INSTANCE.sendToServer(new RecycleMessage(button.id, inventory.getPos()));
-			if (inventory.recycle(currentPlayer)) {
-				currentPlayer.addStat(Main.achievementFirstRecycle, 1);
-			}
+			PacketHandler.INSTANCE.sendToServer(new RecycleMessage(button.id, inventory.getPos(), currentPlayer.getUniqueID()));
+			inventory.recycle(currentPlayer);
 			break;
 		case 1: /** Switch Working */
 			inventory.setWorking(!this.inventory.isWorking());
