@@ -26,7 +26,7 @@ public class Helper {
 	}
 	
 	public static boolean areItemEqual(ItemStack s1, ItemStack s2) {
-		return s1.isItemEqual(s2) && s1.getMetadata() == s2.getMetadata() && ItemStack.areItemStackTagsEqual(s1, s2);
+		return s1.isItemEqual(s2) && s1.getMetadata() == s2.getMetadata();
 	}
 	
 	public static <T1, T2> boolean existInList(T1 element, List<T2> list) {

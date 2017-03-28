@@ -46,8 +46,8 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
-		return (ItemStack) this.inventory.get(index);
+	public ItemStack getStackInSlot(int slotId) {
+		return slotId >= 0 && slotId < count ? (ItemStack) inventory.get(slotId) : ItemStack.EMPTY;
 	}
 
 	@Override
@@ -183,7 +183,7 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 
 	@Override
 	public boolean isEmpty() {
-		for (ItemStack stack : this.inventory) {
+		for (ItemStack stack : inventory) {
             if (!stack.isEmpty()) {
                 return false;
             }

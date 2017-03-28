@@ -99,7 +99,9 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			Helper.sendLog("try to fill same stacks");
 		}
 		/** each stack of the input List */
-		for (ItemStack stackIn : itemsList) {
+		ItemStack stackIn, stackOut;
+		for (int i = 0 ; i < itemsList.size() ; i++) {
+			stackIn = itemsList.get(i);
 			/** input stack empty or max stacksize */
 			if (stackIn.isEmpty()) {
 				if (simulate) {	minCount--;	}
@@ -115,7 +117,8 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			left = stackIn.getCount();
 			maxSize = stackIn.getMaxStackSize();
 			/** each stack of the output List */
-			for (ItemStack stackOut : resultList) {
+			for (int j = 0 ;  j < resultList.size() ; j++) {
+				stackOut = resultList.get(j);
 				/** output stack empty or max stacksize */
 				if (stackOut.isEmpty() || stackOut.getCount()==stackOut.getMaxStackSize()) { continue; }
 				/** stacks equal and same meta/nbt */
@@ -147,7 +150,9 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 					stackCopy = stackIn.copy();
 					stackCopy.setCount(left);
 					resultList.set(emptySlot, stackCopy);
-					if (simulate) { minCount++; }
+					if (simulate) {
+						minCount++;
+					}
 				/** no empty stack */
 				} else {
 					Helper.sendLog("no empty stack to place the stack left");
@@ -158,6 +163,15 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			if (simulate && minCount <= 0) {
 				Helper.sendLog("SUCCESS");
 				return true;
+			}
+			itemsList.set(i, ItemStack.EMPTY);
+		}
+		/** add the fullstack left in input */
+		for (ItemStack stack : itemsList) {
+			if (!stack.isEmpty() && emptySlots.size() > 0) {
+				emptySlot = emptySlots.get(0);
+				emptySlots.remove(0);
+				resultList.set(emptySlot, stack.copy());
 			}
 		}
 		/** overwrite the output slots */

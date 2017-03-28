@@ -160,7 +160,7 @@ public class GuiRecycler extends GuiContainer {
 		super.actionPerformed(button);
 		switch (button.id) {
 		case 0: /** Recycle */
-			PacketHandler.INSTANCE.sendToServer(new RecycleMessage(button.id, inventory.getPos(), currentPlayer.getUniqueID()));
+			PacketHandler.INSTANCE.sendToServer(new RecycleMessage(button.id, inventory.getPos()));
 			inventory.recycle(currentPlayer);
 			break;
 		case 1: /** Switch Working */
