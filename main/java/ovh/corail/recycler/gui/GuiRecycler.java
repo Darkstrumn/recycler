@@ -50,6 +50,7 @@ public class GuiRecycler extends GuiContainer {
 		visual.emptyVisual();
 		/** no recipe */
 		if (itemsList.isEmpty() && !inventory.getStackInSlot(0).isEmpty()) {
+			itemsList.clear();
 			itemsList.add(inventory.getStackInSlot(0));
 		}
 		visual.fillVisual(itemsList);

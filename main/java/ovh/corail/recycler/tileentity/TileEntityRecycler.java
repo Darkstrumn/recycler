@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.minecraftforge.fml.relauncher.Side;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
@@ -260,7 +261,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			this.setInventorySlotContents(1, diskStack);
 		}
 		/** play sound */
-		if (ConfigurationHandler.allowSound) {
+		if (Main.proxy.getSide()==Side.SERVER && ConfigurationHandler.allowSound) {
 			PacketHandler.INSTANCE.sendToAllAround(new SoundMessage(getPos(), 0),
 					new TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 20));
 		}
@@ -347,7 +348,7 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			cantRecycleTicks = 0;
 			countTicks = maxTicks;
 		}
-		
+		Side side = Main.proxy.getSide();
 		/** try to recycle */
 		if (countTicks <= 0) {
 			if (!recycle((EntityPlayer) null)) {
@@ -355,15 +356,17 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			}
 			countTicks = maxTicks;
 			/** play sound */
-		} else if (ConfigurationHandler.allowSound && cantRecycleTicks<=1 && countTicks%15==0) {
+		} else if (side==Side.SERVER && ConfigurationHandler.allowSound && cantRecycleTicks<=1 && countTicks%15==0) {
 			PacketHandler.INSTANCE.sendToAllAround(new SoundMessage(getPos(), 1),
 				new TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 20));
 		}
 
 		progress = (int) Math.floor(((double) (maxTicks-countTicks) / (double) maxTicks) * 100.0);
-		PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(getPos(), progress));
-		if (!isWorking) {
-			PacketHandler.INSTANCE.sendToServer(new WorkingMessage(getPos(), false));
+		if (side == Side.CLIENT) {
+			PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(getPos(), progress));
+			if (!isWorking) {
+				PacketHandler.INSTANCE.sendToServer(new WorkingMessage(getPos(), false));
+			}
 		}
 	}
 

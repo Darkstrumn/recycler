@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 
@@ -35,8 +36,7 @@ public class SlotRecycler extends Slot {
 	@Override
 	public void onSlotChanged() {
 		super.onSlotChanged();
-		/** TODO could refresh buttons depending on test */
-		((GuiRecycler)Minecraft.getMinecraft().currentScreen).refreshVisual();
-		((GuiRecycler)Minecraft.getMinecraft().currentScreen).updateButtons();
+		Main.proxy.updateRecyclingScreen();
+		
 	}
 }
