@@ -10,14 +10,14 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
-public class WorkingMessage implements IMessage {
+public class ServerWorkingMessage implements IMessage {
 	private BlockPos currentPos; 
 	private boolean isWorking;
 
-	public WorkingMessage() {
+	public ServerWorkingMessage() {
 	}
 
-	public WorkingMessage(BlockPos currentPos, boolean isWorking) {
+	public ServerWorkingMessage(BlockPos currentPos, boolean isWorking) {
 		this.currentPos = currentPos;
 		this.isWorking = isWorking;
 	}
@@ -34,9 +34,9 @@ public class WorkingMessage implements IMessage {
 		buf.writeBoolean(this.isWorking);
 	}
 	
-	public static class Handler implements IMessageHandler<WorkingMessage, IMessage> {
+	public static class Handler implements IMessageHandler<ServerWorkingMessage, IMessage> {
 		@Override
-		public IMessage onMessage(final WorkingMessage message, final MessageContext ctx) {
+		public IMessage onMessage(final ServerWorkingMessage message, final MessageContext ctx) {
 			IThreadListener mainThread = (IThreadListener) ctx.getServerHandler().player.world;
 			mainThread.addScheduledTask(new Runnable() {
 				@Override

@@ -7,8 +7,9 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import ovh.corail.recycler.handler.PacketHandler;
-import ovh.corail.recycler.packet.ServerProgressMessage;
+import ovh.corail.recycler.packet.ClientProgressMessage;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class ContainerRecycler extends Container {
@@ -33,8 +34,10 @@ public class ContainerRecycler extends Container {
 	public ItemStack slotClick(int slotId, int dragType, ClickType clickType, EntityPlayer player) {
 		ItemStack stack = super.slotClick(slotId, dragType, clickType, player);
 		/** reset progress */
-		if ((slotId == 0 || slotId == 1) && inventory.isWorking()) {
-			PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(inventory.getPos(), 0));
+		if (!inventory.getWorld().isRemote && (slotId == 0 || slotId == 1) && inventory.isWorking()) {
+				inventory.setProgress(0);
+				PacketHandler.INSTANCE.sendToAllAround(new ClientProgressMessage(inventory.getPos(), 0),
+					new TargetPoint(inventory.getWorld().provider.getDimension(), (double) inventory.getPos().getX(), (double) inventory.getPos().getY(), (double) inventory.getPos().getZ(), 12.0d));
 		}
 		return stack;
 	}

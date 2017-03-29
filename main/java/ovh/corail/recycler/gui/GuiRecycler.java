@@ -24,8 +24,8 @@ import ovh.corail.recycler.core.RecyclingRecipe;
 import ovh.corail.recycler.core.VisualManager;
 import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.packet.RecycleMessage;
+import ovh.corail.recycler.packet.ServerWorkingMessage;
 import ovh.corail.recycler.packet.TakeAllMessage;
-import ovh.corail.recycler.packet.WorkingMessage;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class GuiRecycler extends GuiContainer {
@@ -167,7 +167,7 @@ public class GuiRecycler extends GuiContainer {
 		case 1: /** Switch Working */
 			inventory.setWorking(!this.inventory.isWorking());
 			updateButtons();
-			PacketHandler.INSTANCE.sendToServer(new WorkingMessage(inventory.getPos(), inventory.isWorking()));
+			PacketHandler.INSTANCE.sendToServer(new ServerWorkingMessage(inventory.getPos(), inventory.isWorking()));
 			break;
 		case 2: /** Take All */
 			PacketHandler.INSTANCE.sendToServer(new TakeAllMessage(inventory.getPos()));

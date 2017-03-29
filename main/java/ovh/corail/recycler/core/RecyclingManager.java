@@ -219,15 +219,18 @@ public class RecyclingManager {
 			Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
 			if (!enchants.isEmpty()) {
 				Iterator i = enchants.entrySet().iterator();
-				ItemStack currentBook;
 				Enchantment enchant;
 				Integer level;
+				ItemStack currentBook = new ItemStack(Items.ENCHANTED_BOOK);
+				int enchant_nb = 0;
 				while (i.hasNext()) {
 					Map.Entry pair = (Map.Entry)i.next();
 					enchant = (Enchantment) pair.getKey();
 					level = (Integer) pair.getValue();
-					currentBook = new ItemStack(Items.ENCHANTED_BOOK);
 					Items.ENCHANTED_BOOK.addEnchantment(currentBook, new EnchantmentData(enchant, level));
+					enchant_nb++;
+				}
+				if (enchant_nb > 0) {
 					itemsList.add(currentBook);
 				}
 			}

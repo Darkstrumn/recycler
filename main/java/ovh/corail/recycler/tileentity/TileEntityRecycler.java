@@ -16,9 +16,9 @@ import ovh.corail.recycler.core.RecyclingManager;
 import ovh.corail.recycler.core.RecyclingRecipe;
 import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.PacketHandler;
-import ovh.corail.recycler.packet.ServerProgressMessage;
+import ovh.corail.recycler.packet.ClientProgressMessage;
+import ovh.corail.recycler.packet.ClientWorkingMessage;
 import ovh.corail.recycler.packet.SoundMessage;
-import ovh.corail.recycler.packet.WorkingMessage;
 
 public class TileEntityRecycler extends TileEntityInventory implements ITickable {
 
@@ -307,8 +307,6 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		return true;
 	}
 
-
-
 	@Override
 	public void update() {
 		if (world.isRemote || !isWorking) { return; }
@@ -348,7 +346,6 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			cantRecycleTicks = 0;
 			countTicks = maxTicks;
 		}
-		Side side = Main.proxy.getSide();
 		/** try to recycle */
 		if (countTicks <= 0) {
 			if (!recycle((EntityPlayer) null)) {
@@ -356,17 +353,18 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 			}
 			countTicks = maxTicks;
 			/** play sound */
-		} else if (side==Side.SERVER && ConfigurationHandler.allowSound && cantRecycleTicks<=1 && countTicks%15==0) {
+		} else if (ConfigurationHandler.allowSound && cantRecycleTicks<=1 && countTicks%15==0) {
 			PacketHandler.INSTANCE.sendToAllAround(new SoundMessage(getPos(), 1),
 				new TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 20));
 		}
 
 		progress = (int) Math.floor(((double) (maxTicks-countTicks) / (double) maxTicks) * 100.0);
-		if (side == Side.CLIENT) {
-			PacketHandler.INSTANCE.sendToServer(new ServerProgressMessage(getPos(), progress));
-			if (!isWorking) {
-				PacketHandler.INSTANCE.sendToServer(new WorkingMessage(getPos(), false));
-			}
+		/** TODO less packets */
+		PacketHandler.INSTANCE.sendToAllAround(new ClientProgressMessage(getPos(), progress),
+					new TargetPoint(world.provider.getDimension(), (double) getPos().getX(), (double) getPos().getY(), (double) getPos().getZ(), 12.0d));
+		if (!isWorking) {
+			PacketHandler.INSTANCE.sendToAllAround(new ClientWorkingMessage(getPos(), false),
+					new TargetPoint(world.provider.getDimension(), (double) getPos().getX(), (double) getPos().getY(), (double) getPos().getZ(), 12.0d));
 		}
 	}
 
