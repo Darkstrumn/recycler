@@ -4,7 +4,7 @@ import java.io.File;
 
 import net.minecraftforge.common.config.Configuration;
 import ovh.corail.recycler.core.Helper;
-import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.core.ModProps;
 
 public class ConfigurationHandler {
 	public static Configuration config;
@@ -21,7 +21,7 @@ public class ConfigurationHandler {
 		if (!configDir.exists()) {
 			configDir.mkdir();
 		}
-		config = new Configuration(new File(configDir, Main.MOD_ID + ".cfg"), Main.MOD_VER);
+		config = new Configuration(new File(configDir, ModProps.MOD_ID + ".cfg"), ModProps.MOD_VER);
 		config.load();
 		ConfigurationHandler.refreshConfig();
 	}

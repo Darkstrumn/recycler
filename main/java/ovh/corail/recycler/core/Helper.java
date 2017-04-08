@@ -3,20 +3,22 @@ package ovh.corail.recycler.core;
 import java.util.List;
 import java.util.Random;
 
+import com.google.common.collect.Lists;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class Helper {
 	private static Random random = new Random();
@@ -29,28 +31,57 @@ public class Helper {
 		return s1.isItemEqual(s2) && s1.getMetadata() == s2.getMetadata();
 	}
 	
+	/** merge same stack and remove empty */
+	public static List<ItemStack> mergeStackInList(List<ItemStack> itemStackList) {
+		List<ItemStack> outputList = Lists.newArrayList();
+		for (ItemStack stack : itemStackList) {
+			ItemStack currentStack = stack.copy();
+			/** looking for existing same stack */
+			for (int i = 0 ; i < outputList.size() ; i++) {
+				if (currentStack.isEmpty()) { break; }
+				ItemStack lookStack = outputList.get(i).copy();
+				if (lookStack.getCount()==lookStack.getMaxStackSize()) { continue; }
+				if (Helper.areItemEqual(currentStack, lookStack)) {
+					int space = lookStack.getMaxStackSize() - lookStack.getCount();
+					int add = Math.min(space, currentStack.getCount());
+					if (add > 0) {
+						currentStack.shrink(add);
+						lookStack.grow(add);
+						outputList.set(i, lookStack);
+					}
+				}
+			}
+			if (!currentStack.isEmpty()) {
+				outputList.add(currentStack);
+			}
+		}
+		return outputList;
+	}
+	
 	public static <T1, T2> boolean existInList(T1 element, List<T2> list) {
-		if (!(element instanceof ItemStack)) { return list.contains(element); }
 		if (list.isEmpty()) { return false; }
+		if (!(element instanceof ItemStack) && !(element instanceof Item)) { return list.contains(element); }
+		ItemStack stack = element instanceof Item ? new ItemStack((Item) element, 1, 0) : (ItemStack) element;
 		boolean compare;
 		for (T2 elementList : list) {
-			compare = areItemEqual((ItemStack)element, (elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : (ItemStack)elementList ));
+			compare = areItemEqual(stack, (elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : (elementList instanceof Item ? new ItemStack((Item) elementList,1,0) : (ItemStack)elementList )));
 			if (compare) { return true; }
 		}
 		return false;
 	}
 	
 	public static <T1, T2> int indexOfList(T1 element, List<T2> list) {
-		if (!(element instanceof ItemStack)) { return list.indexOf(element); }
+		if (!(element instanceof ItemStack) && !(element instanceof Item)) { return list.indexOf(element); }
 		int index = -1;
 		if (list.isEmpty()) { return index; }
+		ItemStack stack = element instanceof Item ? new ItemStack((Item) element, 1, 0) : (ItemStack) element;
 		boolean compare;
 		for (T2 elementList : list) {
 			index++;
-			compare = areItemEqual((ItemStack)element, (elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : (ItemStack)elementList ));
+			compare = areItemEqual(stack, (elementList instanceof RecyclingRecipe ? ((RecyclingRecipe)elementList).getItemRecipe() : (elementList instanceof Item ? new ItemStack((Item) elementList,1,0) : (ItemStack)elementList )));
 			if (compare) { return index; }
 		}
-		return index;
+		return -1;
 	}
 	
 	public static ItemStack addToInventoryWithLeftover(ItemStack stack, IInventory inventory, boolean simulate) {
@@ -114,7 +145,7 @@ public class Helper {
 	}
 	
 	public static String getTranslation(String message) {
-		return I18n.translateToLocal(message);
+		return I18n.format(message);
 	}
 
 	public static void render() {
@@ -165,17 +196,22 @@ public class Helper {
 
 	public static void getNewRecipes() {
 		/** nugget => ingot */
-		GameRegistry.addRecipe(new ItemStack(Items.DIAMOND, 1),
-				new Object[] { "000", "000", "000", Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1), });
+		GameRegistry.addRecipe(new ItemStack(Items.DIAMOND, 1),	new Object[] { "000", "000", "000", 
+				Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1, 0), 
+		});
 		/** ingot => nugget */
-		GameRegistry.addRecipe(new ItemStack(Main.diamond_fragment, 9),
-				new Object[] { "0", Character.valueOf('0'), new ItemStack(Items.DIAMOND, 1), });
+		GameRegistry.addRecipe(new ItemStack(Main.diamond_fragment, 9), new Object[] { "0", 
+				Character.valueOf('0'), new ItemStack(Items.DIAMOND, 1), 
+		});
 		/** recycler recipe */
-		GameRegistry.addRecipe(new ItemStack(Main.recycler, 1), new Object[] { "000", "111", "000", Character.valueOf('0'),
-				new ItemStack(Blocks.COBBLESTONE, 1), Character.valueOf('1'), new ItemStack(Items.IRON_INGOT, 1), });
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Main.recycler, 1), new Object[] { "000", "111", "000", 
+				Character.valueOf('0'),	"cobblestone",  
+				Character.valueOf('1'), "ingotIron", 
+		}));
 		/** diamond disk recipe */
-		GameRegistry.addRecipe(new ItemStack(Main.diamond_disk, 1),
-				new Object[] { " 0 ", "010", " 0 ", Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1),
-						Character.valueOf('1'), new ItemStack(Items.IRON_INGOT, 1), });	
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Main.diamond_disk, 1),	new Object[] { " 0 ", "010", " 0 ", 
+				Character.valueOf('0'), Main.diamond_fragment,
+				Character.valueOf('1'), "ingotIron", 
+		}));
 	}
 }

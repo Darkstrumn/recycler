@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import ovh.corail.recycler.core.Helper;
-import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.core.ModProps;
 import ovh.corail.recycler.core.PageManager;
 import ovh.corail.recycler.core.RecyclingRecipe;
 import ovh.corail.recycler.core.VisualManager;
@@ -32,8 +32,8 @@ public class GuiRecyclingBook extends GuiScreen {
 	private VisualManager visual = new VisualManager();
 	private GuiTextField searchBox;
 	private ItemStack currentBook;
-	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
-	public static ResourceLocation textureRecyclingBook = new ResourceLocation(Main.MOD_ID + ":textures/gui/book.png");
+	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(ModProps.MOD_ID + ":textures/gui/vanilla_recycler.png");
+	public static ResourceLocation textureRecyclingBook = new ResourceLocation(ModProps.MOD_ID + ":textures/gui/book.png");
 	
 	public GuiRecyclingBook() {
 		super();

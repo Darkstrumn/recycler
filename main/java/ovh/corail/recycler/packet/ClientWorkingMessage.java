@@ -48,7 +48,7 @@ public class ClientWorkingMessage implements IMessage {
 					TileEntity tile = worldIn.getTileEntity(message.currentPos);
 					if (tile == null || !(tile instanceof TileEntityRecycler)) { return ; }
 					TileEntityRecycler recycler = (TileEntityRecycler) worldIn.getTileEntity(message.currentPos);
-   					recycler.setWorking(message.isWorking);
+   					recycler.updateWorking(message.isWorking);
 				}
 			});
 			return null;

@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import ovh.corail.recycler.core.Helper;
-import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.core.ModProps;
 import ovh.corail.recycler.core.RecyclingManager;
 import ovh.corail.recycler.core.RecyclingRecipe;
 import ovh.corail.recycler.core.VisualManager;
@@ -35,7 +35,7 @@ public class GuiRecycler extends GuiContainer {
 	private float oldMouseX;
 	private float oldMouseY;
 	private int inputMax;
-	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
+	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(ModProps.MOD_ID + ":textures/gui/vanilla_recycler.png");
 	
 	public GuiRecycler(EntityPlayer player, World world, int x, int y, int z, TileEntityRecycler inventory) {
 		super(new ContainerRecycler(player, world, x, y, z, inventory));
@@ -50,7 +50,7 @@ public class GuiRecycler extends GuiContainer {
 		visual.emptyVisual();
 		/** no recipe */
 		if (itemsList.isEmpty() && !inventory.getStackInSlot(0).isEmpty()) {
-			itemsList.clear();
+			//itemsList.clear(); FIX#5
 			itemsList.add(inventory.getStackInSlot(0));
 		}
 		visual.fillVisual(itemsList);
@@ -165,7 +165,7 @@ public class GuiRecycler extends GuiContainer {
 			inventory.recycle(currentPlayer);
 			break;
 		case 1: /** Switch Working */
-			inventory.setWorking(!this.inventory.isWorking());
+			inventory.updateWorking(!this.inventory.isWorking());
 			updateButtons();
 			PacketHandler.INSTANCE.sendToServer(new ServerWorkingMessage(inventory.getPos(), inventory.isWorking()));
 			break;

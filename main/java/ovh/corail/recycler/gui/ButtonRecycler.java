@@ -5,7 +5,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.core.ModProps;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class ButtonRecycler extends GuiButton {
@@ -14,7 +14,7 @@ public class ButtonRecycler extends GuiButton {
 	private int textureY=0;
 	private int buttonHeight = 14;
 	private int buttonWidth = 74;
-	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(Main.MOD_ID + ":textures/gui/vanilla_recycler.png");
+	public static ResourceLocation textureVanillaRecycler = new ResourceLocation(ModProps.MOD_ID + ":textures/gui/vanilla_recycler.png");
 
 	public ButtonRecycler(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, TileEntityRecycler invent) {
 		super(buttonId, x, y, widthIn, heightIn, buttonText);

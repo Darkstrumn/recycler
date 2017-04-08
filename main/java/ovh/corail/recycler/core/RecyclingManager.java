@@ -365,7 +365,7 @@ public class RecyclingManager {
 		List<JsonRecyclingRecipe> jsonRecipesList;
 		if (!userDefinedFile.exists()) {
 			jsonRecipesList = new ArrayList<JsonRecyclingRecipe>();
-			jsonRecipesList.add(new JsonRecyclingRecipe(Main.MOD_ID+":recycler:1:0", new String[] { "minecraft:cobblestone:6:0", "minecraft:iron_ingot:3:0", }));
+			jsonRecipesList.add(new JsonRecyclingRecipe(ModProps.MOD_ID+":recycler:1:0", new String[] { "minecraft:cobblestone:6:0", "minecraft:iron_ingot:3:0", }));
 			saveAsJson(userDefinedFile, jsonRecipesList);
 		} else {
 			Type token = new TypeToken<List<JsonRecyclingRecipe>>() {}.getType();
@@ -416,13 +416,17 @@ public class RecyclingManager {
 		JsonRecyclingRecipe jRecipe = new JsonRecyclingRecipe(inputItem, outputItems);
 		return jRecipe;
 	}
-
-	private String ItemStackToString(ItemStack stack) {
-		return stack.getItem().getRegistryName().toString() + ":" + stack.getCount() + ":" + stack.getMetadata();
+	
+	private String ItemStackToString(ItemStack stack, boolean withStackSize) {
+		return stack.getItem().getRegistryName().toString() + (withStackSize ? ":"+stack.getCount() : "") + ":" + stack.getMetadata();
 	}
 	
-	private ItemStack StringToItemStack(String value) {
-		String[] parts = value.split(":");
+	private String ItemStackToString(ItemStack stack) {
+		return ItemStackToString(stack, true);
+	}
+	
+	private ItemStack StringToItemStack(String stringStack) {
+		String[] parts = stringStack.split(":");
 		if (parts.length == 4) {
 			Item item = Item.REGISTRY.getObject(new ResourceLocation(parts[0], parts[1]));
 			if (item != null) {
@@ -433,20 +437,32 @@ public class RecyclingManager {
 
 	}
 	
-	public RecyclingRecipe convertCraftingRecipe(IRecipe iRecipe) {
-		RecyclingRecipe recipe = new RecyclingRecipe(iRecipe.getRecipeOutput());		
+	private ItemStack StringToItemStack(String stringStack, boolean withStackSize) {
+		if (withStackSize) { return StringToItemStack(stringStack); }
+		String[] parts = stringStack.split(":");
+		if (parts.length == 3) {
+			Item item = Item.REGISTRY.getObject(new ResourceLocation(parts[0], parts[1]));
+			if (item != null) {
+				return new ItemStack(item, 1, Integer.valueOf(parts[2]));
+			}
+		}
+		return ItemStack.EMPTY;
+	}
+	
+	public <T extends IRecipe> RecyclingRecipe convertCraftingRecipe(T iRecipe) {
+		List<ItemStack> outputList = Lists.newArrayList();
 		if (iRecipe instanceof ShapedRecipes) {
 			ShapedRecipes craftingRecipe = (ShapedRecipes) iRecipe;
 			for (int j = 0; j < craftingRecipe.recipeItems.length; j++) {
 				if (!craftingRecipe.recipeItems[j].isEmpty()) {
-					recipe.addStack(craftingRecipe.recipeItems[j]);
+					outputList.add(craftingRecipe.recipeItems[j]);
 				}
 			}
 		} else if (iRecipe instanceof ShapelessRecipes) {
 			ShapelessRecipes craftingRecipe = (ShapelessRecipes) iRecipe;
 			for (int j = 0; j < craftingRecipe.recipeItems.size(); j++) {
 				if (!craftingRecipe.recipeItems.get(j).isEmpty()) {
-					recipe.addStack(craftingRecipe.recipeItems.get(j));
+					outputList.add(craftingRecipe.recipeItems.get(j));
 				}
 			}
 		} else if (iRecipe  instanceof ShapedOreRecipe) {
@@ -462,7 +478,7 @@ public class RecyclingManager {
 		            }
 				}
 				if (!currentStack.isEmpty()) {
-					recipe.addStack(currentStack);
+					outputList.add(currentStack);
 				}
 			}
 		} else if (iRecipe  instanceof ShapelessOreRecipe) {
@@ -478,9 +494,15 @@ public class RecyclingManager {
 					}
 				}
 				if (!currentStack.isEmpty()) {
-					recipe.addStack(currentStack);
+					outputList.add(currentStack);
 				}
 			}
+		}
+		/** merge same stack and remove empty */
+		outputList = Helper.mergeStackInList(outputList);
+		RecyclingRecipe recipe = new RecyclingRecipe(iRecipe.getRecipeOutput());
+		for (ItemStack stack : outputList) {
+			recipe.addStack(stack);
 		}
 		recipe.setUnbalanced(false);
 		recipe.setUserDefined(true);
@@ -521,12 +543,6 @@ public class RecyclingManager {
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.PURPUR_PILLAR,1,0), new ItemStack[] { new ItemStack(Blocks.PURPUR_BLOCK,1,0), }));
 		/* end rod */
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.END_ROD,4,0), new ItemStack[] { new ItemStack(Items.BLAZE_ROD,1,0), new ItemStack(Items.CHORUS_FRUIT_POPPED,1,0), }));		
-		/* new boat */
-		recipes.add(new RecyclingRecipe(new ItemStack(Items.SPRUCE_BOAT,1,0), new ItemStack[] { new ItemStack(Blocks.PLANKS,5,1), }));
-		recipes.add(new RecyclingRecipe(new ItemStack(Items.BIRCH_BOAT,1,0), new ItemStack[] { new ItemStack(Blocks.PLANKS,5,2), }));	
-		recipes.add(new RecyclingRecipe(new ItemStack(Items.JUNGLE_BOAT,1,0), new ItemStack[] { new ItemStack(Blocks.PLANKS,5,3), }));
-		recipes.add(new RecyclingRecipe(new ItemStack(Items.ACACIA_BOAT,1,0), new ItemStack[] { new ItemStack(Blocks.PLANKS,5,4), }));
-		recipes.add(new RecyclingRecipe(new ItemStack(Items.DARK_OAK_BOAT,1,0), new ItemStack[] { new ItemStack(Blocks.PLANKS,5,5), }));
 		/* shield */
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.SHIELD,1,0), new ItemStack[] { new ItemStack(Items.IRON_INGOT,1,0), new ItemStack(Blocks.PLANKS,6,0), }));
 		/** block */
@@ -618,8 +634,6 @@ public class RecyclingManager {
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.JUKEBOX,1,0), new ItemStack[] { new ItemStack(Blocks.PLANKS,8,0), new ItemStack(Items.DIAMOND,1,0), }));
 		/* enchantment table */
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.ENCHANTING_TABLE,1,0), new ItemStack[] { new ItemStack(Items.DIAMOND,2,0),	new ItemStack(Blocks.OBSIDIAN,4,0), new ItemStack(Items.BOOK,1,0), }));
-		/* ender chest */
-		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.CHEST,1,0), new ItemStack[] { new ItemStack(Blocks.OBSIDIAN,8,0), new ItemStack(Items.ENDER_EYE,1,0), }));
 		/* beacon */
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.BEACON,1,0), new ItemStack[] { new ItemStack(Blocks.OBSIDIAN,3,0),	new ItemStack(Items.NETHER_STAR,1,0), new ItemStack(Blocks.GLASS,5,0), }));
 		/* anvil */
@@ -648,8 +662,8 @@ public class RecyclingManager {
 		for (int i = 0; i <= 5; i++) {
 			recipes.add(new RecyclingRecipe(new ItemStack(Blocks.WOODEN_SLAB,2,i), new ItemStack[] { new ItemStack(Blocks.PLANKS,1,i), }));
 		}
-		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.WOODEN_SLAB,2,0), new ItemStack[] { new ItemStack(Blocks.STONE,1,0), }));
-		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.WOODEN_SLAB,2,1), new ItemStack[] { new ItemStack(Blocks.SANDSTONE,1,0), }));
+		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.STONE_SLAB,2,0), new ItemStack[] { new ItemStack(Blocks.STONE,1,0), }));
+		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.STONE_SLAB,2,1), new ItemStack[] { new ItemStack(Blocks.SANDSTONE,1,0), }));
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.STONE_SLAB,2,3), new ItemStack[] { new ItemStack(Blocks.COBBLESTONE,1,0), }));
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.STONE_SLAB,2,4), new ItemStack[] { new ItemStack(Blocks.BRICK_BLOCK,1,0), }));
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.STONE_SLAB,2,5), new ItemStack[] { new ItemStack(Blocks.STONEBRICK,1,0), }));
@@ -855,6 +869,30 @@ public class RecyclingManager {
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.DIAMOND_HELMET,1,0), new ItemStack[] { new ItemStack(Items.DIAMOND,5,0), }));
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.DIAMOND_CHESTPLATE,1,0), new ItemStack[] { new ItemStack(Items.DIAMOND,8,0), }));
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.DIAMOND_LEGGINGS,1,0), new ItemStack[] { new ItemStack(Items.DIAMOND,7,0), }));
+		
+		/** debug duplicated */
+		/*System.out.println("==START_DEBUGGING==");
+		for (int i=0;i<recipes.size();i++) {
+			String index = ItemStackToString(recipes.get(i).getItemRecipe(), false);
+			for (int j=0;j<recipes.size();j++) {
+				if (i!=j && ItemStackToString(recipes.get(j).getItemRecipe(),false).equals(index)) {
+					System.out.println("Duplicated item = "+index);
+				}
+			}
+			int emptyRecipe = 0;
+			if (recipes.get(i).getItemRecipe().isEmpty()) {
+				emptyRecipe++;
+			}
+			if (emptyRecipe>0) { System.out.println(emptyRecipe+" empty recipes"); }
+			int emptyComponent = 0;
+			for (int j=0;j<recipes.get(i).getCount();j++) {
+				if (recipes.get(i).getStack(j).isEmpty()) {
+					emptyComponent++;
+				}
+			}
+			if (emptyComponent>0) { System.out.println(emptyComponent+" empty components"); }
+		}
+		System.out.println("==END_DEBUGGING==");*/
 	}
 	
 }

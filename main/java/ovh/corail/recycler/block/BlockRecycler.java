@@ -15,16 +15,18 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.handler.AchievementHandler;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class BlockRecycler extends Block implements ITileEntityProvider {
 	private static final PropertyDirection FACING = PropertyDirection.create("facing");
-	private static final PropertyBool ENABLED = PropertyBool.create("enabled");
+	public static final PropertyBool ENABLED = PropertyBool.create("enabled");
 	private static String name = "recycler";
 
 	public BlockRecycler() {
@@ -32,18 +34,19 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 		setRegistryName(name);
 		setUnlocalizedName(name);
 		setCreativeTab(Main.tabRecycler);
-		this.isBlockContainer = true;
+		isBlockContainer = true;
 		setHardness(2.0f);
 		setResistance(10.0f);
-		this.blockSoundType = SoundType.STONE;
-		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
+		setLightLevel(0f);
+		blockSoundType = SoundType.STONE;
+		setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(ENABLED, false));
 	}
 	
 	@Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
 		world.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()));
 		EntityPlayer player = (EntityPlayer) placer;
-		player.addStat(Main.achievementPlaceRecycler, 1);
+		player.addStat(AchievementHandler.getAchievement("placeRecycler"), 1);
 		/** place a recycling book in the recycler */
 		TileEntity tile = world.getTileEntity(pos);
 		if (world.getTileEntity(pos) != null && tile instanceof TileEntityRecycler) {
@@ -67,6 +70,11 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState().withProperty(FACING, EnumFacing.getFront(meta & 7)).withProperty(ENABLED, (meta & 8) != 0);
     }
+	
+	@Override
+	public EnumBlockRenderType getRenderType(IBlockState iBlockState) {
+		return EnumBlockRenderType.MODEL;
+	}
 	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {

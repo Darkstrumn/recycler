@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.IModGuiFactory;
 
-public class GuiFactoryRecycler implements IModGuiFactory {
+public class GuiFactory implements IModGuiFactory {
 	@Override
 	public void initialize(Minecraft minecraftInstance) {
 		// TODO Auto-generated method stub
@@ -27,5 +27,15 @@ public class GuiFactoryRecycler implements IModGuiFactory {
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean hasConfigGui() {
+		return true;
+	}
+
+	@Override
+	public GuiScreen createConfigGui(GuiScreen parentScreen) {
+		return new GuiConfigRecycler(parentScreen);
 	}
 }

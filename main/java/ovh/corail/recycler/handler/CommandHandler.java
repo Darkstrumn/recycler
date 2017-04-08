@@ -104,9 +104,9 @@ public class CommandHandler implements ICommand {
 		List<JsonRecyclingRecipe> list = new ArrayList<JsonRecyclingRecipe>();
 		for (int i = 0 ; i < craftingList.size() ; i++) {
 			/* only recipes not in the recycler */
-			/*if (!craftingList.get(i).getRecipeOutput().isEmpty() && rm.hasRecipe(craftingList.get(i).getRecipeOutput()) == -1) {
+			if (!craftingList.get(i).getRecipeOutput().isEmpty() && rm.hasRecipe(craftingList.get(i).getRecipeOutput()) == -1) {
 				list.add(rm.convertRecipeToJson(rm.convertCraftingRecipe(craftingList.get(i))));
-			}*/
+			}
 
 		}
 		File exportFile = new File(ConfigurationHandler.getConfigDir(), "export_crafting_recipes.json");
@@ -123,8 +123,8 @@ public class CommandHandler implements ICommand {
 	private void processAddRecipe(World world, ICommandSender sender) {
 		EntityPlayer player = (EntityPlayer) sender;
 		RecyclingManager rm = RecyclingManager.getInstance();
-		if (player != null && player.getActiveItemStack() != null) {
-			ItemStack stack = player.getActiveItemStack();
+		if (player != null && player.getHeldItemMainhand() != null) {
+			ItemStack stack = player.getHeldItemMainhand();
 			int hasRecipe = Helper.indexOfList(stack, rm.recipes);
 			/** Recipe already in recycler */
 			if (hasRecipe > -1) {
@@ -134,23 +134,31 @@ public class CommandHandler implements ICommand {
 				} else {
 					rm.getRecipe(hasRecipe).setAllowed(true);
 					rm.saveBlacklist();
-					Helper.sendMessage("message.command.addRecipeSuceeded", player, true);
+					Helper.sendMessage("message.command.addRecipeSucceeded", player, true);
 				}
 			} else {
 				/** new recipe added */
+				boolean valid = false;
+				RecyclingRecipe recipe = null;
 				List<IRecipe> craftingList = CraftingManager.getInstance().getRecipeList();
 				for (int i = 0 ; i < craftingList.size() ; i++) {
-					if (craftingList.get(i).getRecipeOutput().isItemEqual(stack)) {
-						RecyclingRecipe recipe = rm.convertCraftingRecipe(craftingList.get(i));
-						rm.addRecipe(recipe);
+					ItemStack o = craftingList.get(i).getRecipeOutput();
+					if (Helper.areItemEqual(o, stack)) {
+						recipe = rm.convertCraftingRecipe(craftingList.get(i));
+						if (recipe.getCount() > 0 && !recipe.getItemRecipe().isEmpty()) {
+							valid = true;
+						}
 						break;
 					}
 				}
-				/** save user defined recipes to json */
-				if (rm.saveUserDefinedRecipes()) {
-					Helper.sendMessage("message.command.addRecipeSuceeded", player, true);
-				} else {
-					Helper.sendMessage("message.command.addRecipeFailed", player, true);
+				/** add recipe and save user defined recipes to json */
+				if (valid) {
+					rm.addRecipe(recipe);
+					if (rm.saveUserDefinedRecipes()) {
+						Helper.sendMessage("message.command.addRecipeSucceeded", player, true);
+					} else {
+						Helper.sendMessage("message.command.addRecipeFailed", player, true);
+					}
 				}
 			}
 		}

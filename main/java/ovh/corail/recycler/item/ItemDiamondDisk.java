@@ -11,6 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.handler.AchievementHandler;
 
 public class ItemDiamondDisk extends Item {
 	private static final String name = "diamond_disk";
@@ -38,6 +39,6 @@ public class ItemDiamondDisk extends Item {
 	
 	@Override
 	public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
-		playerIn.addStat(Main.achievementBuildDisk, 1);
+		playerIn.addStat(AchievementHandler.getAchievement("buildDisk"), 1);
 	}
 }

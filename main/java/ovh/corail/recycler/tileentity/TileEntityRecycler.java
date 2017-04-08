@@ -4,12 +4,14 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
+import ovh.corail.recycler.block.BlockRecycler;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 import ovh.corail.recycler.core.RecyclingManager;
@@ -337,11 +339,11 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		if (cantRecycleTicks > 40) {
 			/** no input item or no disk */
 			if (getStackInSlot(0).isEmpty() || getStackInSlot(1).isEmpty()) {
-				isWorking = false;
+				this.updateWorking(false);
 			}
 			/** no output slot */
 			if (!transferSlotInput()) {
-				isWorking = false;
+				this.updateWorking(false);
 			}
 			cantRecycleTicks = 0;
 			countTicks = maxTicks;
@@ -380,10 +382,12 @@ public class TileEntityRecycler extends TileEntityInventory implements ITickable
 		return countTicks;
 	}
 	
-	public void setWorking(boolean isWorking) {
+	public void updateWorking(boolean isWorking) {
 		this.setProgress(0);
 		this.isWorking = isWorking;
-
+		IBlockState state = world.getBlockState(pos);
+		world.setBlockState(pos, state.withProperty(BlockRecycler.ENABLED, isWorking));
+		//world.getBlockState(pos).getBlock().setLightLevel(isWorking?0.5f:0f);
 	}
 	
 	public void setProgress(int progress) {
