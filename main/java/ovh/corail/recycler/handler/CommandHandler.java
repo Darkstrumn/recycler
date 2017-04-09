@@ -143,6 +143,7 @@ public class CommandHandler implements ICommand {
 				List<IRecipe> craftingList = CraftingManager.getInstance().getRecipeList();
 				for (int i = 0 ; i < craftingList.size() ; i++) {
 					ItemStack o = craftingList.get(i).getRecipeOutput();
+					/** TODO damaged items ! */
 					if (Helper.areItemEqual(o, stack)) {
 						recipe = rm.convertCraftingRecipe(craftingList.get(i));
 						if (recipe.getCount() > 0 && !recipe.getItemRecipe().isEmpty()) {
@@ -159,6 +160,8 @@ public class CommandHandler implements ICommand {
 					} else {
 						Helper.sendMessage("message.command.addRecipeFailed", player, true);
 					}
+				} else {
+					Helper.sendMessage("message.command.addRecipeFailed", player, true);
 				}
 			}
 		}
