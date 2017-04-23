@@ -3,6 +3,7 @@ package ovh.corail.recycler.core;
 import static ovh.corail.recycler.core.ModProps.MOD_ID;
 import static ovh.corail.recycler.core.ModProps.MOD_NAME;
 import static ovh.corail.recycler.core.ModProps.MOD_VER;
+import static ovh.corail.recycler.core.ModProps.MOD_UPDATE;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -25,7 +26,7 @@ import ovh.corail.recycler.item.ItemDiamondDisk;
 import ovh.corail.recycler.item.ItemDiamondFragment;
 import ovh.corail.recycler.item.ItemRecyclingBook;
 
-@Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VER, guiFactory = "ovh.corail." + MOD_ID + ".gui.GuiFactory")
+@Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VER, updateJSON = MOD_UPDATE, guiFactory = "ovh.corail." + MOD_ID + ".gui.GuiFactory")
 public class Main {
 	@Instance(MOD_ID)
 	public static Main instance;

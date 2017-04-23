@@ -25,7 +25,7 @@ public class AchievementHandler {
 	private static void addAchievement(String name, int col, int row, Item icon, String parent) {
 		String upperName = name.substring(0,1).toUpperCase()+name.substring(1);
 		String lowerName = name.substring(0,1).toLowerCase()+name.substring(1);
-		achievements.put(lowerName, new Achievement("achievement."+upperName, upperName, row, col, icon, achievements.get(parent)));
+		achievements.put(lowerName, new Achievement("achievement."+upperName, upperName, row, col, icon, achievements.get(parent)).registerStat());
 		achievementCount++;
 	}
 	
