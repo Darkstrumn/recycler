@@ -1,14 +1,14 @@
 [
 {
   "modid": "recycler",
-  "name": "\u00A75\u00A7lCorail Recycleur",
-  "description": "\u00A7eAdd a new recycling table with json recipes.",
+  "name": "Corail Recycleur",
+  "description": "\u00A7eAdd an recycling table with lots of way to customize the recipes.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "http://minecraft.curseforge.com/projects/corail-recycler",
   "updateUrl": "http://minecraft.curseforge.com/projects/corail-recycler/files",
   "authorList": ["\u00A79Corail", "\u00A79MrRiegel"],
-  "credits": "\u00A7oThe Forge and FML guys, for making this example",
+  "credits": "\u00A7oSpecial thanks to The Forge and FML guys.",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
