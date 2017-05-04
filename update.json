@@ -2,34 +2,34 @@
   "homepage": "https://minecraft.curseforge.com/projects/corail-recycler/files/",
   "1.11.2": {
     "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.4": "Minor Fix and console commands improved"
+    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes"
   },
   "1.10.2": {
     "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.4": "Minor Fix and console commands improved"
+    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes"
   },
   "1.9.4": {
     "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.4": "Minor Fix and console commands improved"
+    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes"
   },
   "1.9.0": {
     "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.4": "Minor Fix and console commands improved"
+    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes"
   },
   "1.8.9": {
     "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.4": "Minor Fix and console commands improved"
+    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes"
   },
   "promos": {
-    "1.11.2-latest": "1.4.5",
-    "1.11.2-recommended": "1.4.5",
-	"1.10.2-latest": "1.4.5",
-    "1.10.2-recommended": "1.4.5",
-	"1.9.4-latest": "1.4.5",
-    "1.9.4-recommended": "1.4.5",
-	"1.9.0-latest": "1.4.5",
-    "1.9.0-recommended": "1.4.5",
-	"1.8.9-latest": "1.4.5",
-    "1.8.9-recommended": "1.4.5"
+    "1.11.2-latest": "1.4.6",
+    "1.11.2-recommended": "1.4.6",
+	"1.10.2-latest": "1.4.6",
+    "1.10.2-recommended": "1.4.6",
+	"1.9.4-latest": "1.4.6",
+    "1.9.4-recommended": "1.4.6",
+	"1.9.0-latest": "1.4.6",
+    "1.9.0-recommended": "1.4.6",
+	"1.8.9-latest": "1.4.6",
+    "1.8.9-recommended": "1.4.6"
   }
 }
