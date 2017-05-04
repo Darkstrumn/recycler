@@ -178,7 +178,7 @@ public class RecyclingManager {
 		while (i.hasNext()) {
 			Map.Entry pair = (Map.Entry)i.next();
 			enchant = (Enchantment) pair.getKey();
-			if (enchant.getRegistryName().getResourcePath().equals("binding_curse")) {
+			if (enchant != null && enchant.getRegistryName().getResourcePath().equals("binding_curse")) {
 				return -1;
 			}
 			i.remove();
@@ -467,8 +467,8 @@ public class RecyclingManager {
 			}
 		} else if (iRecipe  instanceof ShapedOreRecipe) {
 			ShapedOreRecipe craftingRecipe = (ShapedOreRecipe) iRecipe;
-			ItemStack currentStack = ItemStack.EMPTY;
 			for (int j = 0; j < craftingRecipe.getInput().length; j++) {
+				ItemStack currentStack = ItemStack.EMPTY;
 				if (craftingRecipe.getInput()[j] instanceof ItemStack) {
 					currentStack = (ItemStack) craftingRecipe.getInput()[j];
 				} else if (craftingRecipe.getInput()[j] instanceof List) {
@@ -482,9 +482,9 @@ public class RecyclingManager {
 				}
 			}
 		} else if (iRecipe  instanceof ShapelessOreRecipe) {
-			ShapelessOreRecipe craftingRecipe = (ShapelessOreRecipe) iRecipe;
-			ItemStack currentStack = ItemStack.EMPTY;
+			ShapelessOreRecipe craftingRecipe = (ShapelessOreRecipe) iRecipe;	
 			for (int j = 0; j < craftingRecipe.getInput().size(); j++) {
+				ItemStack currentStack = ItemStack.EMPTY;
 				if (craftingRecipe.getInput().get(j) instanceof ItemStack) {
 					currentStack = (ItemStack) craftingRecipe.getInput().get(j);
 				} else if (craftingRecipe.getInput().get(j) instanceof List) {
@@ -497,7 +497,7 @@ public class RecyclingManager {
 					outputList.add(currentStack);
 				}
 			}
-		}
+		}	
 		/** merge same stack and remove empty */
 		outputList = Helper.mergeStackInList(outputList);
 		RecyclingRecipe recipe = new RecyclingRecipe(iRecipe.getRecipeOutput());

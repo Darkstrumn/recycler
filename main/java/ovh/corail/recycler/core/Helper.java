@@ -34,18 +34,22 @@ public class Helper {
 	/** merge same stack and remove empty */
 	public static List<ItemStack> mergeStackInList(List<ItemStack> itemStackList) {
 		List<ItemStack> outputList = Lists.newArrayList();
-		for (ItemStack stack : itemStackList) {
+		for (ItemStack stack : itemStackList) {	
 			ItemStack currentStack = stack.copy();
 			/** looking for existing same stack */
 			for (int i = 0 ; i < outputList.size() ; i++) {
 				if (currentStack.isEmpty()) { break; }
 				ItemStack lookStack = outputList.get(i).copy();
-				if (lookStack.getCount()==lookStack.getMaxStackSize()) { continue; }
+				if (lookStack.isEmpty() || lookStack.getCount()==lookStack.getMaxStackSize()) { continue; }
 				if (Helper.areItemEqual(currentStack, lookStack)) {
 					int space = lookStack.getMaxStackSize() - lookStack.getCount();
 					int add = Math.min(space, currentStack.getCount());
 					if (add > 0) {
-						currentStack.shrink(add);
+						if (add >= currentStack.getCount()) {
+							currentStack = ItemStack.EMPTY;
+						} else {
+							currentStack.shrink(add);
+						}
 						lookStack.grow(add);
 						outputList.set(i, lookStack);
 					}
