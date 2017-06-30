@@ -25,8 +25,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -70,13 +72,15 @@ public class RecyclingManager {
 			stringlist = new ArrayList<String>();
 			stringlist.add("minecraft:stone:1:1"); /** granite */
 			stringlist.add("minecraft:stone:1:3"); /** diorite */
-			stringlist.add("minecraft:stone:2:5"); /** andesite */
+			stringlist.add("minecraft:stone:1:5"); /** andesite */
 			stringlist.add("minecraft:paper:1:0"); /** paper */
 			stringlist.add("minecraft:sugar:1:0"); /** sugar */
 			stringlist.add("minecraft:ender_eye:1:0"); /** ender eye */
-			stringlist.add("minecraft:blaze_powder:2:0"); /** blaze powder */
+			stringlist.add("minecraft:blaze_powder:1:0"); /** blaze powder */
 			stringlist.add("minecraft:magma_cream:1:0"); /** magma cream */
-			stringlist.add("minecraft:fire_charge:3:0"); /** fire charge */				
+			stringlist.add("minecraft:fire_charge:1:0"); /** fire charge */
+			stringlist.add("minecraft:red_nether_brick:1:0"); /** red nether brick */
+			stringlist.add("minecraft:magma:1:0"); /** magma block */
 			saveAsJson(unbalancedFile, stringlist);
 		} else {
 			Type token = new TypeToken<List<String>>() {}.getType();
@@ -189,7 +193,6 @@ public class RecyclingManager {
 		}
 		/** enchanted book need 2 enchants to be recycled */
 		if (stack.getItem() instanceof ItemEnchantedBook && enchants.size() < 2) {
-			System.out.println("MAP"+enchants.size());
 			return -1;
 		}
 		/** damaged items */
@@ -231,13 +234,13 @@ public class RecyclingManager {
 				Enchantment enchant;
 				Integer level;
 				if (stack.getItem() instanceof ItemEnchantedBook) {
-					if (enchants.size() < 2) { return itemsList; }
+				if (enchants.size() < 2) { return itemsList; }
 					while (i.hasNext()) {
 						ItemStack currentBook = new ItemStack(Items.ENCHANTED_BOOK);
 						Map.Entry pair = (Map.Entry)i.next();
 						enchant = (Enchantment) pair.getKey();
 						level = (Integer) pair.getValue();
-						Items.ENCHANTED_BOOK.addEnchantment(currentBook, new EnchantmentData(enchant, level));
+						ItemEnchantedBook.addEnchantment(currentBook, new EnchantmentData(enchant, level));
 						itemsList.add(currentBook);
 					}
 				} else {
@@ -246,12 +249,13 @@ public class RecyclingManager {
 						Map.Entry pair = (Map.Entry)i.next();
 						enchant = (Enchantment) pair.getKey();
 						level = (Integer) pair.getValue();
-						Items.ENCHANTED_BOOK.addEnchantment(currentBook, new EnchantmentData(enchant, level));
+						ItemEnchantedBook.addEnchantment(currentBook, new EnchantmentData(enchant, level));
 					}
 					itemsList.add(currentBook);
 				}
 			}
 		}
+		
 		RecyclingRecipe currentRecipe = recipes.get(num_recipe);
 		ItemStack currentStack;
 		Item currentItem;
@@ -467,53 +471,24 @@ public class RecyclingManager {
 	
 	public <T extends IRecipe> RecyclingRecipe convertCraftingRecipe(T iRecipe) {
 		List<ItemStack> outputList = Lists.newArrayList();
+		NonNullList<Ingredient> ingredients = NonNullList.create();
 		if (iRecipe instanceof ShapedRecipes) {
 			ShapedRecipes craftingRecipe = (ShapedRecipes) iRecipe;
-			for (int j = 0; j < craftingRecipe.recipeItems.length; j++) {
-				if (!craftingRecipe.recipeItems[j].isEmpty()) {
-					outputList.add(craftingRecipe.recipeItems[j]);
-				}
-			}
+			ingredients = craftingRecipe.getIngredients();
 		} else if (iRecipe instanceof ShapelessRecipes) {
 			ShapelessRecipes craftingRecipe = (ShapelessRecipes) iRecipe;
-			for (int j = 0; j < craftingRecipe.recipeItems.size(); j++) {
-				if (!craftingRecipe.recipeItems.get(j).isEmpty()) {
-					outputList.add(craftingRecipe.recipeItems.get(j));
-				}
-			}
+			ingredients = craftingRecipe.getIngredients();
 		} else if (iRecipe  instanceof ShapedOreRecipe) {
 			ShapedOreRecipe craftingRecipe = (ShapedOreRecipe) iRecipe;
-			for (int j = 0; j < craftingRecipe.getInput().length; j++) {
-				ItemStack currentStack = ItemStack.EMPTY;
-				if (craftingRecipe.getInput()[j] instanceof ItemStack) {
-					currentStack = (ItemStack) craftingRecipe.getInput()[j];
-				} else if (craftingRecipe.getInput()[j] instanceof List) {
-					Object o = ((List) craftingRecipe.getInput()[j]).get(0);
-					if (o instanceof ItemStack) {
-						currentStack = (ItemStack) o;
-		            }
-				}
-				if (!currentStack.isEmpty()) {
-					outputList.add(currentStack);
-				}
-			}
+			ingredients = craftingRecipe.getIngredients();
 		} else if (iRecipe  instanceof ShapelessOreRecipe) {
-			ShapelessOreRecipe craftingRecipe = (ShapelessOreRecipe) iRecipe;	
-			for (int j = 0; j < craftingRecipe.getInput().size(); j++) {
-				ItemStack currentStack = ItemStack.EMPTY;
-				if (craftingRecipe.getInput().get(j) instanceof ItemStack) {
-					currentStack = (ItemStack) craftingRecipe.getInput().get(j);
-				} else if (craftingRecipe.getInput().get(j) instanceof List) {
-					Object o = ((List) craftingRecipe.getInput().get(j)).get(0);
-					if (o instanceof ItemStack) {
-						currentStack = (ItemStack) o;
-					}
-				}
-				if (!currentStack.isEmpty()) {
-					outputList.add(currentStack);
-				}
-			}
-		}	
+			ShapelessOreRecipe craftingRecipe = (ShapelessOreRecipe) iRecipe;
+			ingredients = craftingRecipe.getIngredients();
+		}
+		for (int j = 0; j < ingredients.size() ; j++) {
+			ItemStack[] stacks = ingredients.get(j).getMatchingStacks();
+			if (stacks.length > 0 && !stacks[0].isEmpty()) { outputList.add(stacks[0]); }
+		}
 		/** merge same stack and remove empty */
 		outputList = Helper.mergeStackInList(outputList);
 		RecyclingRecipe recipe = new RecyclingRecipe(iRecipe.getRecipeOutput());
@@ -795,11 +770,6 @@ public class RecyclingManager {
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.FISHING_ROD,1,0), new ItemStack[] {	new ItemStack(Items.STRING,2,0), new ItemStack(Items.STICK,3,0), }));
 		/** clock */
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.CLOCK,1,0), new ItemStack[] { new ItemStack(Items.GOLD_INGOT,4,0), new ItemStack(Items.REDSTONE,1,0),	}));
-		/** bed */
-		recipes.add(new RecyclingRecipe(new ItemStack(Items.BED,1,0), new ItemStack[] { 
-				new ItemStack(Blocks.WOOL,3,0),
-				new ItemStack(Blocks.PLANKS,3,0),
-		}));
 		/** redstone repeater */
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.REPEATER,1,0), new ItemStack[] { new ItemStack(Blocks.STONE,3,0), new ItemStack(Blocks.REDSTONE_TORCH,2,0), new ItemStack(Items.REDSTONE,1,0), }));
 		/** redstone comparator */
@@ -885,7 +855,16 @@ public class RecyclingManager {
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.DIAMOND_HELMET,1,0), new ItemStack[] { new ItemStack(Items.DIAMOND,5,0), }));
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.DIAMOND_CHESTPLATE,1,0), new ItemStack[] { new ItemStack(Items.DIAMOND,8,0), }));
 		recipes.add(new RecyclingRecipe(new ItemStack(Items.DIAMOND_LEGGINGS,1,0), new ItemStack[] { new ItemStack(Items.DIAMOND,7,0), }));
-		
+		/** 1.12 */
+		for (int i=0 ; i < 16 ; i++) {
+			recipes.add(new RecyclingRecipe(new ItemStack(Blocks.CONCRETE_POWDER,8,i), new ItemStack[] { new ItemStack(Items.DYE,1,15-i), new ItemStack(Blocks.SAND,4,0), new ItemStack(Blocks.GRAVEL,4,0) }));
+		}
+		for (int i=0 ; i < 16 ; i++) {
+			recipes.add(new RecyclingRecipe(new ItemStack(Blocks.BED,1,i), new ItemStack[] { new ItemStack(Blocks.WOOL,3,i), new ItemStack(Blocks.PLANKS,3,i) }));
+		}
+		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.RED_NETHER_BRICK,1,0), new ItemStack[] { new ItemStack(Items.NETHERBRICK,2,0), new ItemStack(Items.NETHER_WART,2,0) }));
+		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.MAGMA,1,0), new ItemStack[] { new ItemStack(Items.MAGMA_CREAM,4,0) }));
+		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.OBSERVER,1,0), new ItemStack[] { new ItemStack(Blocks.COBBLESTONE,6,0), new ItemStack(Items.REDSTONE,2,0), new ItemStack(Items.QUARTZ,1,0) }));
 		/** debug duplicated */
 		/*System.out.println("==START_DEBUGGING==");
 		for (int i=0;i<recipes.size();i++) {

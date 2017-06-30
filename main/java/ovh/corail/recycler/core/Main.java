@@ -17,7 +17,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import ovh.corail.recycler.block.BlockRecycler;
-import ovh.corail.recycler.handler.AchievementHandler;
 import ovh.corail.recycler.handler.CommandHandler;
 import ovh.corail.recycler.handler.EventHandler;
 import ovh.corail.recycler.handler.SoundHandler;
@@ -53,7 +52,7 @@ public class Main {
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		AchievementHandler.initAchievements();
+		//AchievementHandler.initAchievements();
 		MinecraftForge.EVENT_BUS.register(new EventHandler());
 		SoundHandler.registerSounds();
 		proxy.preInit(event);

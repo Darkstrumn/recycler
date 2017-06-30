@@ -15,9 +15,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class Helper {
@@ -190,32 +191,41 @@ public class Helper {
 	}
 	
 	private static void register(Block block) {
-		GameRegistry.register(block);
-		GameRegistry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
+		ForgeRegistries.BLOCKS.register(block);
+		ForgeRegistries.ITEMS.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
 	}
 
 	private static void register(Item item) {
-		GameRegistry.register(item);
+		ForgeRegistries.ITEMS.register(item);
 	}
 
 	public static void getNewRecipes() {
+		ResourceLocation group = new ResourceLocation(ModProps.MOD_ID, "recipes");
 		/** nugget => ingot */
-		GameRegistry.addRecipe(new ItemStack(Items.DIAMOND, 1),	new Object[] { "000", "000", "000", 
-				Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1, 0), 
+		ShapedOreRecipe recipe_diamond_ingot = new ShapedOreRecipe(group, new ItemStack(Items.DIAMOND, 1), new Object[] { "000", "000", "000",  
+			Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1, 0),
 		});
+		recipe_diamond_ingot.setRegistryName(new ResourceLocation(ModProps.MOD_ID, "recipe_diamond_ingot"));
+		ForgeRegistries.RECIPES.register(recipe_diamond_ingot);
 		/** ingot => nugget */
-		GameRegistry.addRecipe(new ItemStack(Main.diamond_fragment, 9), new Object[] { "0", 
-				Character.valueOf('0'), new ItemStack(Items.DIAMOND, 1), 
+		ShapedOreRecipe recipe_diamond_fragment = new ShapedOreRecipe(group, new ItemStack(Main.diamond_fragment, 9), new Object[] { "0", 
+			Character.valueOf('0'), new ItemStack(Items.DIAMOND, 1), 
 		});
+		recipe_diamond_fragment.setRegistryName(new ResourceLocation(ModProps.MOD_ID, "recipe_diamond_fragment"));
+		ForgeRegistries.RECIPES.register(recipe_diamond_fragment);
 		/** recycler recipe */
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Main.recycler, 1), new Object[] { "000", "111", "000", 
-				Character.valueOf('0'),	"cobblestone",  
-				Character.valueOf('1'), "ingotIron", 
-		}));
+		ShapedOreRecipe recipe_recycler = new ShapedOreRecipe(group, new ItemStack(Main.recycler, 1), new Object[] { "000", "111", "000", 
+			Character.valueOf('0'),	"cobblestone",  
+			Character.valueOf('1'), "ingotIron", 
+		});
+		recipe_recycler.setRegistryName(new ResourceLocation(ModProps.MOD_ID, "recipe_recycler"));
+		ForgeRegistries.RECIPES.register(recipe_recycler);
 		/** diamond disk recipe */
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Main.diamond_disk, 1),	new Object[] { " 0 ", "010", " 0 ", 
-				Character.valueOf('0'), Main.diamond_fragment,
-				Character.valueOf('1'), "ingotIron", 
-		}));
+		ShapedOreRecipe recipe_diamond_disk = new ShapedOreRecipe(group, new ItemStack(Main.diamond_disk, 1), new Object[] { " 0 ", "010", " 0 ", 
+			Character.valueOf('0'), Main.diamond_fragment,
+			Character.valueOf('1'), "ingotIron", 
+		});
+		recipe_diamond_disk.setRegistryName(new ResourceLocation(ModProps.MOD_ID, "recipe_diamond_disk"));
+		ForgeRegistries.RECIPES.register(recipe_diamond_disk);
 	}
 }

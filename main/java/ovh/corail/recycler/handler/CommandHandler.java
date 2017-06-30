@@ -2,6 +2,7 @@ package ovh.corail.recycler.handler;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.command.ICommand;
@@ -11,7 +12,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraft.world.World;
 import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.JsonRecyclingRecipe;
@@ -98,14 +101,15 @@ public class CommandHandler implements ICommand {
 	}
 	
 	private void processExportCraftingRecipes(World world, ICommandSender sender) {
-		CraftingManager cm = CraftingManager.func_77594_a();
 		RecyclingManager rm = RecyclingManager.getInstance();
-		List<IRecipe> craftingList = cm.func_77592_b();
+		RegistryNamespaced<ResourceLocation, IRecipe> craftingList = CraftingManager.REGISTRY;
 		List<JsonRecyclingRecipe> list = new ArrayList<JsonRecyclingRecipe>();
-		for (int i = 0 ; i < craftingList.size() ; i++) {
+		Iterator<IRecipe> it = craftingList.iterator();
+		while (it.hasNext()) {
 			/* only recipes not in the recycler */
-			if (!craftingList.get(i).getRecipeOutput().isEmpty() && rm.hasRecipe(craftingList.get(i).getRecipeOutput()) == -1) {
-				list.add(rm.convertRecipeToJson(rm.convertCraftingRecipe(craftingList.get(i))));
+			IRecipe crafting_recipe = (IRecipe) it.next();
+			if (!crafting_recipe.getRecipeOutput().isEmpty() && rm.hasRecipe(crafting_recipe.getRecipeOutput()) == -1) {
+				list.add(rm.convertRecipeToJson(rm.convertCraftingRecipe(crafting_recipe)));
 			}
 
 		}
@@ -140,12 +144,14 @@ public class CommandHandler implements ICommand {
 				/** new recipe added */
 				boolean valid = false;
 				RecyclingRecipe recipe = null;
-				List<IRecipe> craftingList = CraftingManager.func_77594_a().func_77592_b();
-				for (int i = 0 ; i < craftingList.size() ; i++) {
-					ItemStack o = craftingList.get(i).getRecipeOutput();
+				RegistryNamespaced<ResourceLocation, IRecipe> craftingList = CraftingManager.REGISTRY;
+				Iterator<IRecipe> it = craftingList.iterator();
+				while (it.hasNext()) {
+					IRecipe crafting_recipe = (IRecipe) it.next();
+					ItemStack o = crafting_recipe.getRecipeOutput();
 					/** TODO damaged items ! */
 					if (Helper.areItemEqual(o, stack)) {
-						recipe = rm.convertCraftingRecipe(craftingList.get(i));
+						recipe = rm.convertCraftingRecipe(crafting_recipe);
 						if (recipe.getCount() > 0 && !recipe.getItemRecipe().isEmpty()) {
 							valid = true;
 						}
