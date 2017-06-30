@@ -98,9 +98,9 @@ public class CommandHandler implements ICommand {
 	}
 	
 	private void processExportCraftingRecipes(World world, ICommandSender sender) {
-		CraftingManager cm = CraftingManager.getInstance();
+		CraftingManager cm = CraftingManager.func_77594_a();
 		RecyclingManager rm = RecyclingManager.getInstance();
-		List<IRecipe> craftingList = cm.getRecipeList();
+		List<IRecipe> craftingList = cm.func_77592_b();
 		List<JsonRecyclingRecipe> list = new ArrayList<JsonRecyclingRecipe>();
 		for (int i = 0 ; i < craftingList.size() ; i++) {
 			/* only recipes not in the recycler */
@@ -140,7 +140,7 @@ public class CommandHandler implements ICommand {
 				/** new recipe added */
 				boolean valid = false;
 				RecyclingRecipe recipe = null;
-				List<IRecipe> craftingList = CraftingManager.getInstance().getRecipeList();
+				List<IRecipe> craftingList = CraftingManager.func_77594_a().func_77592_b();
 				for (int i = 0 ; i < craftingList.size() ; i++) {
 					ItemStack o = craftingList.get(i).getRecipeOutput();
 					/** TODO damaged items ! */

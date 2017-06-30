@@ -22,6 +22,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
@@ -47,6 +48,10 @@ public class RecyclingManager {
 	}
 	
 	public void loadRecipes() {
+		/** load enchanted book recipe */
+		if (ConfigurationHandler.recycleEnchantedBook) {
+			recipes.add(new RecyclingRecipe(new ItemStack(Items.ENCHANTED_BOOK,1,0), new ItemStack[] { }));
+		}
 		/** load unbalanced recipes */
 		loadUnbalanced();
 		/** load blacklist recipes */
@@ -181,7 +186,11 @@ public class RecyclingManager {
 			if (enchant != null && enchant.getRegistryName().getResourcePath().equals("binding_curse")) {
 				return -1;
 			}
-			i.remove();
+		}
+		/** enchanted book need 2 enchants to be recycled */
+		if (stack.getItem() instanceof ItemEnchantedBook && enchants.size() < 2) {
+			System.out.println("MAP"+enchants.size());
+			return -1;
 		}
 		/** damaged items */
 		ItemStack testStack = stack.copy();
@@ -215,27 +224,34 @@ public class RecyclingManager {
 			return itemsList;
 		}
 		/** check enchants, no loss */
-		if (ConfigurationHandler.enchantedBooks) {
+		if (ConfigurationHandler.recycleEnchantedBook) {
 			Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
 			if (!enchants.isEmpty()) {
 				Iterator i = enchants.entrySet().iterator();
 				Enchantment enchant;
 				Integer level;
-				ItemStack currentBook = new ItemStack(Items.ENCHANTED_BOOK);
-				int enchant_nb = 0;
-				while (i.hasNext()) {
-					Map.Entry pair = (Map.Entry)i.next();
-					enchant = (Enchantment) pair.getKey();
-					level = (Integer) pair.getValue();
-					Items.ENCHANTED_BOOK.addEnchantment(currentBook, new EnchantmentData(enchant, level));
-					enchant_nb++;
-				}
-				if (enchant_nb > 0) {
+				if (stack.getItem() instanceof ItemEnchantedBook) {
+					if (enchants.size() < 2) { return itemsList; }
+					while (i.hasNext()) {
+						ItemStack currentBook = new ItemStack(Items.ENCHANTED_BOOK);
+						Map.Entry pair = (Map.Entry)i.next();
+						enchant = (Enchantment) pair.getKey();
+						level = (Integer) pair.getValue();
+						Items.ENCHANTED_BOOK.addEnchantment(currentBook, new EnchantmentData(enchant, level));
+						itemsList.add(currentBook);
+					}
+				} else {
+					ItemStack currentBook = new ItemStack(Items.ENCHANTED_BOOK);
+					while (i.hasNext()) {
+						Map.Entry pair = (Map.Entry)i.next();
+						enchant = (Enchantment) pair.getKey();
+						level = (Integer) pair.getValue();
+						Items.ENCHANTED_BOOK.addEnchantment(currentBook, new EnchantmentData(enchant, level));
+					}
 					itemsList.add(currentBook);
 				}
 			}
 		}
-		
 		RecyclingRecipe currentRecipe = recipes.get(num_recipe);
 		ItemStack currentStack;
 		Item currentItem;
@@ -725,7 +741,7 @@ public class RecyclingManager {
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.TRAPDOOR,1,0), new ItemStack[] { new ItemStack(Blocks.PLANKS,3,0), }));
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.IRON_TRAPDOOR,1,0), new ItemStack[] { new ItemStack(Items.IRON_INGOT,2,0), }));
 		/** iron bar */
-		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.IRON_BARS,1,0), new ItemStack[] { new ItemStack(Items.field_191525_da,3,0), }));
+		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.IRON_BARS,1,0), new ItemStack[] { new ItemStack(Items.IRON_NUGGET,3,0), }));
 		/** redstone lamp */
 		recipes.add(new RecyclingRecipe(new ItemStack(Blocks.REDSTONE_LAMP,1,0), new ItemStack[] { new ItemStack(Items.REDSTONE,4,0), new ItemStack(Blocks.GLOWSTONE,1,0), }));
 		/** tripwire hook */

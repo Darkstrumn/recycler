@@ -26,7 +26,7 @@ public class ButtonRecycler extends GuiButton {
 			FontRenderer fontrenderer = mc.fontRenderer;
 			mc.getTextureManager().bindTexture(textureVanillaRecycler);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width	&& mouseY < this.yPosition + this.height;
+			this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width	&& mouseY < this.y + this.height;
 			int isHovered = this.getHoverState(this.hovered);
 			GlStateManager.enableBlend();
 			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -34,8 +34,8 @@ public class ButtonRecycler extends GuiButton {
 			/** texture height to read the button */
 			int readButton = (!enabled?28:(isHovered==2?14:0));
 			int halfWidth = width / 2;
-			drawTexturedModalRect(xPosition, yPosition, textureX, textureY + readButton, halfWidth, height);
-			drawTexturedModalRect(xPosition + halfWidth, yPosition, textureX + buttonWidth - halfWidth, textureY + readButton, halfWidth, height);
+			drawTexturedModalRect(x, y, textureX, textureY + readButton, halfWidth, height);
+			drawTexturedModalRect(x + halfWidth, y, textureX + buttonWidth - halfWidth, textureY + readButton, halfWidth, height);
 			this.mouseDragged(mc, mouseX, mouseY);
 			int j = 14737632;
 
@@ -46,7 +46,7 @@ public class ButtonRecycler extends GuiButton {
 			} else if (this.hovered) {
 				j = 16777120;
 			}
-			this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, j);
+			this.drawCenteredString(fontrenderer, this.displayString, this.x + this.width / 2, this.y + (this.height - 8) / 2, j);
 		}
 	}
 }

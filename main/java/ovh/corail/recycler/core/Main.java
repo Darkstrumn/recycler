@@ -2,8 +2,8 @@ package ovh.corail.recycler.core;
 
 import static ovh.corail.recycler.core.ModProps.MOD_ID;
 import static ovh.corail.recycler.core.ModProps.MOD_NAME;
-import static ovh.corail.recycler.core.ModProps.MOD_VER;
 import static ovh.corail.recycler.core.ModProps.MOD_UPDATE;
+import static ovh.corail.recycler.core.ModProps.MOD_VER;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;

@@ -17,7 +17,7 @@ public class AchievementHandler {
 	public static void initAchievements() {
 		addAchievement("placeRecycler", 0, 0, Main.itemAchievement001, null);
 		addAchievement("buildDisk", 1, 1, Main.diamond_disk, "placeRecycler");
-		addAchievement("firstRecycle", 2, 2, Items.field_191525_da, "buildDisk");
+		addAchievement("firstRecycle", 2, 2, Items.IRON_NUGGET, "buildDisk");
 		addAchievement("readRecyclingBook", -1, -1, Items.BOOK, "placeRecycler");
 
 	}
