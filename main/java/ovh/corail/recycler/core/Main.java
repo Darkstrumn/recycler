@@ -5,6 +5,8 @@ import static ovh.corail.recycler.core.ModProps.MOD_NAME;
 import static ovh.corail.recycler.core.ModProps.MOD_UPDATE;
 import static ovh.corail.recycler.core.ModProps.MOD_VER;
 
+import java.io.File;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,14 +18,20 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import ovh.corail.recycler.block.BlockRecycler;
 import ovh.corail.recycler.handler.CommandHandler;
+import ovh.corail.recycler.handler.ConfigurationHandler;
 import ovh.corail.recycler.handler.EventHandler;
+import ovh.corail.recycler.handler.GuiHandler;
+import ovh.corail.recycler.handler.PacketHandler;
 import ovh.corail.recycler.handler.SoundHandler;
-import ovh.corail.recycler.item.ItemAchievement001;
+import ovh.corail.recycler.item.ItemAdvancement001;
 import ovh.corail.recycler.item.ItemDiamondDisk;
 import ovh.corail.recycler.item.ItemDiamondFragment;
 import ovh.corail.recycler.item.ItemRecyclingBook;
+import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 @Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VER, updateJSON = MOD_UPDATE, guiFactory = "ovh.corail." + MOD_ID + ".gui.GuiFactory")
 public class Main {
@@ -48,18 +56,29 @@ public class Main {
 	public static BlockRecycler recycler = new BlockRecycler();
 	public static ItemRecyclingBook recycling_book = new ItemRecyclingBook();
 	
-	public static ItemAchievement001 itemAchievement001 = new ItemAchievement001();
+	public static ItemAdvancement001 itemAchievement001 = new ItemAdvancement001();
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		//AchievementHandler.initAchievements();
 		MinecraftForge.EVENT_BUS.register(new EventHandler());
 		SoundHandler.registerSounds();
+		/** config */
+		ConfigurationHandler.loadConfig(new File(event.getModConfigurationDirectory(), ModProps.MOD_ID));
+		/** register items and blocks */
+		Helper.register();
+		/** register tileentities */
+		GameRegistry.registerTileEntity(TileEntityRecycler.class, "inventory");
+		/** packet handler */
+		PacketHandler.init();
+		/** load recycling recipes */
+		RecyclingManager.getInstance().loadRecipes();
 		proxy.preInit(event);
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		/** gui handler */
+		NetworkRegistry.INSTANCE.registerGuiHandler(Main.instance, new GuiHandler());
 		proxy.init(event);
 	}
 

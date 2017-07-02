@@ -45,8 +45,6 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
 		world.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()));
 		EntityPlayer player = (EntityPlayer) placer;
-		// TODO Advancement
-		//player.addStat(AchievementHandler.getAchievement("placeRecycler"), 1);
 		/** place a recycling book in the recycler */
 		TileEntity tile = world.getTileEntity(pos);
 		if (world.getTileEntity(pos) != null && tile instanceof TileEntityRecycler) {

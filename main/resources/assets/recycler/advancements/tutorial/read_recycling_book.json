@@ -1,0 +1,24 @@
+{
+    "display": {
+        "icon": {
+            "item": "minecraft:book"
+        },
+        "title": {
+            "translate": "advancement.read_recycling_book.title"
+        },
+        "description": {
+            "translate": "advancement.read_recycling_book.desc"
+        },
+		"frame": "challenge",
+		"hidden": false
+    },
+	"parent": "recycler:tutorial/place_recycler",
+    "criteria": {
+      "coded_trigger": {
+        "trigger": "minecraft:impossible"
+      }
+    },
+	"requirements": [
+      [  "coded_trigger" ]
+    ]
+}

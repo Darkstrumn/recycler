@@ -8,6 +8,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class RecycleMessage implements IMessage {
@@ -48,8 +49,8 @@ public class RecycleMessage implements IMessage {
 					switch (message.id) {
 					case 0: // Recycle
 						recycler.recycle(null);
-						// TODO Advancement
-						//ctx.getServerHandler().player.addStat(AchievementHandler.getAchievement("firstRecycle"), 1);
+						/** advancement first_recycle */
+						Helper.grantAdvancement(ctx.getServerHandler().player, "tutorial/first_recycle");
 						break;
 					}
 				}

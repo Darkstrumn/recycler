@@ -1,0 +1,24 @@
+{
+    "display": {
+        "icon": {
+            "item": "minecraft:iron_nugget"
+        },
+        "title": {
+            "translate": "advancement.first_recycle.title"
+        },
+        "description": {
+            "translate": "advancement.first_recycle.desc"
+        },
+		"frame": "goal",
+		"hidden": false
+    },
+	"parent": "recycler:tutorial/build_disk",
+    "criteria": {
+      "coded_trigger": {
+        "trigger": "minecraft:impossible"
+      }
+    },
+	"requirements": [
+      [  "coded_trigger" ]
+    ]
+}

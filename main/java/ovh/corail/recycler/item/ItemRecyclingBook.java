@@ -7,6 +7,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import ovh.corail.recycler.core.Helper;
 import ovh.corail.recycler.core.Main;
 
 public class ItemRecyclingBook extends Item {
@@ -21,13 +22,13 @@ public class ItemRecyclingBook extends Item {
 	}
 	
 	@Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-		if (playerIn != null) {
-			// TODO Advancement
-			//playerIn.addStat(AchievementHandler.getAchievement("readRecyclingBook"), 1);
-			playerIn.openGui(Main.instance, 1, worldIn, 0, 0, 0);
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand handIn) {
+		if (player != null) {
+			/** advancement read_recycling_book */
+			Helper.grantAdvancement(player, "tutorial/read_recycling_book");
+			player.openGui(Main.instance, 1, worldIn, 0, 0, 0);
 		}
-        return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
+        return new ActionResult(EnumActionResult.SUCCESS, player.getHeldItem(handIn));
     }
 	
 	@Override

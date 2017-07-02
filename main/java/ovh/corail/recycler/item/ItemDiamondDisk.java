@@ -3,7 +3,6 @@ package ovh.corail.recycler.item;
 import java.util.List;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
@@ -36,10 +35,5 @@ public class ItemDiamondDisk extends Item {
 	public void addInformation(ItemStack stack, World world, List list, ITooltipFlag flagIn) {
 		list.add(TextFormatting.WHITE + Helper.getTranslation("item." + name + ".desc"));
 	}
-	
-	@Override
-	public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
-		// TODO Advancement
-		//playerIn.addStat(AchievementHandler.getAchievement("buildDisk"), 1);
-	}
+
 }

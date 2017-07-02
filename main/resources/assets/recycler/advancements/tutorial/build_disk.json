@@ -1,0 +1,25 @@
+{
+    "display": {
+        "icon": {
+            "item": "recycler:diamond_disk"
+        },
+        "title": {
+            "translate": "advancement.build_disk.title"
+        },
+        "description": {
+            "translate": "advancement.build_disk.desc"
+        },
+		"frame": "task",
+		"hidden": false
+    },
+	"parent": "recycler:tutorial/place_recycler",
+    "criteria": {
+      "build_disk": {
+        "trigger": "minecraft:inventory_changed",
+		"item": "recycler:diamond_disk"
+      }
+    },
+	"requirements": [
+      [  "build_disk" ]
+    ]
+}

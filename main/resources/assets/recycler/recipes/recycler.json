@@ -1,0 +1,20 @@
+{
+  "type": "forge:ore_shaped",
+  "group": "recycler:recipes",
+  "pattern": [
+    "000",
+	"111",
+	"000"
+  ],
+  "key": {
+    "0": {
+      "item": "#COBBLESTONE"
+    },
+	"1": {
+      "item": "#IRON_INGOT"
+    }
+  },
+  "result": {
+    "item": "recycler:recycler"
+  }
+}

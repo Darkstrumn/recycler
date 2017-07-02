@@ -1,0 +1,17 @@
+{
+  "type": "forge:ore_shaped",
+  "group": "recycler:recipes",
+  "pattern": [
+    "000",
+	"000",
+	"000"
+  ],
+  "key": {
+    "0": {
+      "item": "recycler:diamond_fragment"
+    }
+  },
+  "result": {
+    "item": "minecraft:diamond"
+  }
+}

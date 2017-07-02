@@ -1,0 +1,25 @@
+{
+    "display": {
+        "icon": {
+            "item": "recycler:advancement_001"
+        },
+        "title": {
+            "translate": "advancement.place_recycler.title"
+        },
+        "description": {
+            "translate": "advancement.place_recycler.desc"
+        },
+		"frame": "challenge",
+		"hidden": false
+    },
+	"parent": "recycler:tutorial/root",
+    "criteria": {
+      "place_recycler": {
+        "trigger": "minecraft:placed_block",
+		"block": "recycler:recycler"
+      }
+    },
+	"requirements": [
+      [  "place_recycler" ]
+    ]
+}

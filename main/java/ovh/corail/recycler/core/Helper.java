@@ -5,27 +5,52 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementManager;
+import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class Helper {
 	private static Random random = new Random();
 	
 	public static int getRandom(int min, int max) {
 		return random.nextInt(max - min + 1) + min;
+	}
+	
+	public static boolean grantAdvancement(EntityPlayer player, String name) {
+		return grantAdvancement(player, ModProps.MOD_ID, name);
+	}
+	
+	public static boolean grantAdvancement(EntityPlayer player, String domain, String name) {
+		if (player == null) { return false; }
+		if (player.world.isRemote) { return true; }
+		PlayerList playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
+		EntityPlayerMP player_mp = playerList.getPlayerByUUID(player.getUniqueID());
+		AdvancementManager am = player_mp.getServerWorld().getAdvancementManager();
+		Advancement advancement = am.getAdvancement(new ResourceLocation(domain, name));
+		if (advancement == null) { return false; }
+		AdvancementProgress advancementprogress = player_mp.getAdvancements().getProgress(advancement);
+        if (!advancementprogress.isDone()) {
+        	for (String criteria : advancementprogress.getRemaningCriteria()) {
+                player_mp.getAdvancements().grantCriterion(advancement, criteria);
+            }
+        }
+		return true;
 	}
 	
 	public static boolean areItemEqual(ItemStack s1, ItemStack s2) {
@@ -199,33 +224,4 @@ public class Helper {
 		ForgeRegistries.ITEMS.register(item);
 	}
 
-	public static void getNewRecipes() {
-		ResourceLocation group = new ResourceLocation(ModProps.MOD_ID, "recipes");
-		/** nugget => ingot */
-		ShapedOreRecipe recipe_diamond_ingot = new ShapedOreRecipe(group, new ItemStack(Items.DIAMOND, 1), new Object[] { "000", "000", "000",  
-			Character.valueOf('0'), new ItemStack(Main.diamond_fragment, 1, 0),
-		});
-		recipe_diamond_ingot.setRegistryName(new ResourceLocation(ModProps.MOD_ID, "recipe_diamond_ingot"));
-		ForgeRegistries.RECIPES.register(recipe_diamond_ingot);
-		/** ingot => nugget */
-		ShapedOreRecipe recipe_diamond_fragment = new ShapedOreRecipe(group, new ItemStack(Main.diamond_fragment, 9), new Object[] { "0", 
-			Character.valueOf('0'), new ItemStack(Items.DIAMOND, 1), 
-		});
-		recipe_diamond_fragment.setRegistryName(new ResourceLocation(ModProps.MOD_ID, "recipe_diamond_fragment"));
-		ForgeRegistries.RECIPES.register(recipe_diamond_fragment);
-		/** recycler recipe */
-		ShapedOreRecipe recipe_recycler = new ShapedOreRecipe(group, new ItemStack(Main.recycler, 1), new Object[] { "000", "111", "000", 
-			Character.valueOf('0'),	"cobblestone",  
-			Character.valueOf('1'), "ingotIron", 
-		});
-		recipe_recycler.setRegistryName(new ResourceLocation(ModProps.MOD_ID, "recipe_recycler"));
-		ForgeRegistries.RECIPES.register(recipe_recycler);
-		/** diamond disk recipe */
-		ShapedOreRecipe recipe_diamond_disk = new ShapedOreRecipe(group, new ItemStack(Main.diamond_disk, 1), new Object[] { " 0 ", "010", " 0 ", 
-			Character.valueOf('0'), Main.diamond_fragment,
-			Character.valueOf('1'), "ingotIron", 
-		});
-		recipe_diamond_disk.setRegistryName(new ResourceLocation(ModProps.MOD_ID, "recipe_diamond_disk"));
-		ForgeRegistries.RECIPES.register(recipe_diamond_disk);
-	}
 }

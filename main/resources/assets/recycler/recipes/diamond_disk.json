@@ -1,0 +1,20 @@
+{
+  "type": "forge:ore_shaped",
+  "group": "recycler:recipes",
+  "pattern": [
+    " 0 ",
+	"010",
+	" 0 "
+  ],
+  "key": {
+    "0": {
+      "item": "recycler:diamond_fragment"
+    },
+	"1": {
+      "item": "#IRON_INGOT"
+    }
+  },
+  "result": {
+    "item": "recycler:diamond_disk"
+  }
+}

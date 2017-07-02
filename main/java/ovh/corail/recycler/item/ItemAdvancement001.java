@@ -2,10 +2,10 @@ package ovh.corail.recycler.item;
 
 import net.minecraft.item.Item;
 
-public class ItemAchievement001 extends Item {
-	private static final String name = "achievement_001";
+public class ItemAdvancement001 extends Item {
+	private static final String name = "advancement_001";
 
-	public ItemAchievement001() {
+	public ItemAdvancement001() {
 		super();
 		setRegistryName(name);
 		setUnlocalizedName(name);
