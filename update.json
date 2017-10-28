@@ -1,5 +1,5 @@
 {
-  "homepage": "https://minecraft.curseforge.com/projects/corail-recycler/files/",
+  "homepage": "https://minecraft.curseforge.com/projects/corail-recycler",
   "1.12": {
     "1.4.6": "First version for 1.12, with same changes as others versions. Advancements are disabled and commands hasn't been tested",
 	"1.4.6.001": "Update to last forge changes (registry)",
