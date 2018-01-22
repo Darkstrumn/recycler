@@ -1,9 +1,11 @@
 package ovh.corail.recycler.core;
 
+import static ovh.corail.recycler.core.ModProps.MC_ACCEPT;
 import static ovh.corail.recycler.core.ModProps.MOD_ID;
 import static ovh.corail.recycler.core.ModProps.MOD_NAME;
 import static ovh.corail.recycler.core.ModProps.MOD_UPDATE;
 import static ovh.corail.recycler.core.ModProps.MOD_VER;
+import static ovh.corail.recycler.core.ModProps.ROOT;
 
 import java.io.File;
 
@@ -33,17 +35,17 @@ import ovh.corail.recycler.item.ItemDiamondFragment;
 import ovh.corail.recycler.item.ItemRecyclingBook;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
-@Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VER, updateJSON = MOD_UPDATE, guiFactory = "ovh.corail." + MOD_ID + ".gui.GuiFactory")
+@Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VER, acceptedMinecraftVersions = MC_ACCEPT, updateJSON = MOD_UPDATE, guiFactory = ROOT + ".gui.GuiFactory")
 public class Main {
 	@Instance(MOD_ID)
 	public static Main instance;
-	@SidedProxy(clientSide = "ovh.corail." + MOD_ID + ".core.ClientProxy", serverSide = "ovh.corail." + MOD_ID + ".core.CommonProxy")
+	@SidedProxy(clientSide = ROOT + ".core.ClientProxy", serverSide = ROOT + ".core.CommonProxy")
 	public static CommonProxy proxy;
 	
 	public static CreativeTabs tabRecycler = new CreativeTabs(MOD_ID) {
 		@Override
 		public ItemStack getTabIconItem() {
-			return new ItemStack(Item.getItemFromBlock(Main.recycler),1);
+			return new ItemStack(Item.getItemFromBlock(Main.recycler));
 		}
 
 		@Override
@@ -70,13 +72,13 @@ public class Main {
 		GameRegistry.registerTileEntity(TileEntityRecycler.class, "inventory");
 		/** packet handler */
 		PacketHandler.init();
-		/** load recycling recipes */
-		RecyclingManager.getInstance().loadRecipes();
 		proxy.preInit(event);
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		/** load recycling recipes */
+		RecyclingManager.getInstance().loadRecipes();
 		/** gui handler */
 		NetworkRegistry.INSTANCE.registerGuiHandler(Main.instance, new GuiHandler());
 		proxy.init(event);

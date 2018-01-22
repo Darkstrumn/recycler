@@ -1,39 +1,35 @@
 {
   "homepage": "https://minecraft.curseforge.com/projects/corail-recycler",
-  "1.12": {
-    "1.4.6": "First version for 1.12, with same changes as others versions. Advancements are disabled and commands hasn't been tested",
-	"1.4.6.001": "Update to last forge changes (registry)",
+  "1.12.2": {
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation",
-	"1.4.8": "crafting recipes in json format, advancements (tutorial part)"
+	"1.4.8": "crafting recipes in json format, advancements (tutorial part)",
+	"1.4.9": "fix for commands"
+  },
+  "1.12.1": {
+	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation",
+	"1.4.8": "crafting recipes in json format, advancements (tutorial part)",
+	"1.4.9": "fix for commands"
   },
   "1.11.2": {
-    "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes",
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation"
   },
   "1.10.2": {
-    "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes",
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation"
   },
   "1.9.4": {
-    "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes",
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation"
   },
   "1.9.0": {
-    "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes",
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation"
   },
   "1.8.9": {
-    "1.4.5": "Fix the achievements on Server, release updater",
-    "1.4.6": "fix issue #8 about command /recycler exportCraftingRecipes",
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation"
   },
   "promos": {
-    "1.12-latest": "1.4.8",
-    "1.12-recommended": "1.4.8",
+    "1.12.2-latest": "1.4.9",
+    "1.12.2-recommended": "1.4.9",
+    "1.12.1-latest": "1.4.9",
+    "1.12.1-recommended": "1.4.9",
     "1.11.2-latest": "1.4.7",
     "1.11.2-recommended": "1.4.7",
 	"1.10.2-latest": "1.4.7",

@@ -15,7 +15,7 @@
 	"parent": "recycler:tutorial/root",
     "criteria": {
       "place_recycler": {
-        "trigger": "minecraft:placed_block",
+        "trigger": "minecraft:inventory_changed",
 		"block": "recycler:recycler"
       }
     },

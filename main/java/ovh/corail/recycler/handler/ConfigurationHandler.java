@@ -10,7 +10,7 @@ public class ConfigurationHandler {
 	public static Configuration config;
 	private static File configDir;
 
-	public static boolean unbalancedRecipes, onlyUserRecipes, allowCommand, recycleMagicItem, recycleEnchantedBook, allowSound;
+	public static boolean unbalancedRecipes, onlyUserRecipes, recycleMagicItem, recycleEnchantedBook, allowSound;
 	public static int chanceLoss;
 	
 	private ConfigurationHandler() {
@@ -29,7 +29,6 @@ public class ConfigurationHandler {
 	public static void refreshConfig() {
 		unbalancedRecipes=config.getBoolean("unbalancedRecipes", config.CATEGORY_GENERAL, false, Helper.getTranslation("config.unbalancedRecipes"));
 		onlyUserRecipes=config.getBoolean("onlyUserRecipes", config.CATEGORY_GENERAL, false, Helper.getTranslation("config.onlyUserRecipes"));
-		allowCommand=config.getBoolean("allowCommand", config.CATEGORY_GENERAL, true, Helper.getTranslation("config.allowCommand"));
 		recycleMagicItem=config.getBoolean("recycleMagicItem", config.CATEGORY_GENERAL, true, Helper.getTranslation("config.recycleMagicItem"));
 		recycleEnchantedBook=config.getBoolean("recycleEnchantedBook", config.CATEGORY_GENERAL, true, Helper.getTranslation("config.recycleEnchantedBook"));
 		chanceLoss=config.getInt("chanceLoss", config.CATEGORY_GENERAL, 0, 0, 100, Helper.getTranslation("config.chanceLoss"));

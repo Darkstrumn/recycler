@@ -33,7 +33,6 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 		setRegistryName(name);
 		setUnlocalizedName(name);
 		setCreativeTab(Main.tabRecycler);
-		isBlockContainer = true;
 		setHardness(2.0f);
 		setResistance(10.0f);
 		setLightLevel(0f);
