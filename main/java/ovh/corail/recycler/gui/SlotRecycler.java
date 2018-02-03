@@ -3,7 +3,7 @@ package ovh.corail.recycler.gui;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.ModRecycler;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 
@@ -35,7 +35,7 @@ public class SlotRecycler extends Slot {
 	@Override
 	public void onSlotChanged() {
 		super.onSlotChanged();
-		Main.proxy.updateRecyclingScreen();
+		ModRecycler.proxy.updateRecyclingScreen();
 		
 	}
 }

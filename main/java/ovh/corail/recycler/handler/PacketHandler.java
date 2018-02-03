@@ -2,7 +2,7 @@ package ovh.corail.recycler.handler;
 
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
-import ovh.corail.recycler.core.ModProps;
+import ovh.corail.recycler.ModProps;
 import ovh.corail.recycler.packet.ClientProgressMessage;
 import ovh.corail.recycler.packet.ClientWorkingMessage;
 import ovh.corail.recycler.packet.RecycleMessage;

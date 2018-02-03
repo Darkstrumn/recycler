@@ -3,8 +3,8 @@ package ovh.corail.recycler.handler;
 import java.io.File;
 
 import net.minecraftforge.common.config.Configuration;
+import ovh.corail.recycler.ModProps;
 import ovh.corail.recycler.core.Helper;
-import ovh.corail.recycler.core.ModProps;
 
 public class ConfigurationHandler {
 	public static Configuration config;

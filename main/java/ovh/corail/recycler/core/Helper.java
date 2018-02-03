@@ -8,25 +8,20 @@ import com.google.common.collect.Lists;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementManager;
 import net.minecraft.advancements.AdvancementProgress;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import ovh.corail.recycler.ModProps;
+import ovh.corail.recycler.ModRecycler;
 
 public class Helper {
-	private static Random random = new Random();
+	public final static Random random = new Random();
 	
 	public static int getRandom(int min, int max) {
 		return random.nextInt(max - min + 1) + min;
@@ -39,8 +34,7 @@ public class Helper {
 	public static boolean grantAdvancement(EntityPlayer player, String domain, String name) {
 		if (player == null) { return false; }
 		if (player.world.isRemote) { return true; }
-		PlayerList playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
-		EntityPlayerMP player_mp = playerList.getPlayerByUUID(player.getUniqueID());
+		EntityPlayerMP player_mp = (EntityPlayerMP)player;
 		AdvancementManager am = player_mp.getServerWorld().getAdvancementManager();
 		Advancement advancement = am.getAdvancement(new ResourceLocation(domain, name));
 		if (advancement == null) { return false; }
@@ -53,6 +47,7 @@ public class Helper {
 		return true;
 	}
 	
+	// TODO
 	public static boolean areItemEqual(ItemStack s1, ItemStack s2) {
 		return s1.isItemEqual(s2) && s1.getMetadata() == s2.getMetadata();
 	}
@@ -168,8 +163,16 @@ public class Helper {
 	}
 	
 	public static void sendLog(String message) {
-		boolean develop = false;
-		if (develop) {
+		sendLog(message, false);
+	}
+	
+	public static void sendLog(String message, boolean translate) {
+		if (translate) {
+			message = Helper.getTranslation(message);
+		}
+		if (ModRecycler.logger != null) {
+			ModRecycler.logger.info(message);
+		} else {
 			System.out.println(message);
 		}
 	}
@@ -178,50 +181,7 @@ public class Helper {
 		return I18n.translateToLocal(message);
 	}
 
-	public static void render() {
-		/** blocks */
-		render(Main.recycler);
-		/** items */
-		render(Main.diamond_fragment);
-		render(Main.diamond_disk);
-		render(Main.itemAchievement001);
-		render(Main.recycling_book);
+	public static String getTranslation(String message, Object... format) {
+		return I18n.translateToLocalFormatted(message, format);
 	}
-
-	private static void render(Block block) {
-		render(Item.getItemFromBlock(block), 0);
-	}
-	
-	private static void render(Item item) {
-		render(item, 0);
-	}
-
-	private static void render(Block block, int meta) {
-		render(Item.getItemFromBlock(block), meta);
-	}
-	
-	private static void render(Item item, int meta) {
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, meta,
-				new ModelResourceLocation(item.getRegistryName(), "inventory"));
-	}
-	
-	public static void register() {
-		/** blocks */
-		register(Main.recycler);
-		/** items */
-		register(Main.diamond_fragment);
-		register(Main.diamond_disk);
-		register(Main.itemAchievement001);
-		register(Main.recycling_book);
-	}
-	
-	private static void register(Block block) {
-		ForgeRegistries.BLOCKS.register(block);
-		ForgeRegistries.ITEMS.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
-	}
-
-	private static void register(Item item) {
-		ForgeRegistries.ITEMS.register(item);
-	}
-
 }

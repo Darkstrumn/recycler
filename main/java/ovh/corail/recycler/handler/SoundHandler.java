@@ -3,7 +3,7 @@ package ovh.corail.recycler.handler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import ovh.corail.recycler.core.ModProps;
+import ovh.corail.recycler.ModProps;
 
 public class SoundHandler {
 	public static SoundEvent recycler, recycler_working;

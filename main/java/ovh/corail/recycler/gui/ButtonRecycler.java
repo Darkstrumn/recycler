@@ -5,7 +5,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import ovh.corail.recycler.core.ModProps;
+import ovh.corail.recycler.ModProps;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
 public class ButtonRecycler extends GuiButton {

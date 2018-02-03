@@ -1,7 +1,7 @@
 {
     "display": {
         "icon": {
-            "item": "recycler:advancement_001"
+            "item": "recycler:recycler"
         },
         "title": {
             "translate": "advancement.place_recycler.title"

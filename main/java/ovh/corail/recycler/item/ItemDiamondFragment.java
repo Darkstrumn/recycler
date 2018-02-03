@@ -1,7 +1,7 @@
 package ovh.corail.recycler.item;
 
 import net.minecraft.item.Item;
-import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.ModRecycler;
 
 public class ItemDiamondFragment extends Item {
 	private static final String name = "diamond_fragment";
@@ -10,7 +10,7 @@ public class ItemDiamondFragment extends Item {
 		super();
 		setRegistryName(name);
 		setUnlocalizedName(name);
-		setCreativeTab(Main.tabRecycler);
+		setCreativeTab(ModRecycler.tabRecycler);
 		setMaxStackSize(64);
 	}
 }

@@ -32,6 +32,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import ovh.corail.recycler.ModProps;
 import ovh.corail.recycler.handler.ConfigurationHandler;
 
 public class RecyclingManager {

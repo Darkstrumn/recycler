@@ -1,4 +1,4 @@
-package ovh.corail.recycler.core;
+package ovh.corail.recycler;
 
 public class ModProps {
 	public static final String MOD_ID = "recycler";

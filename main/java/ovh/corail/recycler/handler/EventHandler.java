@@ -2,7 +2,7 @@ package ovh.corail.recycler.handler;
 
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import ovh.corail.recycler.core.ModProps;
+import ovh.corail.recycler.ModProps;
 
 public class EventHandler {
 	@SubscribeEvent

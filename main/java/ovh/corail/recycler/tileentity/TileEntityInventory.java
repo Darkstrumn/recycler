@@ -14,7 +14,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
-import ovh.corail.recycler.core.Main;
+import ovh.corail.recycler.ModItems;
 
 public class TileEntityInventory extends TileEntity implements ISidedInventory {
 	public final int count = 20;
@@ -163,7 +163,7 @@ public class TileEntityInventory extends TileEntity implements ISidedInventory {
 
 	@Override
 	public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
-		return direction != EnumFacing.DOWN && ((index == 1 && stack.getItem() == Main.diamond_disk) || (index == 0 && stack.getItem() != Main.diamond_disk));
+		return direction != EnumFacing.DOWN && ((index == 1 && stack.getItem() == ModItems.diamond_disk) || (index == 0 && stack.getItem() != ModItems.diamond_disk));
 	}
 	
 	@Override

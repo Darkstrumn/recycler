@@ -9,8 +9,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ovh.corail.recycler.ModRecycler;
 import ovh.corail.recycler.core.Helper;
-import ovh.corail.recycler.core.Main;
 
 public class ItemDiamondDisk extends Item {
 	private static final String name = "diamond_disk";
@@ -19,7 +19,7 @@ public class ItemDiamondDisk extends Item {
 		super();
 		setRegistryName(name);
 		setUnlocalizedName(name);
-		setCreativeTab(Main.tabRecycler);
+		setCreativeTab(ModRecycler.tabRecycler);
 		setMaxStackSize(1);
 		setMaxDamage(5000);
 	}

@@ -7,8 +7,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import ovh.corail.recycler.ModRecycler;
 import ovh.corail.recycler.core.Helper;
-import ovh.corail.recycler.core.Main;
 
 public class ItemRecyclingBook extends Item {
 	private static final String name = "recycling_book";
@@ -17,18 +17,18 @@ public class ItemRecyclingBook extends Item {
 		super();
 		setRegistryName(name);
 		setUnlocalizedName(name);
-		setCreativeTab(Main.tabRecycler);
+		setCreativeTab(ModRecycler.tabRecycler);
 		setMaxStackSize(1);
 	}
 	
 	@Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand handIn) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		if (player != null) {
 			/** advancement read_recycling_book */
 			Helper.grantAdvancement(player, "tutorial/read_recycling_book");
-			player.openGui(Main.instance, 1, worldIn, 0, 0, 0);
+			player.openGui(ModRecycler.instance, 1, world, 0, 0, 0);
 		}
-        return new ActionResult(EnumActionResult.SUCCESS, player.getHeldItem(handIn));
+        return new ActionResult(EnumActionResult.SUCCESS, player.getHeldItem(hand));
     }
 	
 	@Override

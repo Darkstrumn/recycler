@@ -1,10 +1,8 @@
 package ovh.corail.recycler.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
@@ -15,16 +13,20 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import ovh.corail.recycler.core.Main;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import ovh.corail.recycler.ModItems;
+import ovh.corail.recycler.ModRecycler;
 import ovh.corail.recycler.tileentity.TileEntityRecycler;
 
-public class BlockRecycler extends Block implements ITileEntityProvider {
-	private static final PropertyDirection FACING = PropertyDirection.create("facing");
+public class BlockRecycler<TE extends TileEntityRecycler> extends Block {
+	private static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 	public static final PropertyBool ENABLED = PropertyBool.create("enabled");
 	private static String name = "recycler";
 
@@ -32,85 +34,104 @@ public class BlockRecycler extends Block implements ITileEntityProvider {
 		super(Material.ROCK);
 		setRegistryName(name);
 		setUnlocalizedName(name);
-		setCreativeTab(Main.tabRecycler);
-		setHardness(2.0f);
-		setResistance(10.0f);
+		setCreativeTab(ModRecycler.tabRecycler);
+		setHardness(5f);
+		setResistance(20f);
 		setLightLevel(0f);
+		setLightOpacity(255);
+		setHarvestLevel("pickaxe", 0);
 		blockSoundType = SoundType.STONE;
-		setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(ENABLED, false));
-	}
-	
-	@Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-		world.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()));
-		EntityPlayer player = (EntityPlayer) placer;
-		/** place a recycling book in the recycler */
-		TileEntity tile = world.getTileEntity(pos);
-		if (world.getTileEntity(pos) != null && tile instanceof TileEntityRecycler) {
-			TileEntityRecycler recycler = (TileEntityRecycler) world.getTileEntity(pos);
-			recycler.setInventorySlotContents(2, new ItemStack(Main.recycling_book, 1, 0));
-		}
-		
-    }
-	
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] { FACING, ENABLED });
-	}
-	
-	@Override
-	public int getMetaFromState(IBlockState state) {
-		return state.getValue(FACING).getIndex() + (state.getValue(ENABLED) ? 8 : 0);
-	}
-	
-	@Override
-    public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(FACING, EnumFacing.getFront(meta & 7)).withProperty(ENABLED, (meta & 8) != 0);
-    }
-	
-	@Override
-	public EnumBlockRenderType getRenderType(IBlockState iBlockState) {
-		return EnumBlockRenderType.MODEL;
+		setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(ENABLED, false));
 	}
 	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-		super.onBlockActivated(world, pos, state, player, hand, side, hitX, hitY, hitZ);
 		if (!world.isRemote) {
-			if (player instanceof EntityPlayer) {
-				player.openGui(Main.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
-			}
+			player.openGui(ModRecycler.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
 		}
-
 		return true;
 	}
-
-	@Override
-	public int tickRate(World world) {
-		return 1;
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileEntityRecycler();
-	}   
     
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		TileEntity tileentity = world.getTileEntity(pos);
-		if (tileentity instanceof TileEntityRecycler) {
-			InventoryHelper.dropInventoryItems(world, pos, (IInventory) tileentity);
-			world.updateComparatorOutputLevel(pos, this);
+		TE tile = getTileEntity(world, pos);
+		if (tile != null) {
+			InventoryHelper.dropInventoryItems(world, pos, (IInventory) tile);
 			world.removeTileEntity(pos);
 		}
 		super.breakBlock(world, pos, state);
 	}
 	
-	/** block container implement */
 	@Override
-    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
-        super.eventReceived(state, worldIn, pos, id, param);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack stack) {
+		world.setBlockState(pos, state.withProperty(FACING, entity.getHorizontalFacing().getOpposite()), 3);
+		EntityPlayer player = (EntityPlayer) entity;
+		/* place a recycling book in the recycler */
+		TileEntity tile = world.getTileEntity(pos);
+		if (world.getTileEntity(pos) != null && tile instanceof TileEntityRecycler) {
+			TileEntityRecycler recycler = (TileEntityRecycler) world.getTileEntity(pos);
+			recycler.setInventorySlotContents(2, new ItemStack(ModItems.recycling_book, 1, 0));
+		}
+		
     }
+	
+	/*@Override
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing facing) {
+		return facing == EnumFacing.DOWN ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
+	}
+	
+	@Override
+	public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+		return side == EnumFacing.DOWN;
+	}*/
+	
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return true;
+	}
+
+	@Override
+	public boolean isOpaqueCube(IBlockState state) {
+		return true;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT;
+	}
+	
+	@Override
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+		return EnumBlockRenderType.MODEL;
+	}
+
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, FACING, ENABLED);
+	}
+
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		return getDefaultState().withProperty(FACING, EnumFacing.HORIZONTALS[meta & 3]).withProperty(ENABLED, (meta & 8) != 0);
+	}
+
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(FACING).getIndex() + (state.getValue(ENABLED) ? 8 : 0);
+	}
+
+	@Override
+	public TE createTileEntity(World world, IBlockState state) {
+		return (TE) new TileEntityRecycler();
+	}
+	
+	
+	public TE getTileEntity(World world, BlockPos pos) {
+		return (TE)world.getTileEntity(pos);
+	}
+
+	@Override
+	public boolean hasTileEntity(IBlockState state) {
+		return true;
+	}
 }
