@@ -8,27 +8,25 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "1.4.9-1.12"
+
+version = "1.5.0-1.12"
 group = "ovh.corail" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "recycler"
 
-sourceCompatibility = targetCompatibility = '1.8'
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
 }
 
 minecraft {
-    version = "1.12.2-14.23.1.2600"
+    version = "1.12.2-14.23.2.2611"
     runDir = "run"
-    mappings = "snapshot_20180120"
+    mappings = "snapshot_20180208"
     makeObfSourceJar = true
 }
-repositories {
-    maven {
-        url "https://minecraft.curseforge.com/api/maven/"
-    }
-}
+
 dependencies {
 }
 

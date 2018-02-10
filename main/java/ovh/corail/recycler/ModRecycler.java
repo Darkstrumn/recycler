@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import ovh.corail.recycler.core.CommonProxy;
 import ovh.corail.recycler.core.RecyclingManager;
 import ovh.corail.recycler.handler.CommandHandler;
@@ -69,6 +70,7 @@ public class ModRecycler {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		OreDictionary.registerOre("nuggetDiamond", ModItems.diamond_fragment);
 		/** load recycling recipes */
 		RecyclingManager.getInstance().loadRecipes();
 		/** gui handler */

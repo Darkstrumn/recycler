@@ -8,7 +8,8 @@
   ],
   "key": {
     "0": {
-      "item": "recycler:diamond_fragment"
+      "type":"forge:ore_dict",
+	  "ore":"nuggetDiamond"
     }
   },
   "result": {
