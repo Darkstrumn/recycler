@@ -3,12 +3,14 @@
   "1.12.2": {
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation",
 	"1.4.8": "crafting recipes in json format, advancements (tutorial part)",
-	"1.4.9": "fix for commands"
+	"1.4.9": "fix for commands",
+	"1.5.0": "add the diamond fragment to OreDictionary (and adapt the recipes)"
   },
   "1.12.1": {
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation",
 	"1.4.8": "crafting recipes in json format, advancements (tutorial part)",
-	"1.4.9": "fix for commands"
+	"1.4.9": "fix for commands",
+	"1.5.0": "add the diamond fragment to OreDictionary (and adapt the recipes)"
   },
   "1.11.2": {
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation"
@@ -26,10 +28,10 @@
 	"1.4.7": "allow to separate enchantments from an enchanted book (with an option to disable it), improve russian translation"
   },
   "promos": {
-    "1.12.2-latest": "1.4.9",
-    "1.12.2-recommended": "1.4.9",
-    "1.12.1-latest": "1.4.9",
-    "1.12.1-recommended": "1.4.9",
+    "1.12.2-latest": "1.5.0",
+    "1.12.2-recommended": "1.5.0",
+    "1.12.1-latest": "1.5.0",
+    "1.12.1-recommended": "1.5.0",
     "1.11.2-latest": "1.4.7",
     "1.11.2-recommended": "1.4.7",
 	"1.10.2-latest": "1.4.7",
